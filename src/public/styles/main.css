@@ -1,0 +1,278 @@
+body{
+    margin: 0px;
+    padding: 0px;
+    font-family: 'mplus-medium';
+}
+.container{
+    margin-top: 100px;
+    text-align: center;
+}
+.site-item{
+    margin-left:  50px;
+    margin-right: 50px;
+}
+#top{
+    display: flex;
+    justify-content: left;
+}
+#top-title{
+    position: absolute;
+    left: 40%;
+}
+@media screen and (max-width: 600px) {
+    #top{
+        display: block;
+    }
+    #top-title{
+        position: inherit;
+        width: 100%;
+        text-align: center;
+        font-size: 20px;
+    }
+    .container{
+        margin-top: 50px;
+    }
+    .animation-btn ,#top-btn{
+        width: 95%;
+    }
+}
+
+/* Bellow code is using to read-qr.js */
+#read-qr{
+    display: flex;
+
+    height: 100%;
+}
+
+.animation-btn{
+
+    width: 125px;
+    height: 50px;
+    background-color: white;
+
+    margin-top:  20px;
+    margin-left:  10px;
+    margin-right: 10px;
+
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 25px;
+
+}
+
+.animation-btn:hover, .animation-btn:active{
+    background-color: rgb(0, 0, 0);
+    color: white;
+}
+
+.site-image{
+    width: 150px;
+    height: 150px;
+    padding: 5px;
+    margin-top: 50px;
+
+    transition: background-color 500ms;
+
+}
+.site-image:hover, .site-image:active{
+    background-color: rgb(200, 200, 200);
+}
+.drawingBuffer{
+    margin: auto;
+}
+
+.buttons{
+    display: flex;
+    text-align: center;
+    margin-top: 20px;
+
+    flex-flow: column;
+
+    margin-left: 50px;
+}
+
+#set-mode-btn{
+    width: 100px;
+    height: 100px;
+    
+    margin: 15px;
+}
+
+#interactive{
+    margin-left:  20%;
+}
+
+.drawRect, #interactive{
+    position: absolute;
+}
+
+.drawRect{
+    width: 400px;
+    height: 200px;
+    
+    top: 275px;
+    left: 625px;
+    
+    border-style: solid;
+    border-width: 3px;
+    
+    background-color: none;
+    border-color: chartreuse;    
+    
+    /* margin-left: 31%; */
+}
+
+#read-view{
+    margin-top: 20px;
+}
+
+.mode-button{
+    width: 150px;
+    height: 75px;
+
+    margin-left: 10px;
+    margin-right: 10px;
+
+    border-radius: 20px;
+    border-style: none;
+
+    font-size: 22px;
+    color: white;
+}
+
+#under{
+    margin-top: 550px;
+}
+
+/* Bellow code were writted for genalateCard.ejs　*/
+
+.top{
+    text-align: left;
+    margin-left: 55px;
+}
+#genelate-card-form{
+    margin: auto;
+    width: 250px;
+    height: 350px;
+
+    display: flex;
+    flex-flow: column;
+
+    text-align: left;
+
+}
+.form-txtbox{
+    width: 250px;
+    height: 25px;
+    margin-top: 15px;
+}
+.form-label{
+    font-size: 16px;
+}
+#form-submit{
+    
+    padding-top:    20px;
+    padding-bottom: 20px;
+    padding-left:  30px;
+    padding-right: 30px;
+    
+    background-color: gainsboro;
+
+    margin: auto;
+    margin-top: 25px;
+
+    border-radius: 10px;
+    border-style: none;
+
+    font-size: 18px;
+}
+
+#image{
+    margin-top: 15px;
+}
+
+#card{
+    display: block;
+    margin: auto;
+
+    margin-top: 25px;
+
+    border-style: solid;
+    border-width: 0.5px;
+}
+
+/* Bellow code writing for bookView page */
+
+#table{
+    margin: auto;
+    margin-top: 25px;
+}
+
+#table th{
+    padding: 10px;
+    padding-left:  60px;
+    padding-right: 60px;
+}
+#table td{
+    text-align: center;
+}
+
+.search{
+    margin: auto;
+    width:  300px;
+    height: 50px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    
+    text-align: center;
+}
+
+/* Bellow code writing for edit page  */
+
+#edit-form{
+    text-align: center;
+}
+
+#book-id{
+    height: 20px;
+}
+
+.edit-submit{
+    margin: 15px;
+    width: 100px;
+    height: 30px;
+}
+
+#edit-delete{
+    background-color: rgb(251, 64, 64);
+    color: white;
+    border: none;
+
+    border-radius: 2.5px;
+}
+
+/* Bellow code writing for registerBook page */
+
+.form-group{
+    width: 300px;
+    height: 25px;
+    
+    margin: auto;
+    padding-left: 100px;
+    margin-top:    20px;
+    margin-bottom: 20px;
+    
+    text-align: left;
+}
+#submit-btn{
+    margin-top: 10px;
+    width: 100px;
+    height: 30px;
+
+    font-size: 16px;
+}
+
+.form-item{
+    width: 200px;
+    height: 25px;
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カード発行ページ</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/fonts/fonts.css">
+    <meta name="robots" content="noindex" />
+    
+</head>
+<body>
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/bookTable.js"></script>
+    
+    <%- include('header') %>
+    <div id="main">
+        <button class="animation-btn" onclick="location.href = '/main' ">←戻る</button>
+
+        <!-- <div class="search">
+            <label>検索欄</label> <input placeholder="本の名前" id="searchBook" type="text"> <input value="検索" type="submit" onclick="">
+        </div> -->
+        
+        <div class="search">
+            <p>1/30</p>
+            <button class="change-view-button" id="back">前へ</button>
+            <button class="change-view-button" id="next">次へ</button>
+        </div>
+        <table id="table" border="1">
+
+            <tr>
+              <th>本の名前</th>
+              <th>本の著者</th>
+              <th>本のID</th>
+              <th>状態</th>
+              <th>メニュー</th>
+            </tr>
+        </table>
+
+
+        
+
+
+    </div>
+    <%- include('footer') %>
+
+</body>
+</html>
