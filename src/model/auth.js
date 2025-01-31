@@ -15,7 +15,7 @@ app.login = async (req, res) => {
     const { admin_id, admin_password } = req.body;
 
     if (!admin_id || !admin_password) {
-        return res.send('wrong');
+        return res.send('WRONG');
     }
 
     try {
@@ -42,7 +42,7 @@ app.login = async (req, res) => {
             
             return res.redirect('/main');
         } else {
-            return res.send('wrong');
+            return res.send('WRONG');
         }
 
     } catch (error) {

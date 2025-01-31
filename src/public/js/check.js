@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $('#login-btn').on('click', function(event) {
+    $('form').on('submit', function(event) {
         event.preventDefault(); // フォームのデフォルトの送信を防ぐ
 
         const id = $('#admin-id').val();
