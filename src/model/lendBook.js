@@ -31,9 +31,7 @@ app.lendBook = async (req, res) => {
         console.log(e.message);
         res.send(e.message)
     }
-    
     db.end();
-
 }
 
 module.exports = app;

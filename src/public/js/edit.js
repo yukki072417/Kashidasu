@@ -25,7 +25,7 @@ window.onload = () => {
 
             console.log(response[0]);
 
-            if(response[0].IS_LENDING) lockTextBox(response);
+            if(response[0].IS_LENDING) lockTextBox();
             else return;
 
         },
@@ -35,7 +35,7 @@ window.onload = () => {
     });
 }
 
-function lockTextBox(response){
+function lockTextBox(){
     const warningText = $('<p>貸出中は変更できません</p>').css('color', 'red');
     
     $('#writter').prop('disabled', true);

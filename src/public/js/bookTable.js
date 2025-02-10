@@ -56,9 +56,6 @@ function RequestSearchBook() {
     $.ajax({
         url: '/searchBook',
         type: 'POST',
-        headers: {
-            'CSRF-Token': $('meta[name="csrf-token"]').attr('content')
-        },
         data: JSON.stringify({
             "bookID": $('#searchBook').val(),
             "bookNum": currentPage,
@@ -103,7 +100,7 @@ function showTable(data) {
             .text('編集')
             .addClass('edit-btn')
             .on('click', () => {
-                const params = $.param({ id: bookID});
+                const params = $.param({ ID: bookID, BOOK_NAME:bookName, WRITTER:writter});
                 $.ajax({
                     url: `/edit?${params}`,
                     type: 'GET',
@@ -120,9 +117,6 @@ function showTable(data) {
 
             $row.append($('<td>').append($editButton));
             $('#table').append($row);
-
-            
-            
         }
     });
 }

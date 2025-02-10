@@ -17,9 +17,6 @@ router.use(express.json());
 
 // Show login page
 router.get('/login', (req, res) => {
-    // Developing now so define session
-    // req.session.admin_id = 1234567891;
-    // req.session.admin_authed = true;
 
     // Process when user logined
     if (req.session.admin_authed == true) {
