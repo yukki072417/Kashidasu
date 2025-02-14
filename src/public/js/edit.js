@@ -2,7 +2,10 @@ const bookNameTextBox = document.getElementsByName('book-name');
 const writterTextBox = document.getElementsByName('writter');
 
 const url_prams = new URL(window.location.href).searchParams;
-const bookID = url_prams.get('id');
+
+const bookID = url_prams.get('ID');
+const bookName = url_prams.get('BOOK_NAME');
+const bookWritter = url_prams.get('WRITTER');
 
 window.onload = () => {
     $.ajax({
@@ -19,14 +22,13 @@ window.onload = () => {
             const writter = $('#writter');
             const bookID = $('#book-id');
 
-            bookID.val(response[0].ID);
-            bookName.val(response[0].BOOK_NAME);
-            writter.val(response[0].WRITTER);
-
-            console.log(response[0]);
-
-            if(response[0].IS_LENDING) lockTextBox();
-            else return;
+            bookID.val(response.ID);
+            bookName.val(response.BOOK_NAME);
+            writter.val(response.WRITTER);
+            if(response.IS_LENDING)
+                lockTextBox();
+            else
+                return;
 
         },
         error: function(xhr, status, error) {
