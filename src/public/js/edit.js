@@ -18,23 +18,50 @@ window.onload = () => {
             "manualSearchMode": true
         }),
         success: function(response) {
-            const bookName = $('#book-name');
-            const writter = $('#writter');
-            const bookID = $('#book-id');
+            const bookName_textbox = $('#book-name');
+            const writter_textbox = $('#writter');
+            const bookID_textbox = $('#book-id');
 
-            bookID.val(response.ID);
-            bookName.val(response.BOOK_NAME);
-            writter.val(response.WRITTER);
+            bookID_textbox.val(response.ID);
+            bookName_textbox.val(response.BOOK_NAME);
+            writter_textbox.val(response.WRITTER);
             if(response.IS_LENDING)
                 lockTextBox();
             else
                 return;
-
         },
         error: function(xhr, status, error) {
             console.error('Error:', error);
         }
     });
+}
+
+function updateBook(){
+
+    const bookID = $('#book-id').val();
+    const bookName = $('#book-name').val();
+    const bookWritter = $('#writter').val();
+
+    $.ajax({
+        url: '/upload-book',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            "bookID": bookID,
+            "bookName": bookName,
+            "writter": bookWritter
+        }),
+        success: function(response) {
+
+
+            if(response.text = 'Sucsess');
+                alert('変更が適用されました');
+        },
+        error: function(xhr, status, error) {
+            alert('エラー発生:', error);
+        }
+    });
+
 }
 
 function lockTextBox(){
