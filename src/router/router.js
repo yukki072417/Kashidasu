@@ -2,7 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const router = express.Router();
 
-const genelate = require('../controller/generateCard');
+const genelate = require('../controller/outputCard');
 const authModel = require('../model/auth');
 const serachBook = require('../model/serachBook');
 const lendBook = require('../model/lendBook');
