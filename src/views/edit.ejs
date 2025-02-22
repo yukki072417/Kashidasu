@@ -16,11 +16,15 @@
     <%- include('header') %>
     <button class="animation-btn" onclick="location.href = '/book-view' ">←戻る</button>
     <div id="main">
-        <form method="post" action="/upload-book" id="edit-form">
-           <div style="display: flex; justify-content: center;"> <span>本のID:　</span><input type="text" id="book-id" name="bookID"></div>
+        <form id="edit-form">
+            <div style="display: flex; justify-content: center;">
+                <span>本のID:　</span>
+                <input type="text" id="book-id" name="bookID">
+            </div>
+        
            <label>本の名前</label> <input type="text" id="book-name" name='bookName' ><br>
            <label>本の著者</label> <input type="text" id="writter" name='writter' ><br>
-           <input type="submit" value="変更" class="edit-submit">
+           <input type="button" value="変更" onclick="updateBook()" class="edit-submit">
            <input type="button" value="削除" onclick="deleteBook()" id="edit-delete" class="edit-submit">
         </form>
     </div>
