@@ -91,7 +91,7 @@ async function detected(result) {
         bookBarcode = result;
 
         const response = await searchingExiestData(bookBarcode);
-        if (response === 'NOT_EXIST_BOOK') {
+        if (response === 'FAILD') {
             alert('存在しない本のIDです。もう一度お試しください');
         } else {
             sendData(userBarcode, bookBarcode);
@@ -102,9 +102,9 @@ async function detected(result) {
 
 async function searchingExiestData(id) {
     const data = {
-        bookID: id,
-        bookNum: 1,
-        manualSearchMode: true
+        book_id: id,
+        book_num: 1,
+        manual_search_mode: true
     };
 
     try {
@@ -127,8 +127,8 @@ async function searchingExiestData(id) {
 
 function sendData(userBarcode, bookBarcode) {
     const data = {
-        userCode: userBarcode,
-        bookCode: bookBarcode,
+        user_id: userBarcode,
+        book_id: bookBarcode,
     };
 
     const endpoint = readMode === 'lend' ? '/lend' : '/return';

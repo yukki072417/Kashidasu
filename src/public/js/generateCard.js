@@ -37,8 +37,8 @@ function sendForm() {
 
 // グローバルスコープで関数を定義
 window.download = function() {
-    const fileUrl = '/pdf/output_page.1.png';
-    const fileName = 'output_page.1.png';
+    const fileUrl = '/pdf/output_card_image.1.png';
+    const fileName = 'output_card_image.1.png';
 
     const link = document.createElement('a');
     link.href = fileUrl;
@@ -51,14 +51,13 @@ window.download = function() {
 }
 
 function showImage() {
-
     $(function () {
 
         if ($('#card').length) {
             $('#card').remove();
         }
 
-        $('#image').append('<img id="card" src="/pdf/output_page.1.png">');
+        $('#image').append('<img id="card" src="/pdf/output_card_image.1.png">');
         
         $('#form-submit').removeAttr('value');
         $('#form-submit').removeAttr('onclick');

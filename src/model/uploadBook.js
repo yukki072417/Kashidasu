@@ -7,10 +7,10 @@ app.uploadBook = async (req, res) => {
 
     function connect() {
         return mysql.createConnection({
-            host: "db",
-            user: "root",
-            password: "ROOT",
-            database: "KASHIDASU",
+            host: 'db',
+            user: process.env.DB_USER,
+            password: process.env.ROOT_PASSWORD,
+            database: 'KASHIDASU'
         });
     }
 

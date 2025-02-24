@@ -2,32 +2,43 @@ const express = require('express');
 const app = express();
 const mysql = require('mysql2/promise');
 
-function connect() {
+function Connect() {
     return mysql.createConnection({
-        host: "db",
-        user: "root",
-        password: "ROOT",
-        database: "KASHIDASU",
+        host: 'db',
+        user: process.env.DB_USER,
+        password: process.env.ROOT_PASSWORD,
+        database: 'KASHIDASU'
     });
 }
 
-app.returnBook = async (req, res) => {
+app.ReturnBook = async (req, res) => {
     console.log(req.body);
 
-    const db = await connect();
+    const db = await Connect();
     const reqContent = req.body;
-    const userCode = reqContent.userCode;
-    const bookCode = reqContent.bookCode;
+    const userCode = reqContent.user_id;
+    const bookCode = reqContent.book_id;
 
     try {
-        await db.query(
+        const [results] = await db.query(
             'DELETE FROM LENDING_BOOK WHERE BOOK_ID = ? AND USER_ID = ?',
             [bookCode, userCode]
         );
-        res.send('Success');
+
+        if(results.length === 0){
+            res.send(
+                [{result: 'FAILD'}]
+            )
+        }
+        
+        res.send(
+            [{result: 'SUCCESS'}]
+        ).status(200);
     } catch (e) {
         console.log(e.message);
-        res.send(e.message);
+        res.send(
+            [{result: 'ERROR' ,error_message: e.message}]
+        );
     }
 }
 

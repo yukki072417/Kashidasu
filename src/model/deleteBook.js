@@ -1,28 +1,27 @@
+//リファクタリング済
+
 const express = require('express');
 const app = express();
 const mysql = require('mysql2');
 
-app.deleteBook = async (req, res) => {
+app.DeleteBook = async (req, res) => {
 
-    function connect() {
+    function Connect() {
         return mysql.createConnection({
-            host: "db",
-            user: "root",
-            password: "ROOT",
-            database: "KASHIDASU",
+            host: 'db',
+            user: process.env.DB_USER,
+            password: process.env.ROOT_PASSWORD,
+            database: 'KASHIDASU'
         });
     }
 
-    const db = connect();
+    const db = Connect();
+    const bookId = req.body.BOOK_ID;
 
-    const BOOK_ID = req.body.bookID;
-    db.query('DELETE FROM BOOKS WHERE ID = ?', [BOOK_ID]);
-
-    
+    db.query('DELETE FROM BOOKS WHERE ID = ?', [bookId]);
     db.end();
-    res.send('Sucsess').status(200);
+    res.send([{result: 'SUCCESS'}]).status(200);
 
 }
-
 
 module.exports = app;

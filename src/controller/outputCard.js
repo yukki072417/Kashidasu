@@ -1,3 +1,5 @@
+//リファクタリング済み
+
 const { PDFDocument, StandardFonts, PDFPage } = require('pdf-lib');
 const { fromPath } = require('pdf2pic');
 const Jsbarcode = require('jsbarcode');
@@ -23,23 +25,23 @@ let studentNumber;
 
 // ファイルパスの定数化
 const OUTPUT_DIR = '/usr/app/src/public/pdf';
-const BARCODE_OUTPUT_PATH = path.join(OUTPUT_DIR, 'barcode.png');
+const BARCODE_OUTPUT_PATH = path.join(OUTPUT_DIR, 'card_barcode.png');
 
 // ディレクトリの存在確認用関数
-function ensureDirectoryExists(dirPath) {
+function EnsureDirectoryExists(dirPath) {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
 }
 
-function deletePDFFile(dirPath){
+function DeletePDFFile(dirPath){
 
   if(fs.existsSync(dirPath)){
     fs.unlinkSync(dirPath);
   }
 }
 
-function generateBarcode(studentID) {
+function GenerateBarcode(studentID) {
   try {
     const canvas = createCanvas(barcodeW, barcodeH);
     
@@ -52,7 +54,7 @@ function generateBarcode(studentID) {
       fontSize: 12
     });
 
-    ensureDirectoryExists(OUTPUT_DIR);
+    EnsureDirectoryExists(OUTPUT_DIR);
     const buffer = canvas.toBuffer('image/png');
     fs.writeFileSync(BARCODE_OUTPUT_PATH, buffer);
     
@@ -63,16 +65,16 @@ function generateBarcode(studentID) {
   }
 }
 
-app.postRequest = async (req, res) => {
+app.GeneratingBarcode = async (req, res) => {
   try {
     let reqestBody = req.body;
-
+    GeneratingPDF
     studentID = reqestBody.ID;
     studentGread = reqestBody.GREAD;
     studentClass = reqestBody.CLASS;
     studentNumber = reqestBody.NUMBER;
 
-    await generatingPDF(res);
+    await GeneratingPDF(res);
   } catch (error) {
     console.error('リクエスト処理中にエラーが発生:', error);
     res.status(500).send({ error: 'PDF生成中にエラーが発生しました' });
@@ -81,7 +83,7 @@ app.postRequest = async (req, res) => {
 
 module.exports = app;
 
-async function generatingPDF(res) {
+async function GeneratingPDF(res) {
   async function createPdf(outputPath, outputDir) {
     try {
       // 出力ディレクトリの存在確認と作成
@@ -109,7 +111,7 @@ async function generatingPDF(res) {
       const lightFontBytes = await fs.promises.readFile(lightFontPath);
       const lightFontFamily = await pdfDoc.embedFont(lightFontBytes);
 
-      const barcodePath = generateBarcode(studentID);
+      const barcodePath = GenerateBarcode(studentID);
       const barcodeBytes = await fs.promises.readFile(barcodePath);
       const barcodeImage = await pdfDoc.embedPng(barcodeBytes);
   
@@ -157,7 +159,7 @@ async function generatingPDF(res) {
     try {
       const options = {
         density: 300,
-        saveFilename: "output_page",
+        saveFilename: "output_card_image",
         savePath: outputDir,
         format: "png",
         width: 400,
@@ -173,7 +175,7 @@ async function generatingPDF(res) {
   }
   
   try {
-    const pdfOutputPath = path.resolve('/usr/app/src/public/pdf/output.pdf');
+    const pdfOutputPath = path.resolve('/usr/app/src/public/pdf/output_card.pdf');
     const pngOutputDir = path.resolve('/usr/app/src/public/pdf/');
 
     const pdfCreated = await createPdf(pdfOutputPath, pngOutputDir);
@@ -182,7 +184,7 @@ async function generatingPDF(res) {
     }
 
     await convertPdfToPng(pdfOutputPath, pngOutputDir);
-    res.status(200).send({ id: 'Complete' });
+    res.status(200).send({ id: 'Complete'});
   } catch (error) {
     console.error('処理中にエラーが発生:', error);
     res.status(500).send({ error: 'PDF生成中にエラーが発生しました' });

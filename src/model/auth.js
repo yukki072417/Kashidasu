@@ -1,25 +1,27 @@
+//リファクタリング済
+
 const express = require('express');
 const app = express();
 const mysql = require('mysql2/promise');
 
-function connect() {
+function Connect() {
     return mysql.createConnection({
         host: 'db',
-        user: 'root',
-        password: 'ROOT',
+        user: process.env.DB_USER,
+        password: process.env.ROOT_PASSWORD,
         database: 'KASHIDASU'
     });
 }
 
-app.login = async (req, res) => {
+app.Login = async (req, res) => {
     const { admin_id, admin_password } = req.body;
 
     if (!admin_id || !admin_password) {
-        return res.send('WRONG');
+        return res.send({result: 'WRONG'});
     }
 
     try {
-        const db = await connect();
+        const db = await Connect();
         
         const [results] = await db.query(
             'SELECT ID, PASSWORD FROM ADMIN_USER WHERE ID = ?',
@@ -28,9 +30,9 @@ app.login = async (req, res) => {
 
         await db.end();
 
-       // Processesing when the user does not exist.
+       // ユーザーが存在しないときの処理
         if (results.length === 0) {
-            return res.send('WRONG');
+            return res.status(200).send([{result: 'FAILD'}]);
         }
 
         const user = results[0];
@@ -42,12 +44,12 @@ app.login = async (req, res) => {
             
             return res.redirect('/main');
         } else {
-            return res.send('WRONG');
+            return res.status(200).send([{result: 'FAILD'}]);
         }
 
     } catch (error) {
-        console.error('データベースエラー:', error);
-        return res.send('error')
+        console.error('データベースエラー:', error.message);
+        return res.status(200).send([{result: 'ERROR', error: error.message}]);
     }
 };
 

@@ -2,34 +2,35 @@ const express = require("express");
 const app = express();
 const mysql = require("mysql2/promise");
 
-function connect() {
+function Connect() {
   return mysql.createConnection({
-    host: "db",
-    user: "root",
-    password: "ROOT",
-    database: "KASHIDASU",
+      host: 'db',
+      user: process.env.DB_USER,
+      password: process.env.ROOT_PASSWORD,
+      database: 'KASHIDASU'
   });
 }
 
-app.searchBook = async (req, res) => {
+app.SearchBook = async (req, res) => {
+  const db = await Connect();
   try {
+    console.log(reqContent);
     const reqContent = req.body;
-    const bookID = reqContent.bookID;
-    const bookNum = reqContent.bookNum;
-    const searchMode = reqContent.manualSearchMode;
+    const bookID = reqContent.book_id;
+    const bookNum = reqContent.book_num;
+    const searchMode = reqContent.manual_search_mode;
 
-    const db = await connect();
 
     switch (searchMode) {
       case true:
-        manualSearchMode();
+        ManualSearchMode();
         break;
       case false:
-        autoSearchMode();
+        AutoSearchMode();
         break;
     }
 
-    async function manualSearchMode() {
+    async function ManualSearchMode() {
       const [results] = await db.query(`
         SELECT b.*, 
         CASE WHEN l.BOOK_ID IS NOT NULL THEN TRUE ELSE FALSE END AS IS_LENDING 
@@ -40,7 +41,9 @@ app.searchBook = async (req, res) => {
       );
 
       if (results.length === 0) {
-        res.send("NOT_EXIST_BOOK");
+        res.send(
+          [{result: 'FAILD'}]
+        );
       } else {
         res.send(results[0]);
       }
@@ -48,7 +51,7 @@ app.searchBook = async (req, res) => {
       db.end();
     }
 
-    async function autoSearchMode() {
+    async function AutoSearchMode() {
       const [results] = await db.query(`
         SELECT b.*, 
         CASE WHEN l.BOOK_ID IS NOT NULL THEN TRUE ELSE FALSE END AS IS_LENDING 
@@ -57,11 +60,11 @@ app.searchBook = async (req, res) => {
       `);
       const [recordNum] = await db.query(`SELECT COUNT(ID) FROM BOOKS`);
 
-      if ([results[0]] == "") return;
-      else returnResponse();
+      if (results[0] == "") return;
+      else ReturnResponse();
       db.end();
 
-      function returnResponse() {
+      function ReturnResponse() {
         let response = [];
 
         const maxSearch = 30 * bookNum;

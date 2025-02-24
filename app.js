@@ -2,6 +2,7 @@ const express = require('express');
 const session = require('express-session');
 const app = express();
 const userRouter = require('./src/router/router');
+require('dotenv').config();
 
 const PORT = 80;
 

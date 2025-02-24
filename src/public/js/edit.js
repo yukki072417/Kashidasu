@@ -26,7 +26,7 @@ window.onload = () => {
             bookName_textbox.val(response.BOOK_NAME);
             writter_textbox.val(response.WRITTER);
             if(response.IS_LENDING)
-                lockTextBox();
+                LockTextBox();
             else
                 return;
         },
@@ -36,7 +36,7 @@ window.onload = () => {
     });
 }
 
-function updateBook(){
+function EditBook(){
 
     const bookID = $('#book-id').val();
     const bookName = $('#book-name').val();
@@ -54,7 +54,7 @@ function updateBook(){
         success: function(response) {
 
 
-            if(response.text = 'Sucsess');
+            if(response[0].result = 'Sucsess');
                 alert('変更が適用されました');
         },
         error: function(xhr, status, error) {
@@ -64,7 +64,7 @@ function updateBook(){
 
 }
 
-function lockTextBox(){
+function LockTextBox(){
     const warningText = $('<p>貸出中は変更できません</p>').css('color', 'red');
     
     $('#writter').prop('disabled', true);
@@ -74,7 +74,7 @@ function lockTextBox(){
     $('form').append(warningText);
 }
 
-function deleteBook(){
+function DeleteBook(){
 
     if(!confirm('本当に削除しますか？')) return;   
 
@@ -83,7 +83,7 @@ function deleteBook(){
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({  
-            "bookID": bookID
+            "BOOK_ID": bookID
         }),
         success: function(response) {
             console.log(response);

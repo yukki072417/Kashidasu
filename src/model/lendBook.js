@@ -1,35 +1,39 @@
-const express = require("express");
-const app = express();
-const mysql = require("mysql2/promise");
+//リファクタリング済
 
-app.lendBook = async (req, res) => {
+const express = require('express');
+const app = express();
+const mysql = require('mysql2/promise');
+
+app.LendBook = async (req, res) => {
 
     const reqContent = req.body;
-    const userCode = reqContent.userCode;
-    const bookCode = reqContent.bookCode;
-    const db = await connect();
-    const DATE = new Date().toISOString().slice(0, 10);
+    const userCode = reqContent.user_id;
+    const bookCode = reqContent.book_id;
+    const db = await Connect();
+    const date = new Date().toISOString().slice(0, 10);
 
-    function connect() {
+    async function Connect() {
         return mysql.createConnection({
-            host: "db",
-            user: "root",
-            password: "ROOT",
-            database: "KASHIDASU",
+            host: 'db',
+            user: process.env.DB_USER,
+            password: process.env.ROOT_PASSWORD,
+            database: 'KASHIDASU'
         });
     }
-
-    console.log(reqContent);
 
     try{
         await db.query(
             'INSERT INTO LENDING_BOOK (BOOK_ID, USER_ID, LEND_DAY) VALUES (?, ?, ?)',
-            [bookCode, userCode, DATE]
+            [bookCode, userCode, date]
         );
-        res.send('Success');
+        res.send(
+            [{result: 'SUCCESS'}]
+        ).status(200);
     }catch(e){
-        console.log(e.message);
-        res.send(e.message)
+        console.error(e.message);
+        res.send(
+            [{result: 'ERROR', error_message: e.message}]
+        ).status(200);
     }
     db.end();
 }
