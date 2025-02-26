@@ -28,7 +28,7 @@ router.get('/login', (req, res) => {
 });
 
 // Sercching book
-router.post('/searchBook', serachBook.SearchBook);
+router.post('/search-book', serachBook.SearchBook);
 
 // Lending book
 router.post('/lend', lendBook.LendBook);

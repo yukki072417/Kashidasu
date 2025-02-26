@@ -13,16 +13,16 @@ function checking() {
 function requestRegisterBook() {
     const bookID = $('#bookID').val();
     const bookName = $('#bookName').val();
-    const writter = $('#writter').val();
+    const book_auther = $('#writter').val();
 
     $.ajax({
         url: '/register-book',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({  
-            "bookID": bookID,
-            "bookName": bookName,
-            "writter": writter
+            "book_id": bookID,
+            "book_name": bookName,
+            "book_auther": book_auther
         }),
         success: function(response) {
             alert('登録しました');

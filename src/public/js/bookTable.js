@@ -26,9 +26,9 @@ function loadBooks(pageNum) {
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
-            "bookID": "",
-            "bookNum": pageNum,
-            "manualSearchMode": false
+            "book_id": "",
+            "book_num": pageNum,
+            "manual_search_mode": false
         }),
         success: function(data) {
             if (data && data.length > 0) {

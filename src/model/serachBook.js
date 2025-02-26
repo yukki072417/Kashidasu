@@ -14,11 +14,11 @@ function Connect() {
 app.SearchBook = async (req, res) => {
   const db = await Connect();
   try {
-    console.log(reqContent);
     const reqContent = req.body;
     const bookID = reqContent.book_id;
     const bookNum = reqContent.book_num;
     const searchMode = reqContent.manual_search_mode;
+    console.log(reqContent);
 
 
     switch (searchMode) {
@@ -45,6 +45,9 @@ app.SearchBook = async (req, res) => {
           [{result: 'FAILD'}]
         );
       } else {
+
+        //ここに注目して修正
+        console.log(results[0]);
         res.send(results[0]);
       }
       
@@ -72,10 +75,18 @@ app.SearchBook = async (req, res) => {
         let count = 0 + minSearch;
 
         response.push(recordNum[0]);
-
+        
         while ([results].length < maxSearch) {
           if (count < maxSearch) {
-            response.push(results[count]);
+            console.log(results[count]);
+            let data = {
+              book_id: results[count].ID,
+              book_name: results[count].BOOK_NAME,
+              book_auther: results[count].WRITTER,
+              book_is_lending: results[count].IS_LENDING
+            }
+            response.push(data);
+            console.log(response);
           } else {
             break;
           }
