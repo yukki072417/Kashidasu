@@ -1,0 +1,20 @@
+@font-face {
+    font-family: 'mplus-light';
+    src: url(MPLUSRounded1c-Light.ttf);
+}
+@font-face{
+    font-family: 'mplus-medium';
+    src: url(MPLUSRounded1c-Medium.ttf);
+}
+@font-face{
+    font-family: 'mplus-regular';
+    src: url(MPLUSRounded1c-Regular.ttf);
+}
+@font-face{
+    font-family: 'mplus-thin';
+    src: url(MPLUSRounded1c-Thin.ttf); 
+}
+@font-face{
+    font-family: 'mplus-bold';
+    src: url(MPLUSRounded1c-Bold.ttf);
+}
