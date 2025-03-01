@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",
-    "canvas": "^3.0.0-rc2",
+    "canvas": "^3.1.0",
     "cookie-parser": "^1.4.7",
     "csurf": "^1.10.0",
     "csv": "^6.3.10",
