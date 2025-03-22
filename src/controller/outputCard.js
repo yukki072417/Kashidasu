@@ -23,21 +23,12 @@ let studentGread;
 let studentClass;
 let studentNumber;
 
-// ファイルパスの定数化
 const OUTPUT_DIR = '/usr/app/src/public/pdf';
 const BARCODE_OUTPUT_PATH = path.join(OUTPUT_DIR, 'card_barcode.png');
 
-// ディレクトリの存在確認用関数
 function EnsureDirectoryExists(dirPath) {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
-  }
-}
-
-function DeletePDFFile(dirPath){
-
-  if(fs.existsSync(dirPath)){
-    fs.unlinkSync(dirPath);
   }
 }
 
@@ -69,10 +60,10 @@ app.GeneratingBarcode = async (req, res) => {
   try {
     let reqestBody = req.body;
     GeneratingPDF
-    studentID = reqestBody.ID;
-    studentGread = reqestBody.GREAD;
-    studentClass = reqestBody.CLASS;
-    studentNumber = reqestBody.NUMBER;
+    studentID = reqestBody.id;
+    studentGread = reqestBody.gread;
+    studentClass = reqestBody.class;
+    studentNumber = reqestBody.number;
 
     await GeneratingPDF(res);
   } catch (error) {
@@ -86,23 +77,19 @@ module.exports = app;
 async function GeneratingPDF(res) {
   async function createPdf(outputPath, outputDir) {
     try {
-      // 出力ディレクトリの存在確認と作成
       const dir = path.dirname(outputPath);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
 
-      // 既存のファイルがあれば削除
       if (fs.existsSync(outputPath)) {
         fs.unlinkSync(outputPath);
       }
   
-      // 新しいPDFファイルを生成
       const pdfDoc = await PDFDocument.create();
       pdfDoc.registerFontkit(fontkit);
       const page = pdfDoc.addPage([width, height]);
   
-      // フォントの読み込み
       const boldFontPath = path.join(__dirname, '../public/fonts/MPLUSRounded1c-bold.ttf');
       const boldFontBytes = await fs.promises.readFile(boldFontPath);
       const boldFontFamily = await pdfDoc.embedFont(boldFontBytes);
@@ -115,10 +102,8 @@ async function GeneratingPDF(res) {
       const barcodeBytes = await fs.promises.readFile(barcodePath);
       const barcodeImage = await pdfDoc.embedPng(barcodeBytes);
   
-      // バーコード画像のサイズを取得
       const barcodeDims = barcodeImage.scale(1);
   
-      // PDFにテキストを描画
       page.drawText('Kashidasuカード', {
         x: 20,
         y: 160,
