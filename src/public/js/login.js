@@ -31,7 +31,7 @@ $(document).ready(function() {
                 },
                 success: function(response) {
                     console.log(response[0].result);
-                    if (response[0].result == 'FAILD') {
+                    if (response[0].result == 'FAILED') {
                         alert('パスワードまたはIDが間違っています');
                     } else {
                         window.location.href = '/main';

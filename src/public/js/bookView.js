@@ -2,39 +2,39 @@ let currentPage = 1;
 let totalRecords = 0;
 
 $(document).ready(() => {
-    loadBooks(currentPage);
+    LoadBooks(currentPage);
     
     $('#next').on('click', () => {
         const maxPages = Math.ceil(totalRecords / 30);
         if (currentPage < maxPages) {
             currentPage++;
-            loadBooks(currentPage);
+            LoadBooks(currentPage);
         }
     });
 
     $('#back').on('click', () => {
         if (currentPage > 1) {
             currentPage--;
-            loadBooks(currentPage);
+            LoadBooks(currentPage);
         }
     });
 });
 
-function loadBooks(pageNum) {
+function LoadBooks(pageNum) {
     $.ajax({
-        url: '/searchBook',
+        url: '/search-book',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
-            "book_id": "",
-            "book_num": pageNum,
-            "manual_search_mode": false
+            'book_num': pageNum,
+            'manual_search_mode': false
         }),
         success: function(data) {
+            console.log(data);
             if (data && data.length > 0) {
                 totalRecords = data[0]['COUNT(ID)'];
-                showTable(data.slice(1));
-                updatePageInfo();
+                SetTable(data.slice(1));
+                UpdatePageInfo();
             }
         },
         error: function(xhr, status, error) {
@@ -43,7 +43,7 @@ function loadBooks(pageNum) {
     });
 }
 
-function updatePageInfo() {
+function UpdatePageInfo() {
     const maxPages = Math.ceil(totalRecords / 30);
     $('.search p').text(`${currentPage}/${maxPages}`);
     
@@ -51,69 +51,56 @@ function updatePageInfo() {
     $('#back').prop('disabled', currentPage <= 1);
 }
 
-//まだ使わない
-function RequestSearchBook() {
-    $.ajax({
-        url: '/searchBook',
-        type: 'POST',
-        data: JSON.stringify({
-            "bookID": $('#searchBook').val(),
-            "bookNum": currentPage,
-            "manualSearchMode": true
-        }),
-        success: function(data) {
-
-        },
-        error: function(xhr, status, error) {
-            console.error('JSONパースエラー:', error);
-        }
-    });
-}
-
-function showTable(data) {
-    $('#table tr:gt(0)').remove();
+function SetTable(data) {
+$('#table tr:gt(0)').remove();
 
     if (!Array.isArray(data)) {
         data = [data];
     }
 
     data.forEach(book => {
-        if (book && book.BOOK_NAME) {
+        console.log(book);
+        if (book && book.book_name) {
             const $row = $('<tr>');
 
-            const bookID = book.ID;
-            const bookName = book.BOOK_NAME;
-            const writter = book.WRITTER;
-            const IS_LENDING = book.IS_LENDING;
+            const bookID = book.book_id;
+            const bookName = book.book_name;
+            const writter = book.book_auther;
+            const isLending = book.book_is_lending;
+            const lendingUser = book.lending_user_id;
 
             $row.append($('<td>').text(bookName));
             $row.append($('<td>').text(writter));
             $row.append($('<td>').text(bookID));
             
-            const $statusCell = $('<td>').text(IS_LENDING ? '貸出中' : '空き');
-            if (IS_LENDING) {
+            const $statusCell = $('<td>').text(isLending ? '貸出中' : '空き');
+            const $lendingUserCell = $('<td>').text(lendingUser);
+            if (isLending) {
+                $lendingUserCell.css('color', 'red');
                 $statusCell.css('color', 'red');
             }
-            $row.append($statusCell);
+            else $lendingUserCell.text('空き');
             
-            const $editButton = $('<button>')
-            .text('編集')
-            .addClass('edit-btn')
-            .on('click', () => {
-                const params = $.param({ ID: bookID, BOOK_NAME:bookName, WRITTER:writter});
-                $.ajax({
-                    url: `/edit?${params}`,
-                    type: 'GET',
-                    contentType: 'application/json',
+            $row.append($statusCell);
+            $row.append($lendingUserCell);
 
-                    success: function(response) {
-                        window.location.href = `/edit?${params}`;
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error:', error);
-                    }
+            const $editButton = $('<button>')
+                .text('編集')
+                .addClass('edit-btn')
+                .on('click', () => {
+                    const params = $.param({ ID: bookID });
+                    $.ajax({
+                        url: `/edit?${params}`,
+                        type: 'GET',
+                        contentType: 'application/json',
+                        success: function(response) {
+                            window.location.href = `/edit?${params}`;
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
+                        }
+                    });
                 });
-            });
 
             $row.append($('<td>').append($editButton));
             $('#table').append($row);

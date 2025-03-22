@@ -1,81 +1,68 @@
-const bookNameTextBox = document.getElementsByName('book-name');
-const writterTextBox = document.getElementsByName('writter');
-
-const url_prams = new URL(window.location.href).searchParams;
-
-const bookID = url_prams.get('ID');
-const bookName = url_prams.get('BOOK_NAME');
-const bookWritter = url_prams.get('WRITTER');
-
 window.onload = () => {
+    const urlPrams = new URL(window.location.href).searchParams;
+    const bookID = urlPrams.get('ID');
+    let beforeBookID;
+    
     $.ajax({
-        url: '/searchBook',
+        url: '/search-book',
         type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            "bookID": bookID,
-            "bookNum": 1,
-            "manualSearchMode": true
-        }),
+        data: {
+            "book_id": bookID,
+            "manual_search_mode": true
+        },
         success: function(response) {
             const bookName_textbox = $('#book-name');
             const writter_textbox = $('#writter');
             const bookID_textbox = $('#book-id');
 
-            bookID_textbox.val(response.ID);
-            bookName_textbox.val(response.BOOK_NAME);
-            writter_textbox.val(response.WRITTER);
-            if(response.IS_LENDING)
-                LockTextBox();
-            else
-                return;
+            beforeBookID = response.book_id;
+
+            bookID_textbox.val(response.book_id);
+            bookName_textbox.val(response.book_name);
+            writter_textbox.val(response.book_auther);
+
+            if(response.book_is_lending)
+                DisableTextBox(bookID_textbox, bookName_textbox, writter_textbox);
         },
         error: function(xhr, status, error) {
             console.error('Error:', error);
         }
     });
+
+    $('#edit-button').on('click', function(){
+        const bookIDValue = $('#book-id').val();
+        const bookNameValue = $('#book-name').val();
+        const bookAutherValue = $('#writter').val();
+        EditBook(beforeBookID, bookIDValue, bookNameValue, bookAutherValue);
+    });
+
+    $('#delete-button').on('click', function(){
+        const bookIDValue = $('#book-id').val();        
+        DeleteBook(bookIDValue);
+    });
 }
 
-function EditBook(){
-
-    const bookID = $('#book-id').val();
-    const bookName = $('#book-name').val();
-    const bookWritter = $('#writter').val();
-
+function EditBook(beforeBookID, bookID, bookName, bookWritter){
     $.ajax({
         url: '/upload-book',
         type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            "bookID": bookID,
-            "bookName": bookName,
-            "writter": bookWritter
-        }),
+        data: {
+            before_book_id: beforeBookID,
+            book_id: bookID,
+            book_name: bookName,
+            book_auther: bookWritter
+        },
         success: function(response) {
-
-
-            if(response[0].result = 'Sucsess');
-                alert('変更が適用されました');
+            if(response.result === 'SUCCESS') return alert('変更が適用されました');
+            // else return alert('エラー: FAILED OF CHANGE'); 
         },
         error: function(xhr, status, error) {
             alert('エラー発生:', error);
         }
     });
-
 }
 
-function LockTextBox(){
-    const warningText = $('<p>貸出中は変更できません</p>').css('color', 'red');
-    
-    $('#writter').prop('disabled', true);
-    $('#book-name').prop('disabled', true);
-    $('.edit-submit').prop('disabled', true);
-    $('#book-id').prop('disabled', true);
-    $('form').append(warningText);
-}
-
-function DeleteBook(){
-
+function DeleteBook(bookID){
     if(!confirm('本当に削除しますか？')) return;   
 
     $.ajax({
@@ -83,7 +70,7 @@ function DeleteBook(){
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({  
-            "BOOK_ID": bookID
+            'book_id': bookID
         }),
         success: function(response) {
             console.log(response);
@@ -93,4 +80,14 @@ function DeleteBook(){
             console.error('Error:', error);
         }
     });
+}
+
+function DisableTextBox(){
+    const warningText = $('<p>貸出中は変更できません</p>').css('color', 'red');
+    
+    $('#writter').prop('disabled', true);
+    $('#book-name').prop('disabled', true);
+    $('.edit-submit').prop('disabled', true);
+    $('#book-id').prop('disabled', true);
+    $('form').append(warningText);
 }

@@ -1,4 +1,4 @@
-function sendForm() {
+function SendContent() {
     const studentId = document.getElementById('studentId').value;
     const gread = document.getElementById('gread').value;
     const className = document.getElementById('class').value;
@@ -10,10 +10,10 @@ function sendForm() {
     }
 
     const datas = {
-        ID: studentId,
-        GREAD: gread,
-        CLASS: className,
-        NUMBER: number
+        id: studentId,
+        gread: gread,
+        class: className,
+        number: number
     };
 
     $(function () {
@@ -28,7 +28,7 @@ function sendForm() {
 
     xhr.onload = function () {
         if (xhr.status == 200) {
-            showImage();
+            ShowImage();
         } else {
             console.error('Error:', xhr.statusText);
         }
@@ -50,7 +50,7 @@ window.download = function() {
     location.reload();
 }
 
-function showImage() {
+function ShowImage() {
     $(function () {
 
         if ($('#card').length) {
