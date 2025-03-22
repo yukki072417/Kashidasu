@@ -1,5 +1,3 @@
-//リファクタリング済み
-
 const { PDFDocument, StandardFonts, PDFPage } = require('pdf-lib');
 const { fromPath } = require('pdf2pic');
 const Jsbarcode = require('jsbarcode');
