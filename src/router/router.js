@@ -1,5 +1,4 @@
 const express = require('express');
-const session = require('express-session');
 const router = express.Router();
 
 const genelate = require('../controller/outputCard');
@@ -27,6 +26,14 @@ router.get('/login', (req, res) => {
     res.render('login');
 });
 
+//Checking user session
+const requireAuth = (req, res, next) => {
+    if (req.session.admin_authed)
+        next();
+    else
+        res.redirect('/login');
+};
+
 // Sercching book
 router.post('/search-book', serachBook.SearchBook);
 
@@ -40,18 +47,10 @@ router.post('/return', returnBook.ReturnBook);
 router.post('/main', auth.Login);
 
 // Uploading book
-router.post('/upload-book', uploadBook.uploadBook);
+router.post('/upload-book', uploadBook.UploadBook);
 
 // Deleting book
 router.post('/delete-book', deleteBook.DeleteBook);
-
-//Checking user session
-const requireAuth = (req, res, next) => {
-    if (req.session.admin_authed)
-        next();
-    else
-        res.redirect('/login');
-};
 
 // Routing to login page
 router.get('/', (req, res) => {
@@ -83,7 +82,7 @@ router.get('/main', requireAuth, (req, res) => {
 
 // Routing to reading qrcode page
 router.get('/read-qr', (req, res) => {
-    res.render('readQR');
+    res.render('readCode');
 });
 
 // Routing to generaging card page
