@@ -1,27 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang='ja'>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>メインページ</title>
-    <link rel="stylesheet" href="/styles/main.css">
-    <link rel="stylesheet" href="/fonts/fonts.css">
-    <meta name="robots" content="noindex" />
+    <link rel='stylesheet' href='/styles/main.css'>
+    <link rel='stylesheet' href='/fonts/fonts.css'>
+    <meta name='robots' content='noindex' />
 
 </head>
 <body>
 
     <%- include('header') %>
 
-    <div id="top">
-        <h2 id="top-title"> <%-resData.id %> の管理画面</h2>
+    <div id='top'>
+        <h2 id='top-title'> <%-resData.id %> の管理画面</h2>
     </div>
         
-    <div class="container">
-        <a class="site-item" href="/read-qr"><img class="site-image" src="images/LendAndRetrunBtn.png"></a>
-        <a class="site-item" href="/genelate-card"><img class="site-image" src="images/GenerateCard.png"></a>
-        <a class="site-item" href="/register"><img class="site-image" src="images/RegisterBook.png"></a>
-        <a class="site-item" href="/book-view"><img class="site-image" src="images/BookAllView.png"></a>
+    <div class='container'>
+        <a class='site-item' href='/read-qr'><img class='site-image' src='images/LendAndRetrunBtn.png'></a>
+        <a class='site-item' href='/genelate-card'><img class='site-image' src='images/GenerateCard.png'></a>
+        <a class='site-item' href='/register'><img class='site-image' src='images/RegisterBook.png'></a>
+        <a class='site-item' href='/book-view'><img class='site-image' src='images/BookAllView.png'></a>
     </div>
 
     <%- include('footer') %>
