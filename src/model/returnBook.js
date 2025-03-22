@@ -28,19 +28,13 @@ app.ReturnBook = async (req, res) => {
         );
 
         if(results.length === 0){
-            res.send(
-                [{result: 'FAILD'}]
-            )
+            res.send({result: 'FAILD'})
         }
         
-        res.send(
-            [{result: 'SUCCESS'}]
-        ).status(200);
+        res.send({result: 'SUCCESS'}).status(200);
     } catch (e) {
         console.log(e.message);
-        res.send(
-            [{result: 'ERROR' ,error_message: e.message}]
-        );
+        res.send({result: 'ERROR' ,error_message: e.message});
     }
 }
 

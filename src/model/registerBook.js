@@ -5,7 +5,6 @@ const app = express();
 const mysql = require('mysql2');
 
 app.RegisterBook = async (req, res) => {
-    
     function Connect() {
         return mysql.createConnection({
             host: 'db',
@@ -22,14 +21,10 @@ app.RegisterBook = async (req, res) => {
 
     try{
         db.query('INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)', [bookId, bookName, bookAuther]);
-        res.send(
-            [{result: 'SUCCESS'}]
-        );
+        res.send({result: 'SUCCESS'});
     }catch(error){
         console.error(error.message);
-        res.send(
-            [{result: 'FAILD', error_message: error.message}]
-        );
+        res.send({result: 'FAILD', error_message: error.message});
     }
 
     db.end();

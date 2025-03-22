@@ -15,9 +15,10 @@ function Connect() {
 
 app.Login = async (req, res) => {
     const { admin_id, admin_password } = req.body;
+    if(admin_id == null || admin_password == null) res.send([{result: 'FAILED'}]);
 
     if (!admin_id || !admin_password) {
-        return res.send({result: 'WRONG'});
+        return res.send({result: 'FAILED'});
     }
 
     try {
@@ -27,26 +28,23 @@ app.Login = async (req, res) => {
             'SELECT ID, PASSWORD FROM ADMIN_USER WHERE ID = ?',
             [admin_id]
         );
-
         await db.end();
-
-       // ユーザーが存在しないときの処理
-        if (results.length === 0) {
-            return res.status(200).send([{result: 'FAILD'}]);
-        }
-
+        
         const user = results[0];
-
-        // パスワード照合
+        
+        if (results.length === 0) {
+            return res.status(200).send([{result: 'FAILED'}]);
+        }
+        
         if (admin_id === user.ID && admin_password === user.PASSWORD) {
             req.session.admin_id = admin_id;
             req.session.admin_authed = true;
             
             return res.redirect('/main');
         } else {
-            return res.status(200).send([{result: 'FAILD'}]);
+            return res.status(200).send([{result: 'FAILED'}]);
         }
-
+        
     } catch (error) {
         console.error('データベースエラー:', error.message);
         return res.status(200).send([{result: 'ERROR', error: error.message}]);

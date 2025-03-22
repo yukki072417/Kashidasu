@@ -16,7 +16,7 @@ app.DeleteBook = async (req, res) => {
     }
 
     const db = Connect();
-    const bookId = req.body.BOOK_ID;
+    const bookId = req.body.book_id;
 
     db.query('DELETE FROM BOOKS WHERE ID = ?', [bookId]);
     db.end();
