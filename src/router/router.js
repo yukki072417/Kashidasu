@@ -1,9 +1,8 @@
 const express = require('express');
-const session = require('express-session');
 const router = express.Router();
 
 const genelate = require('../controller/outputCard');
-const authModel = require('../model/auth');
+const auth = require('../model/auth');
 const serachBook = require('../model/serachBook');
 const lendBook = require('../model/lendBook');
 const returnBook = require('../model/returnBook');
@@ -27,24 +26,6 @@ router.get('/login', (req, res) => {
     res.render('login');
 });
 
-// Sercching book
-router.post('/searchBook', serachBook.searchBook);
-
-// Lending book
-router.post('/lend', lendBook.lendBook);
-
-// Returning book
-router.post('/return', returnBook.returnBook);
-
-// Logining user
-router.post('/main', authModel.login);
-
-// Uploading book
-router.post('/upload-book', uploadBook.uploadBook);
-
-// Deleting book
-router.post('/delete-book', deleteBook.deleteBook);
-
 //Checking user session
 const requireAuth = (req, res, next) => {
     if (req.session.admin_authed)
@@ -53,6 +34,24 @@ const requireAuth = (req, res, next) => {
         res.redirect('/login');
 };
 
+// Sercching book
+router.post('/search-book', serachBook.SearchBook);
+
+// Lending book
+router.post('/lend', lendBook.LendBook);
+
+// Returning book
+router.post('/return', returnBook.ReturnBook);
+
+// Logining user
+router.post('/main', auth.Login);
+
+// Uploading book
+router.post('/upload-book', uploadBook.UploadBook);
+
+// Deleting book
+router.post('/delete-book', deleteBook.DeleteBook);
+
 // Routing to login page
 router.get('/', (req, res) => {
     res.redirect('login');
@@ -60,7 +59,7 @@ router.get('/', (req, res) => {
 
 // Generating card
 router.post('/generating', (req, res) => {
-    genelate.postRequest(req, res);
+    genelate.GeneratingBarcode(req, res);
 });
 
 router.get('/edit', (req, res) => {
@@ -68,7 +67,7 @@ router.get('/edit', (req, res) => {
 });
 
 router.post('/register-book', (req, res) => {
-    registerBook.registerBook(req, res);
+    registerBook.RegisterBook(req, res);
 });
 
 // Routing to register page
@@ -82,8 +81,8 @@ router.get('/main', requireAuth, (req, res) => {
 });
 
 // Routing to reading qrcode page
-router.get('/read-qr', requireAuth, (req, res) => {
-    res.render('read-qr');
+router.get('/read-qr', (req, res) => {
+    res.render('readCode');
 });
 
 // Routing to generaging card page

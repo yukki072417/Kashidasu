@@ -1,6 +1,6 @@
 $(document).ready(function() {
     $('form').on('submit', function(event) {
-        event.preventDefault(); // フォームのデフォルトの送信を防ぐ
+        event.preventDefault();
 
         const id = $('#admin-id').val();
         const password = $('#admin-password').val();
@@ -30,7 +30,8 @@ $(document).ready(function() {
                     admin_password: password
                 },
                 success: function(response) {
-                    if (response === 'WRONG') {
+                    console.log(response[0].result);
+                    if (response[0].result == 'FAILED') {
                         alert('パスワードまたはIDが間違っています');
                     } else {
                         window.location.href = '/main';

@@ -1,35 +1,45 @@
-const express = require("express");
+const express = require('express');
 const app = express();
-const mysql = require("mysql2/promise");
+const mysql = require('mysql2/promise');
+const { last } = require('pdf-lib');
 
-app.lendBook = async (req, res) => {
+app.LendBook = async (req, res) => {
 
-    const reqContent = req.body;
-    const userCode = reqContent.userCode;
-    const bookCode = reqContent.bookCode;
-    const db = await connect();
-    const DATE = new Date().toISOString().slice(0, 10);
+    const userCode = req.body.user_id;
+    const bookCode = req.body.book_id;
+    const db = await Connect();
+    const date = new Date().toISOString().slice(0, 10);
 
-    function connect() {
+    async function Connect() {
         return mysql.createConnection({
-            host: "db",
-            user: "root",
-            password: "ROOT",
-            database: "KASHIDASU",
+            host: 'db',
+            user: process.env.DB_USER,
+            password: process.env.ROOT_PASSWORD,
+            database: 'KASHIDASU'
         });
     }
-
-    console.log(reqContent);
+    
+    const searchedBook = await db.query(
+        'SELECT * FROM BOOKS WHERE ID = ?',
+        [bookCode]
+    );
+    const lendBook = await db.query(
+        'SELECT * FROM LENDING_BOOK WHERE BOOK_ID = ?',
+        [bookCode]
+    );
+    
+    if(lendBook[0] != "") return res.send({result: 'FAILED', message: 'BOOK_ALRADY_LENDING'}).status(200);
+    if(searchedBook[0] == "") return res.send({result: 'FAILED', message: 'BOOK_NOT_EXIST'}).status(200);
 
     try{
         await db.query(
             'INSERT INTO LENDING_BOOK (BOOK_ID, USER_ID, LEND_DAY) VALUES (?, ?, ?)',
-            [bookCode, userCode, DATE]
+            [bookCode, userCode, date]
         );
-        res.send('Success');
+        res.send({result: 'SUCCESS'}).status(200);
     }catch(e){
-        console.log(e.message);
-        res.send(e.message)
+        console.error(e.message);
+        res.send({result: 'ERROR', error_message: e.message}).status(200);
     }
     db.end();
 }

@@ -2,30 +2,32 @@ const express = require('express');
 const app = express();
 const mysql = require('mysql2');
 
-app.uploadBook = async (req, res) => {
-    console.log(req.body);
-
-    function connect() {
+app.UploadBook = async (req, res) => {
+    
+    function Connect() {
         return mysql.createConnection({
-            host: "db",
-            user: "root",
-            password: "ROOT",
-            database: "KASHIDASU",
+            host: 'db',
+            user: process.env.DB_USER,
+            password: process.env.ROOT_PASSWORD,
+            database: 'KASHIDASU'
         });
     }
 
-    const db = connect();
+    const db = Connect();
 
-    const BOOK_NAME = req.body.bookName;
-    const WRITTER = req.body.writter;
-    const BOOK_ID = req.body.bookID;
-    db.query('DELETE FROM BOOKS WHERE ID = ?', [BOOK_ID]);
-    db.query('INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)', [BOOK_ID, BOOK_NAME, WRITTER]);
+    const BOOK_ID = req.body.book_id;
+    const BEFORE_BOOK_ID = req.body.before_book_id;
+    const BOOK_NAME = req.body.book_name;
+    const WRITTER = req.body.book_auther;
 
-    
-    db.end();
-    res.send('Sucsess').status(200);
-
+    try{
+        db.query('DELETE FROM BOOKS WHERE ID = ?', [BEFORE_BOOK_ID]);
+        db.query('INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)', [BOOK_ID, BOOK_NAME, WRITTER]);
+        db.end();
+        res.send({result: 'SUCCESS'}).status(200);
+    }catch(e){
+        res.send({result: 'FAILED', message: e.message}).status(200);
+    }
 }
 
 

@@ -1,4 +1,4 @@
-function sendForm() {
+function SendContent() {
     const studentId = document.getElementById('studentId').value;
     const gread = document.getElementById('gread').value;
     const className = document.getElementById('class').value;
@@ -10,10 +10,10 @@ function sendForm() {
     }
 
     const datas = {
-        ID: studentId,
-        GREAD: gread,
-        CLASS: className,
-        NUMBER: number
+        id: studentId,
+        gread: gread,
+        class: className,
+        number: number
     };
 
     $(function () {
@@ -28,17 +28,16 @@ function sendForm() {
 
     xhr.onload = function () {
         if (xhr.status == 200) {
-            showImage();
+            ShowImage();
         } else {
             console.error('Error:', xhr.statusText);
         }
     };
 }
 
-// グローバルスコープで関数を定義
 window.download = function() {
-    const fileUrl = '/pdf/output_page.1.png';
-    const fileName = 'output_page.1.png';
+    const fileUrl = '/pdf/output_card_image.1.png';
+    const fileName = 'output_card_image.1.png';
 
     const link = document.createElement('a');
     link.href = fileUrl;
@@ -50,15 +49,14 @@ window.download = function() {
     location.reload();
 }
 
-function showImage() {
-
+function ShowImage() {
     $(function () {
 
         if ($('#card').length) {
             $('#card').remove();
         }
 
-        $('#image').append('<img id="card" src="/pdf/output_page.1.png">');
+        $('#image').append('<img id="card" src="/pdf/output_card_image.1.png">');
         
         $('#form-submit').removeAttr('value');
         $('#form-submit').removeAttr('onclick');

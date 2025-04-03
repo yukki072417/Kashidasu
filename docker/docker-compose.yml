@@ -14,16 +14,18 @@ services:
     tty: true
       
   app:
+    init: true
+    tty: true
+    stdin_open: true
+    restart: always
     working_dir: /usr/app/
     build: .
     container_name: app
     volumes:
       - ../:/usr/app/
-      - ../node_modules:/app/node_modules
+      - ../node_modules:/usr/app/node_modules
     ports:
       - 80:80
-    tty: true
-    stdin_open: true
 
 volumes:
   mysql_data:
