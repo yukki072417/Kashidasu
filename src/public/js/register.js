@@ -1,4 +1,4 @@
-function updateBookInformation() {
+function UpdateBookInformation() {
     const bookID = $('#book-id').val();
     const bookName = $('#book-name').val();
     const bookAuther = $('#book-auther').val();

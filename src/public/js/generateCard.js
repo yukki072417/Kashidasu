@@ -35,7 +35,6 @@ function SendContent() {
     };
 }
 
-// グローバルスコープで関数を定義
 window.download = function() {
     const fileUrl = '/pdf/output_card_image.1.png';
     const fileName = 'output_card_image.1.png';
