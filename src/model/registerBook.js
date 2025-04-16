@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const mysql = require('mysql2');
 
+app.use(express.json()); // JSON ボディを解析するためのミドルウェア
+
 app.RegisterBook = async (req, res) => {
+
     function Connect() {
         return mysql.createConnection({
             host: 'db',
@@ -13,19 +16,51 @@ app.RegisterBook = async (req, res) => {
     }
 
     const db = Connect();
-    const bookId = req.body.book_id;
-    const bookName = req.body.book_name;
-    const bookAuther = req.body.book_auther;
 
-    try{
-        db.query('INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)', [bookId, bookName, bookAuther]);
-        res.send({result: 'SUCCESS'});
-    }catch(error){
-        console.error(error.message);
-        res.send({result: 'FAILD', error_message: error.message});
+    const URL = 'http://localhost:80/search-book-isbn';
+    const isbn13Codes = req.body.isbn13_codes;
+
+    if (!isbn13Codes || !Array.isArray(isbn13Codes)) {
+        return res.status(400).send({ result: 'FAILED', message: 'Invalid ISBN codes' });
+    }
+
+    const data = { isbn13_codes: isbn13Codes};
+
+    await fetch(URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+        .then(async response => {
+            const json = await response.json();
+            RegisterBookToDB(res, db, json);
+        })
+        .catch(error => console.error('Fetch error:', error));
+
+};
+
+async function RegisterBookToDB(res, db, datas) {
+    for (let i = 0; i < datas.titles.length; i++) {
+        let data = datas.titles[i];
+
+        const isbn = data.isbn.slice(0, 14);
+        const title = data.title.slice(0, 30);
+        const authors = data.authors.slice(0, 30);
+
+        try {
+            await db.promise().query(
+                'INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)',
+                [isbn, title, authors]
+            );
+        } catch (error) {
+            console.error(`Error inserting data for ISBN ${isbn}:`, error);
+        }
     }
 
     db.end();
+    res.send({ result: 'SUCCESS' });
 }
 
 module.exports = app;

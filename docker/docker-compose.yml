@@ -6,11 +6,13 @@ services:
     ports:
       - 3306:3306
     environment:
-      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
-      TZ: ${TIME_ZONE}
+      # MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
+      # TZ: ${TIME_ZONE}
+      MYSQL_ROOT_PASSWORD: "ROOT"
+      TZ: "Asia/Tokyo"
     volumes:
       - ../db/:/docker-entrypoint-initdb.d
-      - mysql_data:/var/lib/mysql
+      # - mysql_data:/var/lib/mysql
     tty: true
       
   app:

@@ -1,50 +1,54 @@
-function UpdateBookInformation() {
-    const bookID = $('#book-id').val();
-    const bookName = $('#book-name').val();
-    const bookAuther = $('#book-auther').val();
+function RegisterBooksByFile() {
 
-    if (bookID.length > 10) {
-        alert('10文字以内で入力してください');
-    } else if (isNaN(bookID)) {
-        alert('数字で入力してください');
-    } else {
-        CheckingDB(bookID, bookName, bookAuther);
+    const csvInput = $('#csv-input');
+    const csvFile = csvInput[0].files[0];
+
+    if (csvFile == undefined) alert('ファイルが選択されていません');
+    else {
+        convertToArray(csvFile);
     }
 }
 
-function CheckingDB(bookID, bookName, bookAuther){
-    $.ajax({
-        url: '/search-book',
-        type: 'POST',
-        data: {
-            book_id : bookID,
-            manual_search_mode : true
-        },
-        success: function(response){
-            if(response.message == 'BOOK_NOT_EXIST') RequestRegisterBook(bookID, bookName, bookAuther);
-            else alert('すでに登録されています');
+function SelectFile() {
+    const csvInput = $('#csv-input');
+    csvInput.click();
+}
+
+function convertToArray(csvFile) {
+    const reader = new FileReader();
+
+    reader.readAsText(csvFile);
+    reader.onload = () => {
+
+        let csvArray = [];
+        let lines = reader.result.split(/\r\n|\n/);
+
+        for (let i = 0; i < lines.length; ++i) {
+            let cells = lines[i];
+            if (cells.length != 1) {
+                csvArray.push(cells);
+            }
         }
+        RegisterBook(csvArray);
+    }
+}
+
+function RegisterBook(csvArray) {
+    const URL = '/register-book';
+
+    const datas = JSON.stringify({ isbn13_codes: csvArray.filter(item => item.trim() !== '') });
+
+    fetch(URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: datas
     })
-}
-
-function RequestRegisterBook(bookID, bookName, bookAuther) {
-
-    const data = {  
-        book_id : bookID,
-        book_name : bookName,
-        book_auther : bookAuther
-    }
-
-    $.ajax({
-        url: '/register-book',
-        type: 'POST',
-        data: data,
-        success: function(response) {
-            alert('登録しました');
-            window.location.href = '/register';
-        },
-        error: function(xhr, status, error) {
-            console.error('Error:', error);
-        }
+    .then(async response => {
+        const json = await response.json();
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
     });
 }

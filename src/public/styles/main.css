@@ -213,6 +213,9 @@ body{
     padding-left:  60px;
     padding-right: 60px;
 }
+#book-title{
+    width: 150px;
+}
 #table td{
     text-align: center;
 }
@@ -253,16 +256,9 @@ body{
 
 /* Bellow code writing for registerBook page */
 
-.form-group{
-    width: 300px;
-    height: 25px;
-    
+.register-form-item{
+    width: 750px;
     margin: auto;
-    padding-left: 100px;
-    margin-top:    20px;
-    margin-bottom: 20px;
-    
-    text-align: left;
 }
 
 #submit-btn{
@@ -276,4 +272,8 @@ body{
 .form-item{
     width: 200px;
     height: 25px;
+}
+
+#csv-input{
+    display: none;
 }

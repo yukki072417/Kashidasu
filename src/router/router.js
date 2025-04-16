@@ -9,7 +9,7 @@ const returnBook = require('../model/returnBook');
 const uploadBook = require('../model/uploadBook');
 const registerBook = require('../model/registerBook');
 const deleteBook = require('../model/deleteBook');
-
+const searchBookOfISBN = require('../controller/searchBookOfISBN');
 //Specifying someting
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
@@ -34,8 +34,11 @@ const requireAuth = (req, res, next) => {
         res.redirect('/login');
 };
 
-// Sercching book
+// Searching book to DB
 router.post('/search-book', serachBook.SearchBook);
+
+// Seaching book of ISBN
+router.post('/search-book-isbn', searchBookOfISBN.SearchBookOfISBN);
 
 // Lending book
 router.post('/lend', lendBook.LendBook);
@@ -80,26 +83,21 @@ router.get('/main', requireAuth, (req, res) => {
     res.render('main', { resData: { id: req.session.admin_id } });
 });
 
-// Routing to reading qrcode page
 router.get('/read-qr', (req, res) => {
     res.render('readCode');
 });
 
-// Routing to generaging card page
 router.get('/genelate-card', requireAuth, (req, res) => {
     res.render('genelateCard');
 });
 
-// Routing to book-view page
 router.get('/book-view', (req, res) => {
     res.render('bookView');
 });
 
-// Processing when logout
 router.get('/logout', requireAuth, (req, res) => {
     res.clearCookie('connect.sid');
     res.redirect('login');
 });
 
-/// Export module
 module.exports = router;
