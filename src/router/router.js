@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const genelate = require('../controller/outputCard');
+const generate = require('../controller/outputCard');
 const auth = require('../model/auth');
 const serachBook = require('../model/serachBook');
 const lendBook = require('../model/lendBook');
@@ -52,18 +52,18 @@ router.post('/upload-book', uploadBook.UploadBook);
 // Deleting book
 router.post('/delete-book', deleteBook.DeleteBook);
 
-// Routing to login page
+// Routing to login pagew
 router.get('/', (req, res) => {
     res.redirect('login');
 });
 
 // Generating card
 router.post('/generating', (req, res) => {
-    genelate.GeneratingBarcode(req, res);
+    generate.GenerateCard(req, res);
 });
 
 router.get('/edit', (req, res) => {
-    res.render('edit');
+    res.render('Edit');
 });
 
 router.post('/register-book', (req, res) => {
@@ -72,27 +72,27 @@ router.post('/register-book', (req, res) => {
 
 // Routing to register page
 router.get('/register', (req, res) => {
-    res.render('registerBook');
+    res.render('RegisterBook');
 });
 
 //Routing to main page 
 router.get('/main', requireAuth, (req, res) => {
-    res.render('main', { resData: { id: req.session.admin_id } });
+    res.render('Main', { resData: { id: req.session.admin_id } });
 });
 
 // Routing to reading qrcode page
-router.get('/read-qr', (req, res) => {
-    res.render('readCode');
+router.get('/read-code', (req, res) => {
+    res.render('ReadCode');
 });
 
 // Routing to generaging card page
-router.get('/genelate-card', requireAuth, (req, res) => {
-    res.render('genelateCard');
+router.get('/generate-card', requireAuth, (req, res) => {
+    res.render('GenerateCard');
 });
 
 // Routing to book-view page
-router.get('/book-view', (req, res) => {
-    res.render('bookView');
+router.get('/book-list', (req, res) => {
+    res.render('BookList');
 });
 
 // Processing when logout
@@ -100,6 +100,18 @@ router.get('/logout', requireAuth, (req, res) => {
     res.clearCookie('connect.sid');
     res.redirect('login');
 });
+
+// Routing to Scanning Register page
+router.get('/scanning-registration', (req, res) => {
+    res.render('Registers/ScanningRegister');
+});
+
+// Routing to book-view page
+router.get('/collective-registration', (req, res) => {
+    res.render('Registers/CollectiveRegister');
+});
+
+
 
 /// Export module
 module.exports = router;
