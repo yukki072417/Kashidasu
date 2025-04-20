@@ -5,8 +5,8 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>ログインページ</title>
     
-    <link rel='stylesheet' href='/styles/login.css'>
-    <link rel='stylesheet' href='/styles/main.css'>
+    <link rel='stylesheet' href='/styles/Login.css'>
+    <!-- <link rel='stylesheet' href='/styles/main.css'> -->
 
     <script src='/js/jquery-3.7.1.min.js'></script>
     <script src='/js/login.js'></script>
@@ -15,10 +15,9 @@
 </head>
 <body>
 
-    <%- include('header') %>
+    <%- include('Header') %>
     
     <form method='post'>
-
         <h1 id='form-title'>ログインページ</h1>
         <div class='form-container'>
             <ul class='form-lists'>
@@ -29,8 +28,9 @@
         <div class='form-container' id='login'>
             <input id='login-btn' type='submit' value='ログイン'>
         </div>
-        
     </form>
-    <%- include('footer') %>
+    <input id='open-reading-code' type='button' onclick='location.href = "/read-code"' value='読み取り画面を開く'>
+
+    <%- include('Footer') %>
 </body>
 </html>

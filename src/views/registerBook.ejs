@@ -4,7 +4,7 @@
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>蔵書登録ページ</title>
-    <link rel='stylesheet' href='/styles/main.css'>
+    <link rel='stylesheet' href='/styles/RegisterBook.css'>
     <link rel='stylesheet' href='/fonts/fonts.css'>
     <meta name='robots' content='noindex' />
     
@@ -13,11 +13,15 @@
     <script src='/js/jquery-3.7.1.min.js'></script>
     <script src='/js/register.js'></script>
     
-    <%- include('header') %>
+    <%- include('Header') %>
 
+    <button class='animation-btn' onclick='location.href = "/main" '>←戻る</button>
     <div class='main'>
-        <button class='animation-btn' onclick='location.href = "/main" '>←戻る</button>
-        <div class='container'>
+
+        <div class='guidance-button' id="scanning-registration" class='site-item' onclick="location.href = '/scanning-registration'"></div>
+        <div class='guidance-button' id="collective-registration" class='site-item' onclick="location.href = '/collective-registration'"></div>
+
+        <!-- <div class='container'>
             <h2>書籍登録</h2>
             <div'>
                 <div class='form-group'>
@@ -34,11 +38,10 @@
                 </div>
                 <input type='button' onclick='UpdateBookInformation()' id='submit-btn' value='登録'>
             </div>
-
-        </div>
+        </div> -->
     </div>  
     
-    <%- include('footer') %>
+    <%- include('Footer') %>
 
 </body>
 </html>

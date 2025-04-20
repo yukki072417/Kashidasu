@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang='ja'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>一括登録ページ</title>
+    <link rel='stylesheet' href='/styles/RegisterBook.css'>
+    <link rel='stylesheet' href='/fonts/fonts.css'>
+    <meta name='robots' content='noindex' />
+    
+</head>
+<body>
+    <%- include('../Header') %>
+    <button class='animation-btn' onclick='location.href = "/register" '>←戻る</button>
+        <form method='post'>
+            <div id='input-form'>
+                <!-- ここに一括登録用のcsvファイルを読み込みボタンを置く -->
+            </div>
+            <input type="submit" id="submit-btn" value="登録">
+        </form>
+    <%- include('../Footer') %>
+
+</body>
+</html>
