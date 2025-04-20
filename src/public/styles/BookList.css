@@ -1,0 +1,25 @@
+/* Bellow code writing for bookView page */
+
+#table{
+    margin: auto;
+    margin-top: 25px;
+}
+
+#table th{
+    padding: 10px;
+    padding-left:  60px;
+    padding-right: 60px;
+}
+#table td{
+    text-align: center;
+}
+
+.search{
+    margin: auto;
+    width:  300px;
+    height: 50px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    
+    text-align: center;
+}

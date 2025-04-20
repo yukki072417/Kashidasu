@@ -62,11 +62,31 @@ label{
     border-radius: 7.5px;
     background-color: rgb(80, 180, 255);
 }
-
+#login-btn:hover, #open-reading-code:hover{
+    background-color: rgb(0, 127, 224);
+}
 .warn::placeholder{
     color: rgb(252, 70, 70);
 }
 .warn {
     border-style: solid;
     border-radius: 5px;
+}
+#open-reading-code{
+    display: flex;
+    
+    margin: auto;
+    margin-top: 30px;
+
+    text-align: center;
+
+    width: 150px;
+    height: 55px;
+    font-size: 15px;
+
+    background-color: rgb(80, 180, 255);
+    border-style: none;
+    border-radius: 7.5px;
+
+    font-family: 'mplus-medium';
 }
