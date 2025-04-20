@@ -23,7 +23,7 @@ function ensureDirectoryExists(dirPath) {
   }
 }
 
-function generateBarcode(studentID) {
+function Generating(studentID) {
   try {
     const canvas = createCanvas(barcodeW, barcodeH);
     Jsbarcode(canvas, studentID, {
@@ -66,7 +66,7 @@ async function createPdf(outputPath, studentData) {
     const lightFontBytes = await fs.promises.readFile(lightFontPath);
     const lightFontFamily = await pdfDoc.embedFont(lightFontBytes);
 
-    const barcodePath = generateBarcode(studentData.id);
+    const barcodePath = Generating(studentData.id);
     const barcodeBytes = await fs.promises.readFile(barcodePath);
     const barcodeImage = await pdfDoc.embedPng(barcodeBytes);
     const barcodeDims = barcodeImage.scale(1);
@@ -98,7 +98,8 @@ async function createPdf(outputPath, studentData) {
 
     const pdfBytes = await pdfDoc.save();
     await fs.promises.writeFile(outputPath, pdfBytes);
-    console.log('PDFファイルが正常に生成されました:', outputPath);
+    //デバック専用
+    // console.log('PDFファイルが正常に生成されました:', outputPath);
     return true;
   } catch (error) {
     console.error('PDF生成中にエラーが発生:', error);
@@ -110,7 +111,7 @@ async function convertPdfToPng(pdfPath, outputDir) {
   try {
     const options = {
       density: 300,
-      saveFilename: "output_card_image",
+      saveFilename: "kashidasu_card",
       savePath: outputDir,
       format: "png",
       width: 400,
@@ -124,10 +125,10 @@ async function convertPdfToPng(pdfPath, outputDir) {
   }
 }
 
-app.post('/generate-barcode', async (req, res) => {
+app.GenerateCard = async (req, res) => {
   try {
     const studentData = req.body;
-    const pdfOutputPath = path.resolve('/usr/app/src/public/pdf/output_card.pdf');
+    const pdfOutputPath = path.resolve('/usr/app/src/public/pdf/kashidasu_card.pdf');
     const pngOutputDir = path.resolve('/usr/app/src/public/pdf/');
 
     const pdfCreated = await createPdf(pdfOutputPath, studentData);
@@ -141,6 +142,6 @@ app.post('/generate-barcode', async (req, res) => {
     console.error('リクエスト処理中にエラーが発生:', error);
     res.status(500).send({ error: 'PDF生成中にエラーが発生しました' });
   }
-});
+};
 
 module.exports = app;
