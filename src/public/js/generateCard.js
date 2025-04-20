@@ -36,8 +36,8 @@ function SendContent() {
 }
 
 window.download = function() {
-    const fileUrl = '/pdf/output_card_image.1.png';
-    const fileName = 'output_card_image.1.png';
+    const fileUrl = '/pdf/kashidasu_card.1.png';
+    const fileName = 'kashidasu_card.1.png';
 
     const link = document.createElement('a');
     link.href = fileUrl;
@@ -56,7 +56,7 @@ function ShowImage() {
             $('#card').remove();
         }
 
-        $('#image').append('<img id="card" src="/pdf/output_card_image.1.png">');
+        $('#image').append('<img id="card" src="/pdf/kashidasu_card.1.png">');
         
         $('#form-submit').removeAttr('value');
         $('#form-submit').removeAttr('onclick');
