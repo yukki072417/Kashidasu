@@ -9,7 +9,7 @@ const returnBook = require('../model/returnBook');
 const uploadBook = require('../model/uploadBook');
 const registerBook = require('../model/registerBook');
 const deleteBook = require('../model/deleteBook');
-
+const searchBookOfISBN = require('../controller/searchBookOfISBN');
 //Specifying someting
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
@@ -34,8 +34,11 @@ const requireAuth = (req, res, next) => {
         res.redirect('/login');
 };
 
-// Sercching book
+// Searching book to DB
 router.post('/search-book', serachBook.SearchBook);
+
+// Seaching book of ISBN
+router.post('/search-book-isbn', searchBookOfISBN.SearchBookOfISBN);
 
 // Lending book
 router.post('/lend', lendBook.LendBook);
@@ -95,12 +98,12 @@ router.get('/book-list', (req, res) => {
     res.render('BookList');
 });
 
-// Processing when logout
 router.get('/logout', requireAuth, (req, res) => {
     res.clearCookie('connect.sid');
     res.redirect('login');
 });
 
+<<<<<<< HEAD
 // Routing to Scanning Register page
 router.get('/scanning-registration', (req, res) => {
     res.render('Registers/ScanningRegister');
@@ -114,4 +117,6 @@ router.get('/collective-registration', (req, res) => {
 
 
 /// Export module
+=======
+>>>>>>> 9ce123f5aa2b8d5012f5b8f15e8e6f7dc3239d22
 module.exports = router;
