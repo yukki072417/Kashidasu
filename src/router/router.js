@@ -103,7 +103,6 @@ router.get('/logout', requireAuth, (req, res) => {
     res.redirect('login');
 });
 
-<<<<<<< HEAD
 // Routing to Scanning Register page
 router.get('/scanning-registration', (req, res) => {
     res.render('Registers/ScanningRegister');
@@ -114,9 +113,5 @@ router.get('/collective-registration', (req, res) => {
     res.render('Registers/CollectiveRegister');
 });
 
-
-
 /// Export module
-=======
->>>>>>> 9ce123f5aa2b8d5012f5b8f15e8e6f7dc3239d22
 module.exports = router;
