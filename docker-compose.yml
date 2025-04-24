@@ -1,19 +1,18 @@
-# version: '3.8'
 services:
   db:
+    tty: true
+    init: true
+    stdin_open: true
     image: mysql:8.0
     container_name: db
+    volumes:
+      - ./db/:/docker-entrypoint-initdb.d
+      # - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
+      TZ: ${TIME_ZONE}
     ports:
       - 3306:3306
-    environment:
-      # MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
-      # TZ: ${TIME_ZONE}
-      MYSQL_ROOT_PASSWORD: "ROOT"
-      TZ: "Asia/Tokyo"
-    volumes:
-      - ../db/:/docker-entrypoint-initdb.d
-      # - mysql_data:/var/lib/mysql
-    tty: true
       
   app:
     init: true
@@ -24,8 +23,7 @@ services:
     build: .
     container_name: app
     volumes:
-      - ../:/usr/app/
-      - ../node_modules:/usr/app/node_modules
+      - ./:/usr/app/
     ports:
       - 80:80
 
