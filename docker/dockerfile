@@ -1,8 +1,8 @@
 FROM node:latest
 
 WORKDIR /usr/app/
-COPY start.sh /start.sh
-RUN chmod 744 /start.sh
+# COPY start.sh /start.sh
+# RUN chmod 744 /start.sh
 
 RUN apt-get update && \
     apt-get install -y bash && \
@@ -18,4 +18,4 @@ RUN apt-get update && apt-get install -y libcario2-dev libjpeg-dev libpango1.0-d
 RUN rm -rf node_modules package-lock.json && \
     npm cache clean --force && npm install
 
-CMD [ "/start.sh" ]
+# CMD [ "/start.sh" ]
