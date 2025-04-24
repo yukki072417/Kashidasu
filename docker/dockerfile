@@ -14,4 +14,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install -y libcario2-dev libjpeg-dev libpango1.0-dev libgif-de build-essentioal g++
+RUN rm -rf node_modules package-lock.json && \
+    npm cache clean --force && npm install
+
 CMD [ "/start.sh" ]
