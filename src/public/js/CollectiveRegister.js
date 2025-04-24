@@ -1,5 +1,5 @@
 function RegisterBooksByFile() {
-
+    
     const csvInput = $('#csv-input');
     const csvFile = csvInput[0].files[0];
 
@@ -19,7 +19,6 @@ function convertToArray(csvFile) {
 
     reader.readAsText(csvFile);
     reader.onload = () => {
-
         let csvArray = [];
         let lines = reader.result.split(/\r\n|\n/);
 
@@ -38,6 +37,7 @@ function RegisterBook(csvArray) {
 
     const datas = JSON.stringify({ isbn13_codes: csvArray.filter(item => item.trim() !== '') });
 
+    console.log(datas);
     fetch(URL, {
         method: 'POST',
         headers: {

@@ -18,13 +18,13 @@ app.RegisterBook = async (req, res) => {
     const db = Connect();
 
     const URL = 'http://localhost:80/search-book-isbn';
-    const isbn13Codes = req.body.isbn13_codes;
+    const codes = req.body.isbn13_codes;
 
-    if (!isbn13Codes || !Array.isArray(isbn13Codes)) {
+    if (!codes || !Array.isArray(codes)) {
         return res.status(400).send({ result: 'FAILED', message: 'Invalid ISBN codes' });
     }
 
-    const data = { isbn13_codes: isbn13Codes};
+    const data = { isbn13_codes: codes};
 
     await fetch(URL, {
         method: 'POST',
@@ -36,6 +36,7 @@ app.RegisterBook = async (req, res) => {
         .then(async response => {
             const json = await response.json();
             RegisterBookToDB(res, db, json);
+            console.dir(json);
         })
         .catch(error => console.error('Fetch error:', error));
 

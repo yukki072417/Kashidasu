@@ -79,3 +79,27 @@
 #submit-btn:hover{
     background-color: rgb(111, 170, 220);
 }
+
+h2{
+    text-align: center;
+}
+
+#csv-input{
+    display: none;
+}
+#file-selecter{
+    width: 250px;
+    height: 100px;
+
+    font-size: 26px;
+    border-radius: 10px;
+
+    background-color: white;
+
+    box-shadow: 0px 5px gray;
+}
+
+#file-selecter:hover{
+    transform: translateY(5px);
+    box-shadow: 0px 0px gray;
+}

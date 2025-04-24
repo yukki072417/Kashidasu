@@ -66,7 +66,7 @@ router.post('/generating', (req, res) => {
 });
 
 router.get('/edit', (req, res) => {
-    res.render('Edit');
+    res.render('EditBook');
 });
 
 router.post('/register-book', (req, res) => {
@@ -74,7 +74,7 @@ router.post('/register-book', (req, res) => {
 });
 
 // Routing to register page
-router.get('/register', (req, res) => {
+router.get('/register', requireAuth, (req, res) => {
     res.render('RegisterBook');
 });
 
@@ -104,12 +104,12 @@ router.get('/logout', requireAuth, (req, res) => {
 });
 
 // Routing to Scanning Register page
-router.get('/scanning-registration', (req, res) => {
+router.get('/scanning-registration', requireAuth, (req, res) => {
     res.render('Registers/ScanningRegister');
 });
 
 // Routing to book-view page
-router.get('/collective-registration', (req, res) => {
+router.get('/collective-registration', requireAuth, (req, res) => {
     res.render('Registers/CollectiveRegister');
 });
 

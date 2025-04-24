@@ -43,14 +43,14 @@ async function RequestCameraPermission() {
         alert('カメラの許可が必要です。設定を確認してください');
         return;
     }
-    InitQuagga();
+    InitQuagga('code_128_reader');
 }
 
 function StopStream(stream) {
     stream.getTracks().forEach((track) => track.stop());
 }
 
-function InitQuagga() {
+function InitQuagga(readerType) {
     Quagga.init({
         inputStream: {
             name: 'Live',
@@ -58,7 +58,7 @@ function InitQuagga() {
             target: document.querySelector('#interactive')
         },
         decoder: {
-            readers: ['code_128_reader'],
+            readers: [readerType],
         },
     }, (err) => {
         if (err) {
@@ -84,7 +84,7 @@ async function Detected(result) {
         alert('ユーザーカードのバーコードが読み取られました。\n2秒後に本のバーコードの読み取りを開始します。');
 
         setTimeout(() => {
-            InitQuagga();
+            InitQuagga('ean_reader');
             alert('本のバーコードを読み取ってください');
         }, 2000);
     } else {
@@ -106,12 +106,13 @@ function SendData(userBarcode, bookBarcode) {
         data: data,
         success: function(result) {
             console.dir(result);
-
-            // if(result[0])
             alert('本のバーコードも読み取られました');
         },
         error: function(xhr, status, error) {
             console.error('JSONパースエラー:', error);
         }
     })
+    .done(function(result){
+        console.log(result);
+    });
 }

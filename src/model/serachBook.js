@@ -35,16 +35,16 @@ app.SearchBook = async (req, res) => {
 
 async function ManualSearchMode(db, bookID, res) {
   let response = [];
-  
+
   const [results] = await db.query(`
     SELECT b.*, 
     CASE WHEN l.BOOK_ID IS NOT NULL THEN TRUE ELSE FALSE END AS IS_LENDING 
     FROM BOOKS b 
     LEFT JOIN LENDING_BOOK l ON b.ID = l.BOOK_ID 
-    WHERE b.ID = ?`, 
+    WHERE b.ID = ?`,
     [bookID]
   );
-  
+
   if (results.length === 0) {
     res.send({ result: 'FAILED', message: 'BOOK_NOT_EXIST' });
   } else {
@@ -72,19 +72,38 @@ async function AutoSearchMode(db, bookNum, res) {
     let count = 0 + minSearch;
 
     response.push(recordNum[0]);
-    
-    const lendingInformation = await GetLendingBooks(db);
-    if(lendingInformation != undefined) results[0].USER_ID = lendingInformation.USER_ID;
 
-    response = response.concat(FormatResults(results));    
+    const lendingInformation = await GetLendingBooks(db);
+    if (lendingInformation != undefined) {
+      for (let i = 0; i < results.length; i++) {
+        if (results[i].IS_LENDING == 1) {
+          results[i].USER_ID = GetLendingUser(results, lendingInformation);
+        }
+      }
+    }
+    response = response.concat(FormatResults(results));
     res.send(response);
   }
 }
 
-function FormatResults(results) {
+function GetLendingUser(results, lendingInformation) {
+  let isLending_array = []
+  results.forEach(result => {
+    if (result.IS_LENDING == 1) {
+      isLending_array.push(result.ID);
+    }
+  });
+  for(let j = 0; j < lendingInformation.length; j++){
 
-  if(results[0].USER_ID == undefined) results[0].USER_ID = null;
-  
+  if(isLending_array[j] == lendingInformation[j].BOOK_ID){
+    return lendingInformation[j].USER_ID;
+  }
+  }
+}
+
+function FormatResults(results) {
+  if (results[0].USER_ID == undefined) results[0].USER_ID = null;
+
   return results.map(result => ({
     book_id: result.ID,
     book_name: result.BOOK_NAME,
@@ -97,7 +116,7 @@ function FormatResults(results) {
 async function GetLendingBooks(db) {
   try {
     const [results] = await db.query('SELECT * FROM LENDING_BOOK');
-    return results[0];
+    return results;
   } catch (error) {
     console.error('エラー:', error);
     throw error;
