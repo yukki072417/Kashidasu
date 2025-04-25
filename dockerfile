@@ -5,6 +5,8 @@ WORKDIR /usr/app/
 COPY package.json /usr/app/
 COPY package-lock.json /usr/app/
 
+RUN apt update && apt install -y libnode108
+
 RUN npm install
 
 #RUN apt-get update && \
