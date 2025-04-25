@@ -7,7 +7,7 @@ COPY package-lock.json /usr/app/
 
 RUN apt update && apt install -y libnode108
 
-RUN apt install python3 build-essential
+# RUN apt install python3 build-essential
 RUN npm install -g node-gyp
 
 #RUN apt-get update && \
