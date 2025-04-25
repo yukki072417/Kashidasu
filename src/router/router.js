@@ -6,7 +6,7 @@ const auth = require('../model/auth');
 const serachBook = require('../model/serachBook');
 const lendBook = require('../model/lendBook');
 const returnBook = require('../model/returnBook');
-const uploadBook = require('../model/uploadBook');
+const updateBook = require('../model/updateBook');
 const registerBook = require('../model/registerBook');
 const deleteBook = require('../model/deleteBook');
 const searchBookOfISBN = require('../controller/searchBookOfISBN');
@@ -49,8 +49,8 @@ router.post('/return', returnBook.ReturnBook);
 // Logining user
 router.post('/main', auth.Login);
 
-// Uploading book
-router.post('/upload-book', uploadBook.UploadBook);
+// updateing book
+router.post('/upload-book', updateBook.UploadBook);
 
 // Deleting book
 router.post('/delete-book', deleteBook.DeleteBook);
