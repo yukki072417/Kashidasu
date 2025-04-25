@@ -1,11 +1,11 @@
-FROM node:latest
+FROM node:20
 
 WORKDIR /usr/app/
 
 COPY package.json /usr/app/
 COPY package-lock.json /usr/app/
 
-RUN apt update && apt install -y libnode108
+RUN apt update && apt install -y libnode108 
 
 # RUN apt install python3 build-essential
 RUN npm install -g node-gyp
