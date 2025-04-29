@@ -3,7 +3,7 @@ const app = express();
 const mysql = require('mysql2');
 
 app.DeleteBook = async (req, res) => {
-
+    
     function Connect() {
         return mysql.createConnection({
             host: 'db',
@@ -11,6 +11,14 @@ app.DeleteBook = async (req, res) => {
             password: process.env.ROOT_PASSWORD,
             database: 'KASHIDASU'
         });
+    }
+
+    if(req.body.all_delete != undefined) {
+        const db = Connect();
+        db.query('DELETE FROM BOOKS');
+        db.end();
+        res.send([{result: 'SUCCESS'}]).status(200);
+        return;
     }
 
     const db = Connect();

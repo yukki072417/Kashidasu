@@ -12,7 +12,8 @@ function Connect() {
 }
 
 app.ReturnBook = async (req, res) => {
-    console.log(req.body);
+
+    console.log(req.body)
 
     const db = await Connect();
     const reqContent = req.body;
