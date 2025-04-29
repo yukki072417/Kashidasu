@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql2');
+const log4js = require('log4js');
+const logger = log4js.getLogger('http');
 
 app.DeleteBook = async (req, res) => {
     
@@ -27,7 +29,7 @@ app.DeleteBook = async (req, res) => {
     db.query('DELETE FROM BOOKS WHERE ID = ?', [bookId]);
     db.end();
     res.send([{result: 'SUCCESS'}]).status(200);
-
+    logger.info(`Book ${bookId} deleted successfully`);
 }
 
 module.exports = app;
