@@ -1,11 +1,22 @@
+$(document).ready(function () {
+    $('#csv-input').on('change', function () {
+        const csvFile = this.files[0];
+        if (csvFile) {
+            alert(`ファイル「${csvFile.name}」が選択されました`);
+        }
+    });
+});
+
 function RegisterBooksByFile() {
-    
     const csvInput = $('#csv-input');
     const csvFile = csvInput[0].files[0];
-
     if (csvFile == undefined) alert('ファイルが選択されていません');
     else {
-        convertToArray(csvFile);
+        if (confirm('本を登録しますか？ \nまた、すでに登録されてる本は削除されます。 \n\nよろしいですか？')) {
+            const csvInput = $('#csv-input');
+            const csvFile = csvInput[0].files[0];
+            convertToArray(csvFile);
+        }
     }
 }
 
@@ -33,22 +44,33 @@ function convertToArray(csvFile) {
 }
 
 function RegisterBook(csvArray) {
-    const URL = '/register-book';
+    const Register_URL = '/register-book';
+    const AllDeleteDB_URL = '/delete-book';
 
     const datas = JSON.stringify({ isbn13_codes: csvArray.filter(item => item.trim() !== '') });
 
-    console.log(datas);
-    fetch(URL, {
+    fetch(AllDeleteDB_URL, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: datas
+        body: JSON.stringify({ all_delete: true })
+
     })
-    .then(async response => {
-        const json = await response.json();
-    })
-    .catch(error => {
-        console.error('Fetch error:', error);
-    });
+        .then(response => {
+            fetch(Register_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: datas
+            })
+                .then(async response => {
+                    const json = await response.json();
+                    alert('正常に登録されました')
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                });
+        })
 }

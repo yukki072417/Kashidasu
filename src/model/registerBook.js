@@ -1,7 +1,8 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql2');
-
+const log4js = require('log4js');
+const logger = log4js.getLogger('http');
 app.use(express.json()); // JSON ボディを解析するためのミドルウェア
 
 app.RegisterBook = async (req, res) => {
@@ -36,7 +37,6 @@ app.RegisterBook = async (req, res) => {
         .then(async response => {
             const json = await response.json();
             RegisterBookToDB(res, db, json);
-            console.dir(json);
         })
         .catch(error => console.error('Fetch error:', error));
 
@@ -55,6 +55,7 @@ async function RegisterBookToDB(res, db, datas) {
                 'INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)',
                 [isbn, title, authors]
             );
+            logger.info(`Book ${isbn} registered successfully on ${new Date().toISOString()}`);
         } catch (error) {
             console.error(`Error inserting data for ISBN ${isbn}:`, error);
         }
