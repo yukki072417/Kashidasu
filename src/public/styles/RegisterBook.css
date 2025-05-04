@@ -35,14 +35,6 @@
 
 }
 
-#collective-registration{
-    background: url('https://dummyimage.com/150x150/000/fff&text=collective');
-}
-
-#scanning-registration{
-    background: url('https://dummyimage.com/150x150/000/fff&text=scan');
-}
-
 .main{
     display: flex;
     justify-content: center;

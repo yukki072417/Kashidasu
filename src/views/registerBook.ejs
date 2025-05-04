@@ -20,18 +20,13 @@
     <button class='animation-btn' onclick='location.href = "/main" '>←戻る</button>
     <div class='main'>
 
-        <div class='guidance-button' id="scanning-registration" class='site-item' onclick="location.href = '/scanning-registration'"></div>
-        <div class='guidance-button' id="collective-registration" class='site-item' onclick="location.href = '/collective-registration'"></div>
+        <div class='guidance-button' id="scanning-registration" class='site-item' onclick="location.href = '/scanning-registration'">
+            <h1>スキャンで登録</h1>
+        </div>
+        <div class='guidance-button' id="collective-registration" class='site-item' onclick="location.href = '/collective-registration'">            
+            <h1>CSVファイルで登録</h1>
+        </div>
 
-        <!-- <div class='container'>
-            <h2>書籍登録</h2>
-            <div'>
-                <div class='form-group'>
-                    <input type='text' class='form-item' id='book-id' name='book-id' required>
-                    <label for='ID'>本のID</label>
-                </div>
-            </div>
-        </div> -->
     </div>  
     
     <%- include('Footer') %>
