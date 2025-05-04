@@ -22,8 +22,6 @@ services:
     working_dir: /usr/app/
     build: .
     container_name: app
-    volumes:
-      - ./:/usr/app/
     ports:
       - 80:80
 

@@ -1,9 +1,8 @@
-FROM node:20
+FROM node:23
 
 WORKDIR /usr/app/
 
-COPY package.json /usr/app/
-COPY package-lock.json /usr/app/
+COPY . /usr/app/
 
 # 必要なライブラリをインストール
 RUN apt-get update && apt-get install -y \
