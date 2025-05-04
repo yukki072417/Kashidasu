@@ -18,20 +18,36 @@ function InitQuagga() {
 
     Quagga.onDetected((result) => {
         if (result.codeResult.code) {
+            Quagga.offDetected(); // イベントリスナーを解除
             Detected(result.codeResult.code);
-        } 
+        }
     });
 }
 InitQuagga();
 
-function Detected(resultCode){
-    if(confirm(`ISBNコードは ${resultCode} でよろしいですか？`)){
-        RegisterBook(resultCode);
+function Detected(resultCode) {
+    if (confirm(`ISBNコードは ${resultCode} でよろしいですか？`)) {
+        const title = prompt('本のタイトルを入力してください:');
+        const author = prompt('著者名を入力してください:');
+        if (title && author) {
+            RegisterBook(resultCode, title, author);
+        } else {
+            alert('タイトルと著者名は必須です。');
+        }
     }
-
 }
-function RegisterBook(code){
-    const data = {'isbn13_codes': [code]};
+
+function RegisterBook(isbn, title, author) {
+    const data = {
+        books: [
+            {
+                isbn: isbn,
+                title: title,
+                author: author
+            }
+        ]
+    };
+
     fetch('/register-book', {
         method: 'POST',
         headers: {
@@ -40,7 +56,15 @@ function RegisterBook(code){
         body: JSON.stringify(data),
     })
     .then(async response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const json = await response.json();
         console.log(json);
+        alert('本が正常に登録されました。');
+    })
+    .catch(error => {
+        console.error('Fetch error:', error);
+        alert('本の登録中にエラーが発生しました。');
     });
 }
