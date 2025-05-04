@@ -1,11 +1,14 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql2');
-
+const log4js = require('log4js');
+const logger = log4js.getLogger('http');
 app.use(express.json()); // JSON ボディを解析するためのミドルウェア
 
 app.RegisterBook = async (req, res) => {
+    console.log(req.body);
 
+    // データベース接続関数
     function Connect() {
         return mysql.createConnection({
             host: 'db',
@@ -16,52 +19,46 @@ app.RegisterBook = async (req, res) => {
     }
 
     const db = Connect();
+    const books = req.body.books;
 
-    const URL = 'http://localhost:80/search-book-isbn';
-    const codes = req.body.isbn13_codes;
-
-    if (!codes || !Array.isArray(codes)) {
-        return res.status(400).send({ result: 'FAILED', message: 'Invalid ISBN codes' });
+    // リクエストのバリデーション
+    if (!books || !Array.isArray(books)) {
+        return res.status(400).send({ result: 'FAILED', message: 'Invalid books data' });
     }
 
-    const data = { isbn13_codes: codes};
-
-    await fetch(URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    })
-        .then(async response => {
-            const json = await response.json();
-            RegisterBookToDB(res, db, json);
-            console.dir(json);
-        })
-        .catch(error => console.error('Fetch error:', error));
-
+    // 一括登録処理
+    try {
+        await RegisterBooksToDB(res, db, books);
+    } catch (error) {
+        console.error('Error during book registration:', error);
+        res.status(500).send({ result: 'FAILED', message: 'Internal server error' });
+    }
 };
 
-async function RegisterBookToDB(res, db, datas) {
-    for (let i = 0; i < datas.titles.length; i++) {
-        let data = datas.titles[i];
+// データベースに本を登録する関数
+async function RegisterBooksToDB(res, db, books) {
+    const insertQuery = 'INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)';
 
-        const isbn = data.isbn.slice(0, 14);
-        const title = data.title.slice(0, 30);
-        const authors = data.authors.slice(0, 30);
+    try {
+        for (const book of books) {
+            const { isbn, title, author } = book;
 
-        try {
-            await db.promise().query(
-                'INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)',
-                [isbn, title, authors]
-            );
-        } catch (error) {
-            console.error(`Error inserting data for ISBN ${isbn}:`, error);
+            if (!isbn || !title || !author) {
+                console.warn('Invalid book data:', book);
+                continue;
+            }
+
+            await db.promise().query(insertQuery, [isbn, title, author]);
+            logger.info(`Book ${isbn} registered successfully on ${new Date().toISOString()}`);
         }
-    }
 
-    db.end();
-    res.send({ result: 'SUCCESS' });
+        res.send({ result: 'SUCCESS' });
+    } catch (error) {
+        console.error('Error inserting books into database:', error);
+        throw error;
+    } finally {
+        db.end(); // データベース接続を確実に終了
+    }
 }
 
 module.exports = app;
