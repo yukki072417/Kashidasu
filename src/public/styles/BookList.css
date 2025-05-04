@@ -7,13 +7,13 @@
 
 #table th{
     padding: 10px;
-    padding-left:  60px;
-    padding-right: 60px;
+    padding-left:  30px;
+    padding-right: 30px;
 }
 #table td{
     text-align: center;
+    height: 35px;
 }
-
 .search{
     margin: auto;
     width:  300px;
@@ -22,4 +22,22 @@
     margin-bottom: 20px;
     
     text-align: center;
+}
+#book-auther{
+    width: 120px;
+}
+#book-title{
+    width: 250px;
+}
+#book-state{
+    width: 120px;
+}
+#book-menu{
+    width: 75px;
+}
+#book-lend-person{
+    width: 100px;
+}
+#book-isbn{
+    width: 120px;
 }

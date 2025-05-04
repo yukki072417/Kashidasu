@@ -1,17 +1,36 @@
 <!DOCTYPE html>
 <html lang='ja'>
+
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>読み取り登録</title>
-    <link rel='stylesheet' href='/styles/RegisterBook.css'>
+    <title>読み取りページ</title>
+    
+    <script src='/js/jquery-3.7.1.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js'></script>
+
+    <link rel='stylesheet' href='/styles/ReadCode.css'>
     <link rel='stylesheet' href='/fonts/fonts.css'>
     <meta name='robots' content='noindex' />
+
+        
 </head>
+
 <body>
     <%- include('../Header') %>
-    <button class='animation-btn' onclick='location.href = "/register" '>←戻る</button>
-        
+    
+    <section id='read-qr'>
+        <div class='buttons'>
+            <button class='animation-btn' onclick='location.href = "/register" '>←戻る</button>
+        </div>
+        <div id='read-view'>
+            <div id='interactive'></div>
+            <canvas class='drawRect'></canvas>
+        </div>
+    </section>
     <%- include('../Footer') %>
+    
+    <script src='/js/SccaningRegister.js'></script>
 </body>
+
 </html>

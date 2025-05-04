@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql2');
+const log4js = require('log4js');
+const logger = log4js.getLogger('http');
 
 app.UploadBook = async (req, res) => {
     
@@ -24,6 +26,7 @@ app.UploadBook = async (req, res) => {
         db.query('DELETE FROM BOOKS WHERE ID = ?', [BEFORE_BOOK_ID]);
         db.query('INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)', [BOOK_ID, BOOK_NAME, WRITTER]);
         db.end();
+        logger.info(`Book ${BOOK_ID} updated successfully`);
         res.send({result: 'SUCCESS'}).status(200);
     }catch(e){
         res.send({result: 'FAILED', message: e.message}).status(200);

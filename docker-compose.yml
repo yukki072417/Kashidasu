@@ -7,7 +7,7 @@ services:
     container_name: db
     volumes:
       - ./db/:/docker-entrypoint-initdb.d
-      # - mysql_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
       TZ: ${TIME_ZONE}
@@ -22,8 +22,6 @@ services:
     working_dir: /usr/app/
     build: .
     container_name: app
-    volumes:
-      - ./:/usr/app/
     ports:
       - 80:80
 

@@ -30,7 +30,6 @@ function LoadBooks(pageNum) {
             'manual_search_mode': false
         }),
         success: function(data) {
-            console.log(data);
             if (data && data.length > 0) {
                 totalRecords = data[0]['COUNT(ID)'];
                 SetTable(data.slice(1));
@@ -59,7 +58,6 @@ $('#table tr:gt(0)').remove();
     }
 
     data.forEach(book => {
-        console.log(book);
         if (book && book.book_name) {
             const $row = $('<tr>');
 

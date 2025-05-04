@@ -1,9 +1,11 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql2');
+const log4js = require('log4js');
+const logger = log4js.getLogger('http');
 
 app.DeleteBook = async (req, res) => {
-
+    
     function Connect() {
         return mysql.createConnection({
             host: 'db',
@@ -13,13 +15,21 @@ app.DeleteBook = async (req, res) => {
         });
     }
 
+    if(req.body.all_delete != undefined) {
+        const db = Connect();
+        db.query('DELETE FROM BOOKS');
+        db.end();
+        res.send([{result: 'SUCCESS'}]).status(200);
+        return;
+    }
+
     const db = Connect();
     const bookId = req.body.book_id;
 
     db.query('DELETE FROM BOOKS WHERE ID = ?', [bookId]);
     db.end();
     res.send([{result: 'SUCCESS'}]).status(200);
-
+    logger.info(`Book ${bookId} deleted successfully`);
 }
 
 module.exports = app;

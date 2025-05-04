@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const generate = require('../controller/outputCard');
+const generate = require('../generater/outputCard');
 const auth = require('../model/auth');
 const serachBook = require('../model/serachBook');
 const lendBook = require('../model/lendBook');
@@ -9,7 +9,6 @@ const returnBook = require('../model/returnBook');
 const updateBook = require('../model/updateBook');
 const registerBook = require('../model/registerBook');
 const deleteBook = require('../model/deleteBook');
-const searchBookOfISBN = require('../controller/searchBookOfISBN');
 //Specifying someting
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
@@ -36,9 +35,6 @@ const requireAuth = (req, res, next) => {
 
 // Searching book to DB
 router.post('/search-book', serachBook.SearchBook);
-
-// Seaching book of ISBN
-router.post('/search-book-isbn', searchBookOfISBN.SearchBookOfISBN);
 
 // Lending book
 router.post('/lend', lendBook.LendBook);
