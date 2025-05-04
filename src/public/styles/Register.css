@@ -33,6 +33,11 @@
     margin-left:  75px;
     margin-right: 75px;
 
+    border: solid 3px rgb(188, 188, 188);
+}
+
+.guidance-button:hover{
+    background-color: rgb(210, 210, 210);
 }
 
 .main{
@@ -94,4 +99,9 @@ h2{
 #file-selecter:hover{
     transform: translateY(5px);
     box-shadow: 0px 0px gray;
+}
+
+.guidance-text{
+    text-align: center;
+    font-size: 22px;    
 }

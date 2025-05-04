@@ -119,13 +119,13 @@ function SendData(userBarcode, bookBarcode) {
     })
     .done(function(result) {
 
-        if (result.result == 'SUCCESS' && readMode == 'lend') alert('正常に貸出が完了しました');
-        else if (result.result == 'FAILED' && result.message == 'BOOK_NOT_EXIST') alert('エラー: この本は存在しません\n正常に読み込まれていないか、本が登録されていません。');
+        if (result.result === 'SUCCESS' && readMode == 'lend') alert('正常に貸出が完了しました');
+        else if (result.result === 'FAILED' && result.message == 'BOOK_ALRADY_LENDING') alert('エラー: この本はすでに貸出中です\n先に返却してください');
         
         if (result.result == 'SUCCESS' && readMode == 'return') alert('正常に返却が完了しました');
-        else if (result.result == 'FAILED' && result.message == 'BOOK_ALRADY_LENDING') alert('エラー: この本はすでに貸出中です\n先に返却してください');
+        else if (result.result == 'FAILED' && result.message == 'BOOK_NOT_EXIST') alert('エラー: この本は存在しません\n正常に読み込まれていないか、本が登録されていません\n読み取られたISBNコード: ' + result.requested_data);
         
-        location.reload();
+        // location.reload();
 
     })
     .always(() => {

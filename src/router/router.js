@@ -22,7 +22,7 @@ router.get('/login', (req, res) => {
         return res.redirect('/main');
     }
     // Rendering to login page
-    res.render('login');
+    res.render('Login');
 });
 
 //Checking user session
@@ -30,7 +30,7 @@ const requireAuth = (req, res, next) => {
     if (req.session.admin_authed)
         next();
     else
-        res.redirect('/login');
+        res.redirect('/Login');
 };
 
 // Searching book to DB
@@ -53,7 +53,7 @@ router.post('/delete-book', deleteBook.DeleteBook);
 
 // Routing to login pagew
 router.get('/', (req, res) => {
-    res.redirect('login');
+    res.redirect('Login');
 });
 
 // Generating card
@@ -71,7 +71,7 @@ router.post('/register-book', (req, res) => {
 
 // Routing to register page
 router.get('/register', requireAuth, (req, res) => {
-    res.render('RegisterBook');
+    res.render('Register');
 });
 
 //Routing to main page 
@@ -96,7 +96,7 @@ router.get('/book-list', (req, res) => {
 
 router.get('/logout', requireAuth, (req, res) => {
     res.clearCookie('connect.sid');
-    res.redirect('login');
+    res.redirect('Login');
 });
 
 // Routing to Scanning Register page
