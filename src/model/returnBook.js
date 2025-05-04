@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql2/promise');
+const log4js = require('log4js');
+const logger = log4js.getLogger('http');
 
 function Connect() {
     return mysql.createConnection({
@@ -12,7 +14,6 @@ function Connect() {
 }
 
 app.ReturnBook = async (req, res) => {
-    console.log(req.body);
 
     const db = await Connect();
     const reqContent = req.body;
@@ -29,6 +30,7 @@ app.ReturnBook = async (req, res) => {
             res.send({result: 'FAILD'})
         }
         
+        logger.info(`User ${userCode} returned book ${bookCode} on ${new Date().toISOString()}`);
         res.send({result: 'SUCCESS'}).status(200);
     } catch (e) {
         console.log(e.message);

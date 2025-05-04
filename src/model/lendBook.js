@@ -1,7 +1,8 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql2/promise');
-const { last } = require('pdf-lib');
+const log4js = require('log4js');
+const logger = log4js.getLogger('http');
 
 app.LendBook = async (req, res) => {
 
@@ -36,6 +37,7 @@ app.LendBook = async (req, res) => {
             'INSERT INTO LENDING_BOOK (BOOK_ID, USER_ID, LEND_DAY) VALUES (?, ?, ?)',
             [bookCode, userCode, date]
         );
+        logger.info(`User ${userCode} lent ${bookCode} on ${date}`);
         res.send({result: 'SUCCESS'}).status(200);
     }catch(e){
         console.error(e.message);

@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const mysql = require('mysql2/promise');
+const log4js = require('log4js');
+const logger = log4js.getLogger('http');
 
 function Connect() {
     return mysql.createConnection({
@@ -37,7 +39,8 @@ app.Login = async (req, res) => {
         if (admin_id === user.ID && admin_password === user.PASSWORD) {
             req.session.admin_id = admin_id;
             req.session.admin_authed = true;
-            
+            logger.info(`User ${admin_id} logged in Kashidasu`);
+
             return res.redirect('/main');
         } else {
             return res.status(200).send([{result: 'FAILED'}]);

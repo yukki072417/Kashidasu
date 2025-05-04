@@ -9,6 +9,8 @@ const ReturnModeButton = '/images/ReturnButtonImage.png';
 
 window.addEventListener('load', async () => {
     RequestCameraPermission();
+    
+    alert('ユーザーカードを読み込んでください')
 });
 
 function SetReadMode() {
@@ -100,6 +102,9 @@ function SendData(userBarcode, bookBarcode) {
     };
     const endpoint = readMode === 'lend' ? '/lend' : '/return';
 
+    if (SendData.isSending) return; // 二重送信を防止
+    SendData.isSending = true;
+
     $.ajax({
         url: endpoint,
         type: 'POST',
@@ -112,7 +117,19 @@ function SendData(userBarcode, bookBarcode) {
             console.error('JSONパースエラー:', error);
         }
     })
-    .done(function(result){
-        console.log(result);
+    .done(function(result) {
+
+        if (result.result == 'SUCCESS' && readMode == 'lend') alert('正常に貸出が完了しました');
+        else if (result.result == 'FAILED' && result.message == 'BOOK_NOT_EXIST') alert('エラー: この本は存在しません\n正常に読み込まれていないか、本が登録されていません。');
+        
+        if (result.result == 'SUCCESS' && readMode == 'return') alert('正常に返却が完了しました');
+        else if (result.result == 'FAILED' && result.message == 'BOOK_ALRADY_LENDING') alert('エラー: この本はすでに貸出中です\n先に返却してください');
+        
+        location.reload();
+
+    })
+    .always(() => {
+        SendData.isSending = false; // リクエスト完了後に解除
     });
 }
+SendData.isSending = false; // フラグを初期化

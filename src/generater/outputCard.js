@@ -98,8 +98,6 @@ async function createPdf(outputPath, studentData) {
 
     const pdfBytes = await pdfDoc.save();
     await fs.promises.writeFile(outputPath, pdfBytes);
-    //デバック専用
-    // console.log('PDFファイルが正常に生成されました:', outputPath);
     return true;
   } catch (error) {
     console.error('PDF生成中にエラーが発生:', error);
