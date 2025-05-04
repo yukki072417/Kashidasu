@@ -1,3 +1,5 @@
+alert('本の裏にあるISBNコード(上部)をスキャンしてください')
+
 function InitQuagga() {
     Quagga.init({
         inputStream: {
@@ -33,8 +35,10 @@ function Detected(resultCode) {
             RegisterBook(resultCode, title, author);
         } else {
             alert('タイトルと著者名は必須です。');
+            location.reload();
         }
     }
+    else location.reload();
 }
 
 function RegisterBook(isbn, title, author) {
@@ -62,9 +66,11 @@ function RegisterBook(isbn, title, author) {
         const json = await response.json();
         console.log(json);
         alert('本が正常に登録されました。');
+        location.reload();
     })
     .catch(error => {
         console.error('Fetch error:', error);
         alert('本の登録中にエラーが発生しました。');
+        location.reload();
     });
 }

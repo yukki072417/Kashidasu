@@ -38,6 +38,7 @@ app.RegisterBook = async (req, res) => {
 // データベースに本を登録する関数
 async function RegisterBooksToDB(res, db, books) {
     const insertQuery = 'INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)';
+    const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }).slice(0, 10);
 
     try {
         for (const book of books) {
@@ -49,7 +50,7 @@ async function RegisterBooksToDB(res, db, books) {
             }
 
             await db.promise().query(insertQuery, [isbn, title, author]);
-            logger.info(`Book ${isbn} registered successfully on ${new Date().toISOString()}`);
+            logger.info(`Book ${isbn} registered successfully on ${date}`);
         }
 
         res.send({ result: 'SUCCESS' });

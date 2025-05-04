@@ -9,7 +9,7 @@ app.LendBook = async (req, res) => {
     const userCode = req.body.user_id;
     const bookCode = req.body.book_id;
     const db = await Connect();
-    const date = new Date().toISOString().slice(0, 10);
+    const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }).slice(0, 10);
 
     async function Connect() {
         return mysql.createConnection({
@@ -30,7 +30,7 @@ app.LendBook = async (req, res) => {
     );
     
     if(lendBook[0] != "") return res.send({result: 'FAILED', message: 'BOOK_ALRADY_LENDING'}).status(200);
-    if(searchedBook[0] == "") return res.send({result: 'FAILED', message: 'BOOK_NOT_EXIST'}).status(200);
+    if(searchedBook[0] == "") return res.send({result: 'FAILED', message: 'BOOK_NOT_EXIST', requested_data: bookCode}).status(200);
 
     try{
         await db.query(
