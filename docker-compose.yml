@@ -24,6 +24,15 @@ services:
     container_name: app
     ports:
       - 80:80
+    command: node app.js
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /usr/app/src
+        - action: rebuild
+          path: package.json
+      
 
 volumes:
   mysql_data:
