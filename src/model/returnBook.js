@@ -1,8 +1,8 @@
-//リファクタリング済
-
 const express = require('express');
 const app = express();
 const mysql = require('mysql2/promise');
+const log4js = require('log4js');
+const logger = log4js.getLogger('http');
 
 function Connect() {
     return mysql.createConnection({
@@ -14,12 +14,20 @@ function Connect() {
 }
 
 app.ReturnBook = async (req, res) => {
-    console.log(req.body);
 
     const db = await Connect();
     const reqContent = req.body;
     const userCode = reqContent.user_id;
     const bookCode = reqContent.book_id;
+    const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }).slice(0, 10);
+
+    const searchedBook = await db.query(
+        'SELECT * FROM BOOKS WHERE ID = ?',
+        [bookCode]
+    );
+
+    console.dir(searchedBook[0]);
+    if(searchedBook[0] == "") return res.send({result: 'FAILED', message: 'BOOK_NOT_EXIST', requested_data: bookCode}).status(200);
 
     try {
         const [results] = await db.query(
@@ -28,19 +36,14 @@ app.ReturnBook = async (req, res) => {
         );
 
         if(results.length === 0){
-            res.send(
-                [{result: 'FAILD'}]
-            )
+            res.send({result: 'FAILD'})
         }
         
-        res.send(
-            [{result: 'SUCCESS'}]
-        ).status(200);
+        logger.info(`User ${userCode} returned book ${bookCode} on ${date}`);
+        res.send({result: 'SUCCESS'}).status(200);
     } catch (e) {
         console.log(e.message);
-        res.send(
-            [{result: 'ERROR' ,error_message: e.message}]
-        );
+        res.send({result: 'ERROR' ,error_message: e.message});
     }
 }
 

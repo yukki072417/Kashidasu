@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang='ja'>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>蔵書登録ページ</title>
+    <link rel='stylesheet' href='/styles/Register.css'>
+    <link rel='stylesheet' href='/fonts/fonts.css'>
+    <meta name='robots' content='noindex' />
+
+</head>
+
+<body>
+    <script src='/js/jquery-3.7.1.min.js'></script>
+    <script src='/js/register.js'></script>
+    
+    <%- include('Header') %>
+
+    <button class='animation-btn' onclick='location.href = "/main" '>←戻る</button>
+    <div class='main'>
+
+        <div class='guidance-button' id="scanning-registration" class='site-item' onclick="location.href = '/scanning-registration'">
+            <h3 class="guidance-text">スキャンで<br>登録</h3>
+        </div>
+        <div class='guidance-button' id="collective-registration" class='site-item' onclick="location.href = '/collective-registration'">            
+            <h3 class="guidance-text">CSVファイルで<br>登録</h3>
+        </div>
+
+    </div>  
+    
+    <%- include('Footer') %>
+
+</body>
+
+</html>

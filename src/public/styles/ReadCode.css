@@ -1,0 +1,85 @@
+/* Bellow code is using to read-qr.js */
+#read-qr{
+    display: flex;
+
+    height: 100%;
+}
+
+.site-image{
+    width: 150px;
+    height: 150px;
+    padding: 5px;
+    margin-top: 50px;
+
+    transition: background-color 500ms;
+
+}
+.site-image:hover, .site-image:active{
+    background-color: rgb(200, 200, 200);
+}
+.drawingBuffer{
+    margin: auto;
+}
+
+.buttons{
+    display: flex;
+    text-align: center;
+    margin-top: 20px;
+
+    flex-flow: column;
+
+    margin-left: 50px;
+}
+
+#set-mode-btn{
+    width: 100px;
+    height: 100px;
+    
+    margin: 15px;
+}
+
+#interactive{
+    margin-left:  20%;
+}
+
+.drawRect, #interactive{
+    position: absolute;
+}
+
+.drawRect{
+    width: 400px;
+    height: 200px;
+    
+    top: 275px;
+    left: 625px;
+    
+    border-style: solid;
+    border-width: 3px;
+    
+    background-color: none;
+    border-color: chartreuse;    
+    
+    /* margin-left: 31%; */
+}
+
+#read-view{
+    margin-top: 20px;
+}
+
+.mode-button{
+    width: 150px;
+    height: 75px;
+
+    margin-left: 10px;
+    margin-right: 10px;
+
+    border-radius: 20px;
+    border-style: none;
+
+    font-size: 22px;
+    color: white;
+}
+
+#under{
+    margin-top: 550px;
+}

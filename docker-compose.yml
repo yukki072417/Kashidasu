@@ -1,0 +1,38 @@
+services:
+  db:
+    tty: true
+    init: true
+    stdin_open: true
+    image: mysql:8.0
+    container_name: db
+    volumes:
+      - ./db/:/docker-entrypoint-initdb.d
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
+      TZ: ${TIME_ZONE}
+    ports:
+      - 3306:3306
+      
+  app:
+    init: true
+    tty: true
+    stdin_open: true
+    restart: always
+    working_dir: /usr/app/
+    build: .
+    container_name: app
+    ports:
+      - 80:80
+    command: node app.js
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /usr/app/src
+        - action: rebuild
+          path: package.json
+      
+
+volumes:
+  mysql_data:
