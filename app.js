@@ -14,7 +14,7 @@ const logger = log4js.getLogger('system');
 
 require('dotenv').config();
 
-const PORT = 3000;
+const PORT = 80;
 
 app.use(session({
     secret: 'seacret-key',
