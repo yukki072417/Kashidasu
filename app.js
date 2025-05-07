@@ -7,16 +7,14 @@ const app = express();
 const userRouter = require('./src/router/router');
 
 const logDir = path.join(__dirname, 'logs');
-if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir);
-}
+if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
 
 log4js.configure(path.join(__dirname, './config/config.json'));
 const logger = log4js.getLogger('system');
 
 require('dotenv').config();
 
-const PORT = 80;
+const PORT = 3000;
 
 app.use(session({
     secret: 'seacret-key',
