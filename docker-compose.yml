@@ -32,7 +32,20 @@ services:
           target: /usr/app/src
         - action: rebuild
           path: package.json
-      
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    ports:
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      - CADDY_TLS_SELF_SIGNED=1
 
 volumes:
   mysql_data:
+  caddy_data:
+  caddy_config:
