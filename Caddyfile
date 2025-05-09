@@ -1,8 +1,7 @@
 {
-    auto_https off
+    auto_https on
 }
 
 https://localhost {
     reverse_proxy app:80
-    tls /path/to/cert.pem /path/to/key.pem
 }
