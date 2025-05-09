@@ -15,7 +15,7 @@ const logger = log4js.getLogger('system');
 
 require('dotenv').config();
 
-const HTTPS_PORT = 443;
+const HTTPS_PORT = 80;
 
 // HTTPS用の証明書と秘密鍵を読み込む
 const options = {
