@@ -1,7 +1,0 @@
-{
-    auto_https on
-}
-
-https://localhost {
-    reverse_proxy app:80
-}
