@@ -23,7 +23,7 @@ services:
     build: .
     container_name: app
     ports:
-      - 443:443
+      - 80:80
     volumes:
       - ./selfsigned.key:/usr/app/selfsigned.key
       - ./selfsigned.crt:/usr/app/selfsigned.crt
@@ -35,6 +35,5 @@ services:
           target: /usr/app/src
         - action: rebuild
           path: package.json
-
 volumes:
   mysql_data:
