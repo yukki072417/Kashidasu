@@ -9,23 +9,24 @@ const returnBook = require('../model/returnBook');
 const updateBook = require('../model/updateBook');
 const registerBook = require('../model/registerBook');
 const deleteBook = require('../model/deleteBook');
-//Specifying someting
+
+// ミドルウェアを指定
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
 
-// Show login page
+// ログインページを表示
 router.get('/login', (req, res) => {
 
-    // Process when user logined
+    // ユーザーがログイン済みの場合の処理
     if (req.session.admin_authed == true) {
-        // redirect to main page
+        // メインページへリダイレクト
         return res.redirect('/main');
     }
-    // Rendering to login page
+    // ログインページをレンダリング
     res.render('Login');
 });
 
-//Checking user session
+// ユーザーのセッションを確認
 const requireAuth = (req, res, next) => {
     if (req.session.admin_authed)
         next();
@@ -33,81 +34,84 @@ const requireAuth = (req, res, next) => {
         res.redirect('/login');
 };
 
-// Searching book to DB
+// データベースで書籍を検索
 router.post('/search-book', serachBook.SearchBook);
 
-// Lending book
+// 書籍を貸し出す
 router.post('/lend', lendBook.LendBook);
 
-// Returning book
+// 書籍を返却する
 router.post('/return', returnBook.ReturnBook);
 
-// Logining user
+// ユーザーのログイン処理
 router.post('/main', auth.Login);
 
-// updateing book
+// 書籍情報を更新する
 router.post('/upload-book', updateBook.UploadBook);
 
-// Deleting book
+// 書籍を削除する
 router.post('/delete-book', deleteBook.DeleteBook);
 
-// Routing to login pagew
+// ログインページへルーティング
 router.get('/', (req, res) => {
     res.redirect('Login');
 });
 
-// Generating card
+// カードを生成する
 router.post('/generating', (req, res) => {
     generate.GenerateCard(req, res);
 });
 
+// 書籍編集ページを表示
 router.get('/edit', (req, res) => {
     res.render('EditBook');
 });
 
+// 書籍を登録する
 router.post('/register-book', (req, res) => {
     registerBook.RegisterBook(req, res);
 });
 
-// Routing to register page
+// 書籍登録ページへルーティング
 router.get('/register', requireAuth, (req, res) => {
     res.render('Register');
 });
 
-//Routing to main page 
+// メインページへルーティング
 router.get('/main', requireAuth, (req, res) => {
     res.render('Main', { resData: { id: req.session.admin_id } });
 });
 
-// Routing to reading qrcode page
+// QRコード読み取りページへルーティング
 router.get('/read-code', (req, res) => {
     res.render('ReadCode');
 });
 
-// Routing to generaging card page
+// カード生成ページへルーティング
 router.get('/generate-card', requireAuth, (req, res) => {
     res.render('GenerateCard');
 });
 
-// Routing to book-view page
+// 書籍一覧ページへルーティング
 router.get('/book-list', (req, res) => {
     res.render('BookList');
 });
 
+// ログアウト処理
 router.get('/logout', requireAuth, (req, res) => {
     res.clearCookie('connect.sid');
     res.redirect('Login');
 });
 
-// Routing to Scanning Register page
+// スキャン登録ページへルーティング
 router.get('/scanning-registration', requireAuth, (req, res) => {
     res.render('Registers/ScanningRegister');
 });
 
-// Routing to book-view page
+// 書籍一覧ページへルーティング
 router.get('/collective-registration', requireAuth, (req, res) => {
     res.render('Registers/CollectiveRegister');
 });
 
-/// Export module
+/// モジュールをエクスポート
 module.exports = router;
