@@ -30,7 +30,7 @@ const requireAuth = (req, res, next) => {
     if (req.session.admin_authed)
         next();
     else
-        res.redirect('/Login');
+        res.redirect('/login');
 };
 
 // Searching book to DB
