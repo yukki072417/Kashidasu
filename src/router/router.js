@@ -9,6 +9,7 @@ const returnBook = require('../model/returnBook');
 const updateBook = require('../model/updateBook');
 const registerBook = require('../model/registerBook');
 const deleteBook = require('../model/deleteBook');
+const updateSettings = require('../model/updateSettings');
 
 // ミドルウェアを指定
 router.use(express.urlencoded({ extended: true }));
@@ -16,6 +17,12 @@ router.use(express.json());
 
 // ログインページを表示
 router.get('/login', (req, res) => {
+
+    //デバッグモード判定
+    if(process.env.DEBUG_MODE == 'true'){
+      req.session.admin_authed = true
+      req.session.admin_id = 'yukki072417'
+    }
 
     // ユーザーがログイン済みの場合の処理
     if (req.session.admin_authed == true) {
@@ -54,7 +61,7 @@ router.post('/delete-book', deleteBook.DeleteBook);
 
 // ログインページへルーティング
 router.get('/', (req, res) => {
-    res.redirect('Login');
+    res.redirect('login');
 });
 
 // カードを生成する
@@ -100,7 +107,7 @@ router.get('/book-list', (req, res) => {
 // ログアウト処理
 router.get('/logout', requireAuth, (req, res) => {
     res.clearCookie('connect.sid');
-    res.redirect('Login');
+    res.redirect('login');
 });
 
 // スキャン登録ページへルーティング
@@ -111,6 +118,14 @@ router.get('/scanning-registration', requireAuth, (req, res) => {
 // 書籍一覧ページへルーティング
 router.get('/collective-registration', requireAuth, (req, res) => {
     res.render('Registers/CollectiveRegister');
+});
+
+router.get('/settings', requireAuth, (req, res) => {
+    res.render('Settings');
+});
+
+router.post('/settings-apply', (req, res) => {
+  updateSettings.UpdateSettings
 });
 
 /// モジュールをエクスポート
