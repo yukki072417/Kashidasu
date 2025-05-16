@@ -27,7 +27,7 @@ services:
     command: node app.js
     develop:
       watch:
-        - action: sync
+        - action: sync+restart
           path: ./src
           target: /usr/app/src
         - action: rebuild
