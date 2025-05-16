@@ -22,7 +22,11 @@ services:
     working_dir: /usr/app/
     build: .
     container_name: app
+    environment:
+      DOMAIN: "192.168.1.100.nip.io" # nip.ioを使用したドメイン名
+      EMAIL: "user@example.com"  
     ports:
+      - 80:80
       - 443:443
     volumes:
       - ./server.key:/usr/app/server.key

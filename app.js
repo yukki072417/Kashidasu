@@ -28,17 +28,18 @@ const DOMAIN = '10.100.240.128';
 const EMAIL = 'user@example.com';
 
 const lex = LEX.create({
-    configDir: require('os').homedir() + '/letsencrypt/etc'
-  , approveRegistration: function (hostname, approve) { // leave `null` to disable automatic registration
-      if (hostname === DOMAIN) { // Or check a database or list of allowed domains
-        approve(null, {
-          domains: [DOMAIN]
-        , email: EMAIL
-        , agreeTos: true
-        });
-      }
-    }
-  });
+    server: 'https://acme-staging-v02.api.letsencrypt.org/directory', // ステージング環境（テスト用）
+    configDir: require('os').homedir() + '/letsencrypt/etc',
+    approveRegistration: function (hostname, approve) {
+        if (hostname === DOMAIN) {
+            approve(null, {
+                domains: [DOMAIN],
+                email: EMAIL,
+                agreeTos: true,
+            });
+        }
+    },
+});
 
 app.use(session({
     secret: 'seacret-key',
@@ -57,14 +58,10 @@ app.set('view engine', 'ejs');
 app.use('/', userRouter);
 
 // HTTPSサーバーを起動
-https.createServer(options, app).listen(HTTPS_PORT, () => {
-    logger.info(`Kashidasu server start now... HTTPS PORT: ${HTTPS_PORT}`);
-    console.log(`Kashidasu server start now... HTTPS PORT: ${HTTPS_PORT}`);
+const httpsServer = lex.createHttpsServer({}, (req, res) => {
+    res.end('Hello, HTTPS with Let\'s Encrypt!');
 });
 
-lex.onRequest = app;
-
-lex.listen([80], [443, 5001], function () {
-  var protocol = ('requestCert' in this) ? 'https': 'http';
-  console.log("Listening at " + protocol + '://localhost:' + this.address().port);
+httpsServer.listen(443, () => {
+    console.log(`HTTPS Server running on https://${DOMAIN}`);
 });
