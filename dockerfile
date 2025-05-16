@@ -19,8 +19,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # 証明書をコンテナにコピー
-COPY selfsigned.key /usr/app/selfsigned.key
-COPY selfsigned.crt /usr/app/selfsigned.crt
+# COPY server.key /usr/app/server.key
+# COPY server.crt /usr/app/server.crt
 
 # 不要なキャッシュを削除
 RUN rm -rf node_modules package-lock.json && npm cache clean --force

@@ -15,20 +15,37 @@ const logger = log4js.getLogger('system');
 
 require('dotenv').config();
 
-const HTTPS_PORT = 80;
+const HTTPS_PORT = 443;
 
 // HTTPS用の証明書と秘密鍵を読み込む
 const options = {
-  key: fs.readFileSync('./selfsigned.key'),
-  cert: fs.readFileSync('./selfsigned.crt'),
+  key: fs.readFileSync('./server.key'),
+  cert: fs.readFileSync('./server.crt'),
 };
+
+const LEX = require('letsencrypt-express');
+const DOMAIN = '10.100.240.128';
+const EMAIL = 'user@example.com';
+
+const lex = LEX.create({
+    configDir: require('os').homedir() + '/letsencrypt/etc'
+  , approveRegistration: function (hostname, approve) { // leave `null` to disable automatic registration
+      if (hostname === DOMAIN) { // Or check a database or list of allowed domains
+        approve(null, {
+          domains: [DOMAIN]
+        , email: EMAIL
+        , agreeTos: true
+        });
+      }
+    }
+  });
 
 app.use(session({
     secret: 'seacret-key',
     resave: false,
     saveUninitialized: false,
     cookie: { 
-        secure: false,
+        secure: true,
         maxAge: 1000 * 60 * 60 * 24
     }
 }));
@@ -43,4 +60,11 @@ app.use('/', userRouter);
 https.createServer(options, app).listen(HTTPS_PORT, () => {
     logger.info(`Kashidasu server start now... HTTPS PORT: ${HTTPS_PORT}`);
     console.log(`Kashidasu server start now... HTTPS PORT: ${HTTPS_PORT}`);
+});
+
+lex.onRequest = app;
+
+lex.listen([80], [443, 5001], function () {
+  var protocol = ('requestCert' in this) ? 'https': 'http';
+  console.log("Listening at " + protocol + '://localhost:' + this.address().port);
 });
