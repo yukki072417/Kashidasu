@@ -1,0 +1,27 @@
+section{
+    margin-top: 50px;
+    
+    border-style: solid;
+    border-color: gray;
+    border-bottom: 1px;
+    border-left: 0px;
+    border-right: 0px;
+}
+form{
+    display: flex;
+    justify-content: center;
+}
+.form-block{
+    text-align: right;
+}
+.form-block label{
+    margin-right: 15px;
+}
+.form-block li{
+    list-style: none;
+}
+.form-textbox{
+    width: 200px;
+    margin-top: 10px;
+    height: 25px;
+}

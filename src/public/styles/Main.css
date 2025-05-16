@@ -38,6 +38,11 @@ body{
     background-repeat: no-repeat;
     background-size: 150px;
 }
+#settings{
+    /* background: url('/images/.jpg'); */
+    /* background-repeat: no-repeat; */
+    /* background-size: 150px; */
+}
 #read-code:hover, #read-code:active{
     background: url('/images/ReadCode_pushed.jpg');
     background-repeat: no-repeat;
@@ -57,6 +62,9 @@ body{
     background: url('/images/BookList_pushed.jpg');
     background-repeat: no-repeat;
     background-size: 150px;
+}
+#settings:hover{
+    
 }
 
 @media screen and (max-width: 600px) {
