@@ -31,6 +31,15 @@ services:
     volumes:
       - ./certs:/usr/app/certs
     command: node app.js
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./web
+          target: /src/web
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
 
 volumes:
   mysql_data:
