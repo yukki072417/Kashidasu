@@ -4,7 +4,7 @@ WORKDIR /usr/app/
 
 COPY . /usr/app/
 
-# 必要なライブラリをインストール
+# 必要なライブラリのインストール
 RUN apt-get update && apt-get install -y \
     libnode108 \
     libcairo2-dev \
@@ -18,9 +18,9 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# 不要なキャッシュを削除
+# npmパッケージ等のクリーンアップとインストール
 RUN rm -rf node_modules package-lock.json && npm cache clean --force
-
-# node-gyp と依存関係をインストール
 RUN npm install -g node-gyp
 RUN npm install
+
+# HTTPS証明書は docker-compose.yml でホスト側の "./certs" をマウントして供給するのでここでのコピーは不要

@@ -1,8 +1,15 @@
+version: "3.8"
 services:
+  ca:
+    build:
+      context: ./ca
+    container_name: ca
+    volumes:
+      - ./certs:/root/ca/certs
+    # 初回証明書生成後に再生成を避けるため再起動は不要
+    restart: "no"
+
   db:
-    tty: true
-    init: true
-    stdin_open: true
     image: mysql:8.0
     container_name: db
     volumes:
@@ -12,27 +19,18 @@ services:
       MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
       TZ: ${TIME_ZONE}
     ports:
-      - 3306:3306
+      - "3306:3306"
       
   app:
-    init: true
-    tty: true
-    stdin_open: true
-    restart: always
-    working_dir: /usr/app/
     build: .
     container_name: app
+    depends_on:
+      - ca
     ports:
-      - 80:80
+      - "443:443"
+    volumes:
+      - ./certs:/usr/app/certs
     command: node app.js
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./src
-          target: /usr/app/src
-        - action: rebuild
-          path: package.json
-      
 
 volumes:
   mysql_data:
