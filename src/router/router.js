@@ -120,13 +120,5 @@ router.get('/collective-registration', requireAuth, (req, res) => {
     res.render('Registers/CollectiveRegister');
 });
 
-router.get('/settings', requireAuth, (req, res) => {
-    res.render('Settings');
-});
-
-router.post('/settings-apply', (req, res) => {
-  updateSettings.UpdateSettings
-});
-
 /// モジュールをエクスポート
 module.exports = router;
