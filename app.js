@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 const userRouter = require('./src/router/router');
+const https = require('https');
 
 const logDir = path.join(__dirname, 'logs');
 if (!fs.existsSync(logDir)) {
@@ -16,7 +17,7 @@ const logger = log4js.getLogger('system');
 
 require('dotenv').config();
 
-const PORT = 80;
+const PORT = 443;
 
 app.use(session({
     secret: 'seacret-key',
@@ -34,7 +35,12 @@ app.set('views', './src/views');
 app.set('view engine', 'ejs');
 app.use('/', userRouter);
 
-app.listen(PORT, () => {
-    logger.info(`Kashidasu server start now... PORT: ${PORT}`);
-    console.log(`Kashidasu server start now... PORT: ${PORT}`);
+const options = {
+    key: fs.readFileSync('/usr/app/certs/server.key'),
+    cert: fs.readFileSync('/usr/app/certs/server.crt'),
+};
+
+https.createServer(options, app).listen(PORT, () => {
+    logger.info(`HTTPSサーバーがポート ${PORT} で起動しました`);
+    console.log(`HTTPSサーバーがポート ${PORT} で起動しました`);
 });
