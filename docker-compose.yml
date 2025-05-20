@@ -40,6 +40,5 @@ services:
             - node_modules/
         - action: rebuild
           path: package.json
-
 volumes:
   mysql_data:
