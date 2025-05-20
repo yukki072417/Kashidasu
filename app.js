@@ -6,7 +6,6 @@ const path = require('path');
 const https = require('https');
 const app = express();
 const userRouter = require('./src/router/router');
-const https = require('https');
 
 const logDir = path.join(__dirname, 'logs');
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
