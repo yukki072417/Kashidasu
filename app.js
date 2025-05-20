@@ -38,6 +38,6 @@ const options = {
 };
 
 https.createServer(options, app).listen(PORT, () => {
-    logger.info(`HTTPSサーバーがポート ${PORT} で起動しました`);
-    console.log(`HTTPSサーバーがポート ${PORT} で起動しました`);
+    logger.info(`Kashidasuサーバーがポート ${PORT} で起動しました`);
+    console.log(`Kashidasuサーバーがポート ${PORT} で起動しました`);
 });
