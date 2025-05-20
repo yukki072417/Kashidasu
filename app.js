@@ -3,6 +3,7 @@ const session = require('express-session');
 const log4js = require('log4js');
 const fs = require('fs');
 const path = require('path');
+const https = require('https');
 const app = express();
 const userRouter = require('./src/router/router');
 const https = require('https');
@@ -39,6 +40,6 @@ const options = {
 };
 
 https.createServer(options, app).listen(PORT, () => {
-    logger.info(`HTTPSサーバーがポート ${PORT} で起動しました`);
-    console.log(`HTTPSサーバーがポート ${PORT} で起動しました`);
+    logger.info(`Kashidasuサーバーがポート ${PORT} で起動しました`);
+    console.log(`Kashidasuサーバーがポート ${PORT} で起動しました`);
 });
