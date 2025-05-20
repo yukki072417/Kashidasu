@@ -6,6 +6,7 @@ const path = require('path');
 const https = require('https');
 const app = express();
 const userRouter = require('./src/router/router');
+const https = require('https');
 
 const logDir = path.join(__dirname, 'logs');
 if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
@@ -15,13 +16,7 @@ const logger = log4js.getLogger('system');
 
 require('dotenv').config();
 
-const HTTPS_PORT = 80;
-
-// HTTPS用の証明書と秘密鍵を読み込む
-const options = {
-  key: fs.readFileSync('./selfsigned.key'),
-  cert: fs.readFileSync('./selfsigned.crt'),
-};
+const PORT = 443;
 
 app.use(session({
     secret: 'seacret-key',
@@ -39,8 +34,12 @@ app.set('views', './src/views');
 app.set('view engine', 'ejs');
 app.use('/', userRouter);
 
-// HTTPSサーバーを起動
-https.createServer(options, app).listen(HTTPS_PORT, () => {
-    logger.info(`Kashidasu server start now... HTTPS PORT: ${HTTPS_PORT}`);
-    console.log(`Kashidasu server start now... HTTPS PORT: ${HTTPS_PORT}`);
+const options = {
+    key: fs.readFileSync('/usr/app/certs/server.key'),
+    cert: fs.readFileSync('/usr/app/certs/server.crt'),
+};
+
+https.createServer(options, app).listen(PORT, () => {
+    logger.info(`Kashidasuサーバーがポート ${PORT} で起動しました`);
+    console.log(`Kashidasuサーバーがポート ${PORT} で起動しました`);
 });
