@@ -30,12 +30,13 @@ services:
       - "443:443"
     volumes:
       - ./certs:/usr/app/certs
+      - ./src:/usr/app/src    
     command: node app.js
     develop:
       watch:
         - action: sync+restart
-          path: ./web
-          target: /src/web
+          path: ./src
+          target: /usr/app
           ignore:
             - node_modules/
         - action: rebuild
