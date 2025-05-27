@@ -8,9 +8,7 @@ const userRouter = require('./src/router/router');
 const https = require('https');
 
 const logDir = path.join(__dirname, 'logs');
-if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir);
-}
+if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
 
 log4js.configure(path.join(__dirname, './config/config.json'));
 const logger = log4js.getLogger('system');
