@@ -32,7 +32,7 @@ app.SearchBook = async (req, res) => {
     db.end();
   }
 }
-
+// 特定の本を1件検索するときの関数
 async function ManualSearchMode(db, bookID, res) {
   let response = [];
 
@@ -52,64 +52,64 @@ async function ManualSearchMode(db, bookID, res) {
     res.send(response[0]);
   }
 }
-
 async function AutoSearchMode(db, bookNum, res) {
+  // 本の情報と貸出情報を分かりやすく取得
   const [results] = await db.query(`
-    SELECT b.*, 
-    CASE WHEN l.BOOK_ID IS NOT NULL THEN TRUE ELSE FALSE END AS IS_LENDING 
-    FROM BOOKS b 
-    LEFT JOIN LENDING_BOOK l ON b.ID = l.BOOK_ID
+    SELECT 
+      b.ID AS book_id,
+      b.BOOK_NAME AS book_name,
+      b.WRITTER AS book_author,
+      l.USER_ID AS lending_user_id,
+      l.LEND_DATE AS lend_date,
+      l.DEAD_LINE AS dead_line
+    FROM BOOKS b
+    LEFT JOIN LENDING_BOOK l
+      ON b.ID = l.BOOK_ID
   `);
-  const [recordNum] = await db.query(`SELECT COUNT(ID) FROM BOOKS`);
+
+  // 本の総数も取得
+  const [recordNum] = await db.query(`SELECT COUNT(ID) AS total FROM BOOKS`);
 
   if (results.length === 0) {
     res.send([{ result: 'BOOK_NOT_EXIST' }]);
-
   } else {
-    let response = [];
+    // ページング処理
     const maxSearch = 30 * bookNum;
     const minSearch = 30 * (bookNum - 1);
-    let count = 0 + minSearch;
 
-    response.push(recordNum[0]);
+    // 30件ずつ切り出し
+    const pageResults = results.slice(minSearch, maxSearch);
 
-    const lendingInformation = await GetLendingBooks(db);
-    if (lendingInformation != undefined) {
-      for (let i = 0; i < results.length; i++) {
-        if (results[i].IS_LENDING == 1) {
-          results[i].USER_ID = GetLendingUser(results, lendingInformation);
-        }
-      }
-    }
-    response = response.concat(FormatResults(results));
+    // レスポンスを分かりやすく整形
+    const response = {
+      total: recordNum[0].total,
+      books: pageResults.map(result => {
+        return {
+          book_id:         result.book_id,
+          book_name:       result.book_name,
+          book_author:     result.book_author,
+          is_lending:      result.lending_user_id ? true : false,
+          lending_user_id: result.lending_user_id || null,
+          lend_date:       result.lend_date || null,
+          dead_line:       result.dead_line || null 
+        };
+      })
+    };
+
     res.send(response);
-  }
-}
-
-function GetLendingUser(results, lendingInformation) {
-  let isLending_array = []
-  results.forEach(result => {
-    if (result.IS_LENDING == 1) {
-      isLending_array.push(result.ID);
-    }
-  });
-  for(let j = 0; j < lendingInformation.length; j++){
-
-  if(isLending_array[j] == lendingInformation[j].BOOK_ID){
-    return lendingInformation[j].USER_ID;
-  }
   }
 }
 
 function FormatResults(results) {
   if (results[0].USER_ID == undefined) results[0].USER_ID = null;
+  console.log(results);
 
   return results.map(result => ({
     book_id: result.ID,
     book_name: result.BOOK_NAME,
     book_auther: result.WRITTER,
     book_is_lending: result.IS_LENDING,
-    lending_user_id: result.USER_ID
+    lending_user_id: result.USER_ID,
   }));
 }
 

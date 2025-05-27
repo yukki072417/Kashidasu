@@ -23,6 +23,9 @@ services:
       
   app:
     build: .
+    init: true
+    tty: true
+    stdin_open: true
     container_name: app
     depends_on:
       - ca
@@ -31,12 +34,12 @@ services:
     volumes:
       - ./certs:/usr/app/certs
       - ./src:/usr/app/src    
-    command: node app.js
+    # command: node app.js
     develop:
       watch:
         - action: sync+restart
           path: ./src
-          target: /usr/app
+          target: /usr/app/
           ignore:
             - node_modules/
         - action: rebuild

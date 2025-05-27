@@ -25,12 +25,13 @@ app.Login = async (req, res) => {
         const db = await Connect();
         
         const [results] = await db.query(
-            'SELECT ID, PASSWORD FROM ADMIN_USER WHERE ID = ?',
+            'SELECT * FROM ADMIN_USER WHERE ID = ?',
             [admin_id]
         );
         await db.end();
         
         const user = results[0];
+        console.log(results);
         
         if (results.length === 0) {
             return res.status(200).send([{result: 'FAILED'}]);
@@ -39,6 +40,7 @@ app.Login = async (req, res) => {
         if (admin_id === user.ID && admin_password === user.PASSWORD) {
             req.session.admin_id = admin_id;
             req.session.admin_authed = true;
+            req.session.user_name = req.session.USER_NAME;
             logger.info(`User ${admin_id} logged in Kashidasu`);
 
             return res.redirect('/main');

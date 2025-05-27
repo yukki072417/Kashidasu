@@ -30,10 +30,15 @@ function LoadBooks(pageNum) {
             'manual_search_mode': false
         }),
         success: function(data) {
-            if (data && data.length > 0) {
-                totalRecords = data[0]['COUNT(ID)'];
-                SetTable(data.slice(1));
-                UpdatePageInfo();
+            
+            console.log(data);
+            if (data) {
+                //本が存在しない場合、1ページあたり表示できる本の数か30件のため、30を代入して割り切れるようにした
+                // if(data.total == 0) totalRecords = 30;
+                // else totalRecords = data.total;
+                // console.log(data.books.slice(1));
+                // SetTable(data.books.slice(1));
+                // UpdatePageInfo();
             }
         },
         error: function(xhr, status, error) {
@@ -51,7 +56,8 @@ function UpdatePageInfo() {
 }
 
 function SetTable(data) {
-$('#table tr:gt(0)').remove();
+    console.log(data);
+    $('#table tr:gt(0)').remove();
 
     if (!Array.isArray(data)) {
         data = [data];
@@ -63,16 +69,22 @@ $('#table tr:gt(0)').remove();
 
             const bookID = book.book_id;
             const bookName = book.book_name;
-            const writter = book.book_auther;
-            const isLending = book.book_is_lending;
+            const author = book.book_author;
+            const isLending = book.is_lending;
             const lendingUser = book.lending_user_id;
+            const lendDate = book.lend_day
+                ? book.lend_day.split('T')[0].replace(/-/g, '/')
+                : '';
+
+            const lendingDuration = new Date();
 
             $row.append($('<td>').text(bookName));
-            $row.append($('<td>').text(writter));
+            $row.append($('<td>').text(author));
             $row.append($('<td>').text(bookID));
             
             const $statusCell = $('<td>').text(isLending ? '貸出中' : '空き');
             const $lendingUserCell = $('<td>').text(lendingUser);
+            const $deadLine = $('<td>').append(lendDate)
             if (isLending) {
                 $lendingUserCell.css('color', 'red');
                 $statusCell.css('color', 'red');
@@ -81,6 +93,7 @@ $('#table tr:gt(0)').remove();
             
             $row.append($statusCell);
             $row.append($lendingUserCell);
+            $row.append($deadLine); //ここに返却期限
 
             const $editButton = $('<button>')
                 .text('編集')
@@ -99,7 +112,6 @@ $('#table tr:gt(0)').remove();
                         }
                     });
                 });
-
             $row.append($('<td>').append($editButton));
             $('#table').append($row);
         }
