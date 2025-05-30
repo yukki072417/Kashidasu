@@ -50,7 +50,8 @@ async function RegisterBooksToDB(res, db, books) {
             }
 
             await db.promise().query(insertQuery, [isbn, title, author]);
-            logger.info(`Book ${isbn} registered successfully on ${date}`);
+            logger.info(`${date} にISBN ${isbn} の本が正常に登録されました`);
+            console.log(`${date} にISBN ${isbn} の本が正常に登録されました`);
         }
 
         res.send({ result: 'SUCCESS' });

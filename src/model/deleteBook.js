@@ -29,7 +29,8 @@ app.DeleteBook = async (req, res) => {
     db.query('DELETE FROM BOOKS WHERE ID = ?', [bookId]);
     db.end();
     res.send([{result: 'SUCCESS'}]).status(200);
-    logger.info(`Book ${bookId} deleted successfully on ${date}`);
+    logger.info(`${date}にISBN ${bookId} の本が正常に削除されました`);
+    console.log(`${date}にISBN ${bookId} の本が正常に削除されました`);
 }
 
 module.exports = app;
