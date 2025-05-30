@@ -59,49 +59,42 @@ $('#table tr:gt(0)').remove();
 
     data.forEach(book => {
         if (book && book.book_name) {
+    
+            // 返却期限がある前提で期限切れチェック
+            const today = new Date();
+            const deadline = new Date(book.deadline);
+    
+            if (deadline >= today) return; // 期限切れてない → 表示しない
+    
             const $row = $('<tr>');
-
+    
             const bookID = book.book_id;
             const bookName = book.book_name;
             const writter = book.book_auther;
             const isLending = book.book_is_lending;
             const lendingUser = book.lending_user_id;
-
+    
             $row.append($('<td>').text(bookName));
             $row.append($('<td>').text(writter));
             $row.append($('<td>').text(bookID));
-            
-            const $statusCell = $('<td>').text(isLending ? '貸出中' : '空き');
-            const $lendingUserCell = $('<td>').text(lendingUser);
-            if (isLending) {
-                $lendingUserCell.css('color', 'red');
-                $statusCell.css('color', 'red');
-            }
-            else $lendingUserCell.text('空き');
+    
+            const $statusCell = $('<td>').text('返却期限切れ').css('color', 'red');
+            const $lendingUserCell = $('<td>').text(lendingUser).css('color', 'red');
             
             $row.append($statusCell);
             $row.append($lendingUserCell);
-
+    
             const $editButton = $('<button>')
                 .text('編集')
                 .addClass('edit-btn')
                 .on('click', () => {
                     const params = $.param({ ID: bookID });
-                    $.ajax({
-                        url: `/edit?${params}`,
-                        type: 'GET',
-                        contentType: 'application/json',
-                        success: function(response) {
-                            window.location.href = `/edit?${params}`;
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error:', error);
-                        }
-                    });
+                    window.location.href = `/edit?${params}`;
                 });
-
+    
             $row.append($('<td>').append($editButton));
             $('#table').append($row);
         }
     });
+    
 }
