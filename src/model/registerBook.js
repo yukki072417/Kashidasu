@@ -6,7 +6,6 @@ const logger = log4js.getLogger('http');
 app.use(express.json()); // JSON ボディを解析するためのミドルウェア
 
 app.RegisterBook = async (req, res) => {
-    console.log(req.body);
 
     // データベース接続関数
     function Connect() {
