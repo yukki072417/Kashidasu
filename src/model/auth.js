@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const mysql = require('mysql2/promise');
 const log4js = require('log4js');
-const logger = log4js.getLogger('http');
+const logger = log4js.getLogger('access');
 
 function Connect() {
     return mysql.createConnection({

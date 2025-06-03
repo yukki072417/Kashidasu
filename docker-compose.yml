@@ -30,7 +30,8 @@ services:
       - "443:443"
     volumes:
       - ./certs:/usr/app/certs
-      - ./src:/usr/app/src    
+      - ./src:/usr/app/src
+      - ./logs:/usr/app/logs
     command: node app.js
     develop:
       watch:

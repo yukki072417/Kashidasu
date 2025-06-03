@@ -8,9 +8,15 @@ const app = express();
 const userRouter = require('./src/router/router');
 
 const logDir = path.join(__dirname, 'logs');
-if (!fs.existsSync(logDir)) fs.mkdirSync(logDir);
 
-log4js.configure(path.join(__dirname, './config/config.json'));
+// logsディレクトリが存在しない場合は作成
+if (!fs.existsSync(logDir)) {
+    console.log('logsディレクトリを生成');
+    fs.mkdirSync(logDir);
+}
+
+// log4jsの設定ファイルを読み込む
+log4js.configure('./config/config.json');
 const logger = log4js.getLogger('system');
 
 require('dotenv').config();
