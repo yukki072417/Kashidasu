@@ -39,7 +39,8 @@ app.Login = async (req, res) => {
         if (admin_id === user.ID && admin_password === user.PASSWORD) {
             req.session.admin_id = admin_id;
             req.session.admin_authed = true;
-            logger.info(`User ${admin_id} logged in Kashidasu`);
+            logger.info(`学籍番号 ${admin_id} の人がKashidasuにログインしました`);
+            console.log(`学籍番号 ${admin_id} の人がKashidasuにログインしました`);
 
             return res.redirect('/main');
         } else {
