@@ -1,4 +1,4 @@
-![alt text](KashidasuLogo.png)
+![alt text](./images/KashidasuLogo.png)
 ## 概要
 図書室での導入を想定した図書管理アプリで、主に以下のような特徴があります。
 * 必要最低限の機能のみ搭載したシンプルな機能
@@ -14,7 +14,7 @@
 ### 必要要件
 * Docker engineがインストールされていること
 * Docker compose pluginがインストールされていること(Docker engineに大抵付属している)
-* MacまたはWindowsまたはLinux系OSがインストールされているパソコン, サーバー
+* MacまたはWindowsまたはLinux系OSがインストールされているパソコン, サーバーで稼働させること
 * ChromeまたはEdgeのブラウザがインストールされていること
 
 ### 導入
@@ -62,7 +62,7 @@ IPv4の値がIPv4のアドレスです。こちらをアクセス元のPCのブ�
 ブラウザでアクセスすると、**「接続がプライベートではありません」** のような表示がされますが、ローカル（LAN内）のネットワークで動かす場合は、構造上の都合上表示されているだけで、動作に影響はありません。
 
 「詳細設定」をクリックし「...に進む(安全ではありません)」をクリックして、Kashidasuにアクセスしてください
-![alt text](warning.png)
+![alt text](./images/warning.png)
 
 ## 開発者
 
