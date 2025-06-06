@@ -39,7 +39,8 @@ app.ReturnBook = async (req, res) => {
             res.send({result: 'FAILD'})
         }
         
-        logger.info(`User ${userCode} returned book ${bookCode} on ${date}`);
+        logger.info(`${date} に学籍番号 ${userCode} の人が ISBN ${bookCode} の本を正常に返却されました`);
+        console.log(`${date} に学籍番号 ${userCode} の人が ISBN ${bookCode} の本を正常に返却されました`);
         res.send({result: 'SUCCESS'}).status(200);
     } catch (e) {
         console.log(e.message);

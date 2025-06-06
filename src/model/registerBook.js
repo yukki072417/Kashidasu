@@ -6,7 +6,6 @@ const logger = log4js.getLogger('http');
 app.use(express.json()); // JSON ボディを解析するためのミドルウェア
 
 app.RegisterBook = async (req, res) => {
-    console.log(req.body);
 
     // データベース接続関数
     function Connect() {
@@ -50,7 +49,8 @@ async function RegisterBooksToDB(res, db, books) {
             }
 
             await db.promise().query(insertQuery, [isbn, title, author]);
-            logger.info(`Book ${isbn} registered successfully on ${date}`);
+            logger.info(`${date} にISBN ${isbn} の本が正常に登録されました`);
+            console.log(`${date} にISBN ${isbn} の本が正常に登録されました`);
         }
 
         res.send({ result: 'SUCCESS' });
