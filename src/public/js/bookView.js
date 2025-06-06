@@ -1,5 +1,6 @@
 let currentPage = 1;
 let totalRecords = 0;
+let showOnlyOverdue = false;  // 期限切れだけ表示フラグ
 
 $(document).ready(() => {
     LoadBooks(currentPage);
@@ -18,6 +19,17 @@ $(document).ready(() => {
             LoadBooks(currentPage);
         }
     });
+
+    // 期限切れ表示切替ボタンのクリックイベント
+    $('#toggle-overdue').on('click', () => {
+        showOnlyOverdue = !showOnlyOverdue;
+        if (showOnlyOverdue) {
+            $('#toggle-overdue').text('全ての本を表示');
+        } else {
+            $('#toggle-overdue').text('期限切れ本だけ表示');
+        }
+        LoadBooks(currentPage);
+    });
 });
 
 function LoadBooks(pageNum) {
@@ -30,6 +42,7 @@ function LoadBooks(pageNum) {
             'manual_search_mode': false
         }),
         success: function(data) {
+            console.log(data);
             if (data && data.length > 0) {
                 totalRecords = data[0]['COUNT(ID)'];
                 SetTable(data.slice(1));
@@ -51,7 +64,7 @@ function UpdatePageInfo() {
 }
 
 function SetTable(data) {
-$('#table tr:gt(0)').remove();
+    $('#table tr:gt(0)').remove();
 
     if (!Array.isArray(data)) {
         data = [data];
@@ -59,31 +72,40 @@ $('#table tr:gt(0)').remove();
 
     data.forEach(book => {
         if (book && book.book_name) {
-    
-            // 返却期限がある前提で期限切れチェック
             const today = new Date();
-            const deadline = new Date(book.deadline);
-    
-            if (deadline >= today) return; // 期限切れてない → 表示しない
-    
+            const deadlineRaw = book.deadline;
+            const deadline = deadlineRaw ? new Date(deadlineRaw) : null;
+
+            // 期限切れだけ表示モードなら期限切れの本だけ表示
+            if (showOnlyOverdue) {
+                if (!deadline || isNaN(deadline.getTime()) || deadline >= today) return;
+            }
+
             const $row = $('<tr>');
-    
+
             const bookID = book.book_id;
             const bookName = book.book_name;
             const writter = book.book_auther;
             const isLending = book.book_is_lending;
             const lendingUser = book.lending_user_id;
-    
+
             $row.append($('<td>').text(bookName));
             $row.append($('<td>').text(writter));
             $row.append($('<td>').text(bookID));
-    
-            const $statusCell = $('<td>').text('返却期限切れ').css('color', 'red');
-            const $lendingUserCell = $('<td>').text(lendingUser).css('color', 'red');
-            
+
+            const $statusCell = $('<td>').text(isLending ? '貸出中' : '空き');
+            const $lendingUserCell = $('<td>').text(lendingUser);
+            if (isLending) {
+                $lendingUserCell.css('color', 'red');
+                $statusCell.css('color', 'red');
+            }
+            else {
+                $lendingUserCell.text('空き');
+            }
+
             $row.append($statusCell);
             $row.append($lendingUserCell);
-    
+
             const $editButton = $('<button>')
                 .text('編集')
                 .addClass('edit-btn')
@@ -91,10 +113,9 @@ $('#table tr:gt(0)').remove();
                     const params = $.param({ ID: bookID });
                     window.location.href = `/edit?${params}`;
                 });
-    
+
             $row.append($('<td>').append($editButton));
             $('#table').append($row);
         }
     });
-    
 }
