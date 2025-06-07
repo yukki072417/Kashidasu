@@ -58,11 +58,11 @@ async function createPdf(outputPath, studentData) {
     pdfDoc.registerFontkit(fontkit);
     const page = pdfDoc.addPage([width, height]);
 
-    const boldFontPath = path.join(__dirname, '../public/fonts/MPLUSRounded1c-bold.ttf');
+    const boldFontPath = path.join(__dirname, '../public/fonts/MPLUSRounded1c-Bold.ttf');
     const boldFontBytes = await fs.promises.readFile(boldFontPath);
     const boldFontFamily = await pdfDoc.embedFont(boldFontBytes);
 
-    const lightFontPath = path.join(__dirname, '../public/fonts/MPLUSRounded1c-light.ttf');
+    const lightFontPath = path.join(__dirname, '../public/fonts/MPLUSRounded1c-Light.ttf');
     const lightFontBytes = await fs.promises.readFile(lightFontPath);
     const lightFontFamily = await pdfDoc.embedFont(lightFontBytes);
 

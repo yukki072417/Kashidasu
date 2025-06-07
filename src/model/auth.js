@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const mysql = require('mysql2/promise');
 const log4js = require('log4js');
-const logger = log4js.getLogger('http');
+const logger = log4js.getLogger('access');
 
 function Connect() {
     return mysql.createConnection({
@@ -40,8 +40,8 @@ app.Login = async (req, res) => {
         if (admin_id === user.ID && admin_password === user.PASSWORD) {
             req.session.admin_id = admin_id;
             req.session.admin_authed = true;
-            req.session.user_name = req.session.USER_NAME;
-            logger.info(`User ${admin_id} logged in Kashidasu`);
+            logger.info(`学籍番号 ${admin_id} の人がKashidasuにログインしました`);
+            console.log(`学籍番号 ${admin_id} の人がKashidasuにログインしました`);
 
             return res.redirect('/main');
         } else {

@@ -26,7 +26,8 @@ app.UploadBook = async (req, res) => {
         db.query('DELETE FROM BOOKS WHERE ID = ?', [BEFORE_BOOK_ID]);
         db.query('INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)', [BOOK_ID, BOOK_NAME, WRITTER]);
         db.end();
-        logger.info(`Book ${BOOK_ID} updated successfully`);
+        logger.info(`ISBN ${BOOK_ID} の本の情報が更新されました`);
+        console.log(`ISBN ${BOOK_ID} の本の情報が更新されました`);
         res.send({result: 'SUCCESS'}).status(200);
     }catch(e){
         res.send({result: 'FAILED', message: e.message}).status(200);

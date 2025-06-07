@@ -33,8 +33,9 @@ services:
       - "443:443"
     volumes:
       - ./certs:/usr/app/certs
-      - ./src:/usr/app/src    
-    # command: node app.js
+      - ./src:/usr/app/src
+      - ./logs:/usr/app/logs
+    command: node app.js
     develop:
       watch:
         - action: sync+restart
@@ -44,6 +45,5 @@ services:
             - node_modules/
         - action: rebuild
           path: package.json
-
 volumes:
   mysql_data:

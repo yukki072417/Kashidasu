@@ -5,19 +5,19 @@
       },
       "SystemLogAppender": {
         "type": "file",
-        "filename": "./logs/system.log",
+        "filename": "logs/system.log",
         "maxLogSize": 5000000,
         "backups": 3
       },
       "HttpLogAppender": {
         "type": "file",
-        "filename": "./logs/http.log",
+        "filename": "logs/http.log",
         "pattern": ".yyyy-MM-dd",
         "daysToKeep": 7
       },
       "AccessLogAppender": {
         "type": "file",
-        "filename": "./logs/access.log",
+        "filename": "logs/access.log",
         "pattern": ".yyyy-MM-dd",
         "daysToKeep": 7
       }

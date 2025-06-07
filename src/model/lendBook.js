@@ -37,7 +37,8 @@ app.LendBook = async (req, res) => {
             'INSERT INTO LENDING_BOOK (BOOK_ID, USER_ID, LEND_DAY) VALUES (?, ?, ?)',
             [bookCode, userCode, date]
         );
-        logger.info(`User ${userCode} lent ${bookCode} on ${date}`);
+        logger.info(`${date} に学籍番号 ${userCode} の人が ISBN ${bookCode} の本を貸出しました`);
+        console.log(`${date} に学籍番号 ${userCode} の人が ISBN ${bookCode} の本を貸出しました`);
         res.send({result: 'SUCCESS'}).status(200);
     }catch(e){
         console.error(e.message);
