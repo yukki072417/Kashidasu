@@ -28,7 +28,7 @@
     width: 120px;
 }
 #book-title{
-    width: 250px;
+    width: 200px;
 }
 #book-state{
     width: 120px;
@@ -41,4 +41,7 @@
 }
 #book-isbn{
     width: 120px;
+}
+#book-deadline{
+    width: 150px;
 }

@@ -42,7 +42,6 @@ function LoadBooks(pageNum) {
             'manual_search_mode': false
         }),
         success: function(data) {
-            console.log(data);
             if (data && data.length > 0) {
                 totalRecords = data[0]['COUNT(ID)'];
                 SetTable(data.slice(1));
@@ -88,10 +87,35 @@ function SetTable(data) {
             const writter = book.book_auther;
             const isLending = book.book_is_lending;
             const lendingUser = book.lending_user_id;
+            const lendDateRaw = book.lend_date;
+            let lendDate = null;
+            let $lendDateCell = null;
+            if (lendDateRaw) {
+                const d = new Date(lendDateRaw);
+                const yy = String(d.getFullYear()).slice(-2);
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                lendDate = `${yy}/${mm}/${dd}`;
 
-            $row.append($('<td>').text(bookName));
-            $row.append($('<td>').text(writter));
-            $row.append($('<td>').text(bookID));
+                // 2週間後の日付を計算
+                const d2 = new Date(d);
+                d2.setDate(d2.getDate() + 14);
+                const yy2 = String(d2.getFullYear()).slice(-2);
+                const mm2 = String(d2.getMonth() + 1).padStart(2, '0');
+                const dd2 = String(d2.getDate()).padStart(2, '0');
+                const lendDatePlus2Weeks = `${yy2}/${mm2}/${dd2}`;
+
+                // 今日の日付（時刻を無視）
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                d2.setHours(0,0,0,0);
+
+                // 「貸出日 → 2週間後」の形式で表示
+                $lendDateCell = $('<td>').text(`${lendDate} → ${lendDatePlus2Weeks}`);
+                if (d2.getTime() === today.getTime()) {
+                    $lendDateCell.css('color', 'red');
+                }
+            }
 
             const $statusCell = $('<td>').text(isLending ? '貸出中' : '空き');
             const $lendingUserCell = $('<td>').text(lendingUser);
@@ -103,9 +127,6 @@ function SetTable(data) {
                 $lendingUserCell.text('空き');
             }
 
-            $row.append($statusCell);
-            $row.append($lendingUserCell);
-
             const $editButton = $('<button>')
                 .text('編集')
                 .addClass('edit-btn')
@@ -114,7 +135,14 @@ function SetTable(data) {
                     window.location.href = `/edit?${params}`;
                 });
 
+            $row.append($('<td>').text(bookName));
+            $row.append($('<td>').text(writter));
+            $row.append($('<td>').text(bookID));
+            $row.append($statusCell);
+            $row.append($lendingUserCell);
             $row.append($('<td>').append($editButton));
+            if ($lendDateCell) $row.append($lendDateCell);
+            
             $('#table').append($row);
         }
     });
