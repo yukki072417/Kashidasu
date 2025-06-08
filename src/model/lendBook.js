@@ -14,7 +14,7 @@ app.LendBook = async (req, res) => {
     async function Connect() {
         return mysql.createConnection({
             host: 'db',
-            user: process.env.DB_USER,
+            user: "root",
             password: process.env.ROOT_PASSWORD,
             database: 'KASHIDASU'
         });
