@@ -10,6 +10,7 @@ const updateBook = require('../model/updateBook');
 const registerBook = require('../model/registerBook');
 const deleteBook = require('../model/deleteBook');
 const updateSettings = require('../model/updateSettings');
+const mysql = require('mysql2/promise'); // 追加
 
 // ミドルウェアを指定
 router.use(express.urlencoded({ extended: true }));
@@ -85,8 +86,34 @@ router.get('/register', requireAuth, (req, res) => {
 });
 
 // メインページへルーティング
-router.get('/main', requireAuth, (req, res) => {
-    res.render('Main', { resData: { id: req.session.admin_id } });
+router.get('/main', requireAuth, async (req, res) => {
+    try {
+        const db = await mysql.createConnection({
+            host: 'db',
+            user: process.env.DB_USER,
+            password: process.env.ROOT_PASSWORD,
+            database: 'KASHIDASU',
+            charset: 'utf8mb4' // ★ここを追加
+        });
+
+        const [rows] = await db.execute(
+            'SELECT FIRST_NAME, LAST_NAME FROM ADMIN_USER WHERE ID = ?',
+            [req.session.admin_id]
+        );
+        await db.end();
+
+        let firstName = '';
+        let lastName = '';
+        if (rows.length > 0) {
+            firstName = rows[0].FIRST_NAME;
+            lastName = rows[0].LAST_NAME;
+        }
+
+        res.render('Main', { resData: { id: req.session.admin_id, firstName, lastName } });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('DB error');
+    }
 });
 
 // QRコード読み取りページへルーティング
