@@ -3,11 +3,12 @@ const app = express();
 const mysql = require('mysql2/promise');
 const log4js = require('log4js');
 const logger = log4js.getLogger('access');
+require('dotenv').config(); // ←追加
 
 function Connect() {
     return mysql.createConnection({
         host: 'db',
-        user: "root",
+        user: 'root',
         password: process.env.ROOT_PASSWORD,
         database: 'KASHIDASU'
     });
