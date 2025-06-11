@@ -1,4 +1,4 @@
-![alt text](./images/KashidasuLogo.png)
+![Kashidasu Logo](./images/KashidasuLogo.png)
 ## 概要
 図書室での導入を想定した図書管理アプリで、主に以下のような特徴があります。
 * 必要最低限の機能のみ搭載したシンプルな機能
@@ -72,9 +72,10 @@ IPv4の値がIPv4のアドレスです。こちらをアクセス元のPCのブ�
 ブラウザでアクセスすると、**「接続がプライベートではありません」** のような表示がされますが、ローカル（LAN内）のネットワークで動かす場合は、構造上の都合上表示されているだけで、動作に影響はありません。
 
 「詳細設定」をクリックし「...に進む(安全ではありません)」をクリックして、Kashidasuにアクセスしてください
-![alt text](./images/warning.png)
+![Warning](./images/warning.png)
 
 ## 開発者
 
 #### ゆっきー
-仕事用? メールアドレス: yukki.maybe.engineer@gmail.com
+仕事用? メールアドレス: yukki.maybe.engineer@gmail.com<br>
+なお案件は承っておりません。高校3年生の受験生ですので。
