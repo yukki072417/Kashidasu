@@ -32,6 +32,7 @@ services:
       - ./certs:/usr/app/certs
       - ./src:/usr/app/src
       - ./logs:/usr/app/logs
+      - ./.env:/usr/app/.env   # ←追加
     command: node app.js
     develop:
       watch:

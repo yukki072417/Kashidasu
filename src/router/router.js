@@ -90,10 +90,9 @@ router.get('/main', requireAuth, async (req, res) => {
     try {
         const db = await mysql.createConnection({
             host: 'db',
-            user: process.env.DB_USER,
+            user: 'root',
             password: process.env.ROOT_PASSWORD,
             database: 'KASHIDASU',
-            charset: 'utf8mb4' // ★ここを追加
         });
 
         const [rows] = await db.execute(
