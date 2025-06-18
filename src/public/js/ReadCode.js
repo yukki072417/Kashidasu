@@ -2,6 +2,7 @@ let userBarcode = null;
 let bookBarcode = null;
 let userCodeReaded = false;
 let readMode = 'lend';
+let manualInputValue
 const setModeBtn = '#set-mode-btn';
 
 const LendModeButton = '/images/LendButtonImage.png';
@@ -133,3 +134,46 @@ function SendData(userBarcode, bookBarcode) {
     });
 }
 SendData.isSending = false; // フラグを初期化
+
+
+// // 手入力によるバーコード読み取り機能を初期化
+function InitManualBarcodeReader() {
+    const $input = $('#hidden-barcode-input');
+
+    // 自動フォーカス
+    $(document).ready(() => {
+        $input.focus();
+    });
+
+    // 入力イベント（13桁入力で処理開始）
+    $input.on('input', () => {
+        const value = $input.val();
+        if (value.length === 13) {
+            manualInputValue = value;
+            console.log('手入力バーコード読み取り:', manualInputValue);
+            DetectedManual(manualInputValue);
+            $input.val('');
+            $input.blur();
+            setTimeout(() => $input.focus(), 500); // 再フォーカス
+        }
+    });
+}
+
+// 手入力されたバーコードを処理（Detected関数と同様の処理）
+function DetectedManual(code) {
+    if (!userCodeReaded) {
+        userBarcode = code;
+        userCodeReaded = true;
+
+        alert('ユーザーカードのコードが入力されました。\n2秒後に本のバーコードの入力をしてください。');
+        setTimeout(() => {
+            alert('本のコードを入力してください');
+        }, 2000);
+    } else {
+        bookBarcode = code;
+        SendData(userBarcode, bookBarcode);
+    }
+}
+
+// 初期化呼び出し
+InitManualBarcodeReader();
