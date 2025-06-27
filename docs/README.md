@@ -74,6 +74,30 @@ IPv4の値がIPv4のアドレスです。こちらをアクセス元のPCのブ�
 「詳細設定」をクリックし「...に進む(安全ではありません)」をクリックして、Kashidasuにアクセスしてください
 ![Warning](./images/warning.png)
 
+## 利用OSSライブラリとライセンス
+
+本ソフトウェアは以下のOSSライブラリを利用しています。  
+各ライブラリの著作権表示およびライセンス条項は、それぞれのリポジトリまたはnpmパッケージに従います。
+
+- @pdf-lib/fontkit (MIT License)
+- canvas (MIT License)
+- dotenv (MIT License)
+- ejs (Apache-2.0 License)
+- express (MIT License)
+- express-session (MIT License)
+- jsbarcode (MIT License)
+- log4js (Apache-2.0 License)
+- mysql2 (MIT License)
+- pdf-lib (MIT License)
+- pdf-poppler (MIT License)
+- pdf2pic (MIT License)
+- ほか package.json 記載の各ライブラリ
+
+詳細は node_modules ディレクトリ内の各ライブラリの LICENSE ファイルをご参照ください。
+
+## 著作権
+ベータ版Kashidasu（Kashidasu-beta）は、著作権法に基づき著作権が保護されます。また、本アプリの利用・再配布はMIT License（MITライセンス）の条件に従います。
+
 ## 開発者
 
 #### ゆっきー
