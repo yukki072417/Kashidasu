@@ -34,14 +34,5 @@ services:
       - ./logs:/usr/app/logs
       - ./.env:/usr/app/.env   # ←追加
     command: node app.js
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./src
-          target: /usr/app
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: package.json
 volumes:
   mysql_data:
