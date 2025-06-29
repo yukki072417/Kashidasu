@@ -5,6 +5,7 @@ const log4js = require('log4js');
 const logger = log4js.getLogger('http');
 app.use(express.json()); // JSON ボディを解析するためのミドルウェア
 
+// 本の登録エンドポイント
 app.RegisterBook = async (req, res) => {
 
     // データベース接続関数
@@ -17,49 +18,67 @@ app.RegisterBook = async (req, res) => {
         });
     }
 
+    // データベースに接続
     const db = Connect();
-    const books = req.body.books;
 
-    // リクエストのバリデーション
+    // リクエストボディから本の配列を取得
+    const books = req.body.books;
+    console.log(books);
+
+    // リクエストのバリデーション（booksが配列でなければエラー）
     if (!books || !Array.isArray(books)) {
         return res.status(400).send({ result: 'FAILED', message: 'Invalid books data' });
     }
 
     // 一括登録処理
     try {
-        await RegisterBooksToDB(res, db, books);
+        await RegisterBooksToDB(res, db, books); // 本の配列をDBに登録
     } catch (error) {
+        db.end(); // エラー時はDB接続を閉じる
         console.error('Error during book registration:', error);
         res.status(500).send({ result: 'FAILED', message: 'Internal server error' });
+    } finally {
+        db.end(); // 最後に必ずDB接続を閉じる
     }
 };
 
 // データベースに本を登録する関数
 async function RegisterBooksToDB(res, db, books) {
-    const insertQuery = 'INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)';
+
+    // 日本時間の日付を取得
     const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }).slice(0, 10);
 
     try {
+        // 受け取った本の配列を1冊ずつ処理
         for (const book of books) {
             const { isbn, title, author } = book;
 
+            // ISBN・タイトル・著者がすべて揃っていなければスキップ
             if (!isbn || !title || !author) {
                 console.warn('Invalid book data:', book);
                 continue;
             }
 
-            await db.promise().query(insertQuery, [isbn, title, author]);
+            // 本をDBに登録（プリペアドステートメントでSQLインジェクション対策）
+            await db.promise().query(
+                'INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)',
+                [isbn, title, author]
+            );
+            // ログに出力
             logger.info(`${date} にISBN ${isbn} の本が正常に登録されました`);
             console.log(`${date} にISBN ${isbn} の本が正常に登録されました`);
         }
 
+        // レスポンス返却
         res.send({ result: 'SUCCESS' });
     } catch (error) {
-        console.error('Error inserting books into database:', error);
-        throw error;
+        // 失敗時処理
+        console.error('エラー:', error);
+        db.end();
     } finally {
-        db.end(); // データベース接続を確実に終了
+        // データベースとの接続を切断
+        db.end();
     }
 }
 
-module.exports = app;
+module.exports
