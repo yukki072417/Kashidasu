@@ -32,16 +32,7 @@ services:
       - ./certs:/usr/app/certs
       - ./src:/usr/app/src
       - ./logs:/usr/app/logs
-      - ./.env:/usr/app/.env   # ←追加
-    command: node app.js
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./src
-          target: /usr/app
-          ignore:
-            - node_modules/
-        - action: rebuild
-          path: package.json
+      - ./.env:/usr/app/.env
+    command: nodemon src/app.js
 volumes:
   mysql_data:

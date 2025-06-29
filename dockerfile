@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y \
 
 # npmパッケージ等のクリーンアップとインストール
 RUN rm -rf node_modules package-lock.json && npm cache clean --force
-RUN npm install -g node-gyp
+RUN npm install -g node-gyp nodemon
 RUN npm install
 
 # HTTPS証明書は docker-compose.yml でホスト側の "./certs" をマウントして供給するのでここでのコピーは不要
