@@ -6,7 +6,6 @@ services:
     container_name: ca
     volumes:
       - ./certs:/root/ca/certs
-    # 初回証明書生成後に再生成を避けるため再起動は不要
     restart: "no"
 
   db:
@@ -20,19 +19,21 @@ services:
       TZ: ${TIME_ZONE}
     ports:
       - "3306:3306"
-      
+
   app:
     build: .
     container_name: app
     depends_on:
       - ca
+      - db
     ports:
       - "443:443"
     volumes:
       - ./certs:/usr/app/certs
       - ./src:/usr/app/src
       - ./logs:/usr/app/logs
-      - ./.env:/usr/app/.env   # ←追加
+      - ./.env:/usr/app/.env
     command: node app.js
+
 volumes:
   mysql_data:
