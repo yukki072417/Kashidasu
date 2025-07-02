@@ -120,9 +120,9 @@ function SendData(userBarcode, bookBarcode) {
 
     // サーバーにPOSTリクエストを送信（jQueryのajaxを使用）
     $.ajax({
-        url: endpoint,    // 送信先URL
-        type: 'POST',     // POSTメソッドで送信
-        data: data,       // 送信するデータ
+        url: endpoint,
+        type: 'POST', 
+        data: data,   
         success: function(result) {
             // サーバーから正常な応答があった場合の処理
             alert('本のバーコードも読み取られました');
