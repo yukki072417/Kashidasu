@@ -5,6 +5,7 @@ $(document).ready(function() {
         const id = $('#admin-id').val();
         const password = $('#admin-password').val();
 
+        // 管理者IDが未入力の時の処理
         if (id === "") {
             $('#admin-id').attr('placeholder', '管理者ID  IDが入力されていません');
             $('#admin-id').addClass('warn');
@@ -13,6 +14,7 @@ $(document).ready(function() {
             $('#admin-id').removeClass('warn');
         }
 
+        // 管理者Passwordが未入力の時の処理
         if (password === "") {
             $('#admin-password').attr('placeholder', '管理者パスワード  パスワードが入力されていません');
             $('#admin-password').addClass('warn');
@@ -30,8 +32,8 @@ $(document).ready(function() {
                     admin_password: password
                 },
                 success: function(response) {
-                    console.log(response[0].result);
-                    if (response[0].result == 'FAILED') {
+                    console.log(response.result);
+                    if (response.result == 'FAILED') {
                         alert('パスワードまたはIDが間違っています');
                     } else {
                         window.location.href = '/main';

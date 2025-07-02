@@ -1,5 +1,6 @@
 alert('本の裏にあるISBNコード(上部)をスキャンしてください')
 
+// バーコードリーダ初期化
 function InitQuagga() {
     Quagga.init({
         inputStream: {
@@ -8,6 +9,7 @@ function InitQuagga() {
             target: document.querySelector('#interactive')
         },
         decoder: {
+            // ISBNコードのバーコード規格がeanのため、ean_readerで必ず固定
             readers: ['ean_reader'],
         },
     }, (err) => {
@@ -27,6 +29,7 @@ function InitQuagga() {
 }
 InitQuagga();
 
+// バーコード検知時の処理
 function Detected(resultCode) {
     if (confirm(`ISBNコードは ${resultCode} でよろしいですか？`)) {
         const title = prompt('本のタイトルを入力してください:');
@@ -41,6 +44,7 @@ function Detected(resultCode) {
     else location.reload();
 }
 
+// 本の登録処理
 function RegisterBook(isbn, title, author) {
     const data = {
         books: [
@@ -52,6 +56,7 @@ function RegisterBook(isbn, title, author) {
         ]
     };
 
+    // 本の登録のリクエストを送信
     fetch('/register-book', {
         method: 'POST',
         headers: {
@@ -64,7 +69,6 @@ function RegisterBook(isbn, title, author) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const json = await response.json();
-        console.log(json);
         alert('本が正常に登録されました。');
         location.reload();
     })
