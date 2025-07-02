@@ -30,7 +30,7 @@ app.Login = async (req, res) => {
         
         // データベースからパスワードを取得
         const [results] = await db.query(
-            'SELECT ID, PASSWORD FROM ADMIN_USER WHERE ID = ?',
+            'SELECT * FROM ADMIN_USER WHERE ID = ?',
             [admin_id]
         );
         const user = results[0];
@@ -49,9 +49,8 @@ app.Login = async (req, res) => {
             //ログインセッションをtrue（これでログイン状態が保持される）
             req.session.admin_authed = true;
 
-            // ログに出力
-            logger.info(`学籍番号 ${admin_id} の人がKashidasuにログインしました`);
-            console.log(`学籍番号 ${admin_id} の人がKashidasuにログインしました`);
+            logger.info(`${user.LAST_NAME} ${user.FIRST_NAME} がKashidasuにログインしました`);
+            console.log(`${user.LAST_NAME} ${user.FIRST_NAME} がKashidasuにログインしました`);
 
             // メインページにリダイレクト
             return res.redirect('/main');
