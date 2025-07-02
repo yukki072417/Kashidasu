@@ -9,7 +9,9 @@ const ReturnModeButton = '/images/ReturnButtonImage.png'; // 返却モード時�
 
 // ページ読み込み時の処理
 window.addEventListener('load', async () => {
-    RequestCameraPermission(); // カメラの利用許可をリクエスト
+    RequestCameraPermission();
+    InitManualBarcodeReader();  // ← 手入力機能を初期化
+
     alert('ユーザーカードを読み込んでください');
 });
 
@@ -25,6 +27,7 @@ function SetReadMode() {
 
 // 貸出モードに切り替える関数
 function SetLendMode() {
+
     $(setModeBtn).attr('src', LendModeButton); // ボタン画像を貸出用に
     $(setModeBtn).attr('class', 'lend');       // クラスを"lend"に
     readMode = 'lend';                         // モードを貸出に
@@ -133,23 +136,76 @@ function SendData(userBarcode, bookBarcode) {
         }
     })
     .done(function(result) {
-        // サーバーからの応答内容によってメッセージを表示
-        if (result.result === 'SUCCESS' && readMode == 'lend')
+        if (result.result === 'SUCCESS' && readMode === 'lend') {
             alert('正常に貸出が完了しました');
-        else if (result.result === 'FAILED' && result.message == 'BOOK_ALRADY_LENDING')
+        } else if (result.result === 'FAILED' && result.message === 'BOOK_ALRADY_LENDING') {
             alert('エラー: この本はすでに貸出中です\n先に返却してください');
-        
-        if (result.result == 'SUCCESS' && readMode == 'return')
+        }
+
+        if (result.result === 'SUCCESS' && readMode === 'return') {
             alert('正常に返却が完了しました');
-        else if (result.result == 'FAILED' && result.message == 'BOOK_NOT_EXIST')
+        } else if (result.result === 'FAILED' && result.message === 'BOOK_NOT_EXIST') {
             alert('エラー: この本は存在しません\n正常に読み込まれていないか、本が登録されていません\n読み取られたISBNコード: ' + result.requested_data);
-        
-        // ページをリロード
-        location.reload();
+        }
     })
     .always(() => {
-        // リクエストが完了したらフラグを解除（二重送信防止をリセット）
-        SendData.isSending = false;
+        SendData.isSending = false; // フラグ解除
     });
 }
-SendData.isSending = false; // 二重送信防止用のフラグを初期化
+SendData.isSending = false;
+
+// -----------------------------
+// ▼ 手入力バーコード対応処理 ▼
+// -----------------------------
+function InitManualBarcodeReader() {
+    const $input = $('#hidden-barcode-input');
+
+    // 自動でフォーカス（ページ読み込み時 & 任意のクリック時）
+    $(window).on('load', () => $input.focus());
+    $(document).on('click', () => $input.focus());
+
+    // 入力イベント（半角英数字のみ許可、全角→半角自動変換）
+    $input.on('input', () => {
+        let rawValue = $input.val();
+
+        // 全角英数字→半角に変換
+        const halfWidthValue = rawValue.replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
+            String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+        );
+
+        // 半角英数字以外を除去
+        const cleanedValue = halfWidthValue.replace(/[^0-9a-zA-Z]/g, '');
+
+        $input.val(cleanedValue); // 入力内容を置き換え
+
+        // 10桁（ユーザーカード） or 13桁（本のバーコード）を検出
+        if (!userCodeReaded && cleanedValue.length === 10) {
+            manualInputValue = cleanedValue;
+            console.log('手入力: ユーザーカード', manualInputValue);
+            DetectedManual(manualInputValue);
+            $input.val('');
+            setTimeout(() => $input.focus(), 100);
+        } else if (userCodeReaded && cleanedValue.length === 13) {
+            manualInputValue = cleanedValue;
+            console.log('手入力: 本のバーコード', manualInputValue);
+            DetectedManual(manualInputValue);
+            $input.val('');
+            setTimeout(() => $input.focus(), 100);
+        }
+    });
+}
+
+function DetectedManual(code) {
+    if (!userCodeReaded) {
+        userBarcode = code;
+        userCodeReaded = true;
+
+        alert('ユーザーカードのコードが入力されました。\n2秒後に本のバーコードの入力をしてください。');
+        setTimeout(() => {
+            alert('本のコードを入力してください');
+        }, 2000);
+    } else {
+        bookBarcode = code;
+        SendData(userBarcode, bookBarcode);
+    }
+}
