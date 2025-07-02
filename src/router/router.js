@@ -3,7 +3,7 @@ const router = express.Router();
 
 const generate = require('../generater/outputCard');
 const auth = require('../model/auth');
-const serachBook = require('../model/serachBook');
+const serachBook = require('../model/searchBook');
 const lendBook = require('../model/lendBook');
 const returnBook = require('../model/returnBook');
 const updateBook = require('../model/updateBook');

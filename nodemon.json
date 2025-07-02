@@ -1,4 +1,5 @@
 {
   "watch": ["src"],
-  "ext": "js,json"
+  "ext": "js,json",
+  "ignore": ["node_modules", "logs", "certs"]
 }

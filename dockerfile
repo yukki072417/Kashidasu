@@ -2,7 +2,7 @@ FROM node:23
 
 WORKDIR /usr/app/
 
-COPY . /usr/app/
+COPY package*.json /usr/app/
 
 # 必要なライブラリのインストール
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -17,5 +17,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g node-gyp
+# nodemonをグローバルインストール
+RUN npm install -g nodemon node-gyp
+
+# アプリケーション依存関係をインストール
+COPY . /usr/app/
 RUN npm install
+
+# デフォルトコマンド
+CMD ["nodemon", "src/app.js"]
