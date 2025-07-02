@@ -164,6 +164,11 @@ function InitManualBarcodeReader() {
     $(window).on('load', () => $input.focus());
     $(document).on('click', () => $input.focus());
 
+    // 全てのキー入力を検知してフォーカスを当てる
+    $(document).on('keydown', () => {
+        $input.focus();
+    });
+
     // 入力イベント（半角英数字のみ許可、全角→半角自動変換）
     $input.on('input', () => {
         let rawValue = $input.val();
