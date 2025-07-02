@@ -1,5 +1,5 @@
 # Kashidasu
-csv
+*.csv
 certs
 
 # Logs

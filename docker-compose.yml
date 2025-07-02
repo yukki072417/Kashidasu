@@ -33,7 +33,6 @@ services:
       - ./src:/usr/app/src
       - ./logs:/usr/app/logs
       - ./.env:/usr/app/.env
-    command: node app.js
-
+    command: nodemon src/app.js
 volumes:
   mysql_data:
