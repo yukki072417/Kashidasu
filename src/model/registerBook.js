@@ -1,10 +1,11 @@
 const express = require('express');
+const app = express();
 const mysql = require('mysql2');
 const log4js = require('log4js');
 const logger = log4js.getLogger('http');
 
 // 本の登録エンドポイント
-const RegisterBook = async (req, res) => {
+app.RegisterBook = async (req, res) => {
     // データベース接続関数
     function Connect() {
         return mysql.createConnection({
