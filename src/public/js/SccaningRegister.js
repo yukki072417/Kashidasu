@@ -68,6 +68,7 @@ function RegisterBook(isbn, title, author) {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        if(response.body.result == 'BOOK_ALRADY_EXIST') return alert('この本はすでに登録されています')
         const json = await response.json();
         alert('本が正常に登録されました。');
         location.reload();

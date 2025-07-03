@@ -19,7 +19,7 @@ app.RegisterBook = async (req, res) => {
     }
 
     // データベースに接続
-    const db = Connect();
+    const db = await Connect();
 
     // リクエストボディから本の配列を取得
     const books = req.body.books;
@@ -34,22 +34,23 @@ app.RegisterBook = async (req, res) => {
     try {
         await RegisterBooksToDB(res, db, books); // 本の配列をDBに登録
     } catch (error) {
-        db.end(); // エラー時はDB接続を閉じる
+        // エラー時はDB接続を閉じる
+        db.end();
         console.error('Error during book registration:', error);
         res.status(500).send({ result: 'FAILED', message: 'Internal server error' });
     } finally {
-        db.end(); // 最後に必ずDB接続を閉じる
+        // 最後に必ずDB接続を閉じる
+        db.end();
     }
 };
 
 // データベースに本を登録する関数
 async function RegisterBooksToDB(res, db, books) {
 
-    // 日本時間の日付を取得
+    // 日本時間の日付を取得（ログ用）
     const date = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }).slice(0, 10);
 
     try {
-        // 受け取った本の配列を1冊ずつ処理
         for (const book of books) {
             const { isbn, title, author } = book;
 
@@ -57,6 +58,17 @@ async function RegisterBooksToDB(res, db, books) {
             if (!isbn || !title || !author) {
                 console.warn('Invalid book data:', book);
                 continue;
+            }
+
+            // 事前に同じISBNが存在するかチェック
+            const [rows] = await db.promise().query(
+                'SELECT COUNT(*) AS count FROM BOOKS WHERE ID = ?',
+                [isbn]
+            );
+            if (rows[0].count > 0) {
+                // 既に存在する場合はレスポンスを返して処理を中断
+                res.send({ result: 'BOOK_ALRADY_EXIST'});
+                return;
             }
 
             // 本をDBに登録（プリペアドステートメントでSQLインジェクション対策）
@@ -69,16 +81,13 @@ async function RegisterBooksToDB(res, db, books) {
             console.log(`${date} にISBN ${isbn} の本が正常に登録されました`);
         }
 
-        // レスポンス返却
+        // 全て正常に登録できた場合のみSUCCESSを返す
         res.send({ result: 'SUCCESS' });
     } catch (error) {
         // 失敗時処理
         console.error('エラー:', error);
-        db.end();
-    } finally {
-        // データベースとの接続を切断
-        db.end();
+        throw error; // エラーを上位に投げる
     }
 }
 
-module.exports
+module.exports = app;
