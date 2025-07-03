@@ -33,5 +33,6 @@ services:
       - ./src:/usr/app/src
       - ./logs:/usr/app/logs
       - ./.env:/usr/app/.env
+    command: ["npm", "start"]
 volumes:
   mysql_data:
