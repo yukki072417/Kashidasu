@@ -18,7 +18,7 @@ if (!fs.existsSync(logDir)) {
 }
 
 // log4jsの設定ファイルを読み込む
-log4js.configure(`./config/config.json`);
+log4js.configure(`/usr/app/config/config.json`);
 const logger = log4js.getLogger('system');
 
 const PORT = 443;
