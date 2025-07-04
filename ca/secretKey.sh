@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ../certs ディレクトリが存在しない場合は作成
-CERTS_DIR="../certs"
+CERTS_DIR="/usr/app/certs/"
 if [ ! -d "$CERTS_DIR" ]; then
     mkdir -p "$CERTS_DIR"
     echo "ディレクトリ $CERTS_DIR を作成しました。"
