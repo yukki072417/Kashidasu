@@ -1,4 +1,4 @@
-alert('本の裏にあるISBNコード(上部)をスキャンしてください')
+alert('本の裏にあるISBNコード(上部)をスキャンしてください');
 
 // バーコードリーダ初期化
 function InitQuagga() {
@@ -28,6 +28,44 @@ function InitQuagga() {
     });
 }
 InitQuagga();
+
+// 手入力バーコード処理の初期化
+function InitManualBarcodeReader() {
+    const $input = $('<input>', {
+        id: 'hidden-barcode-input',
+        type: 'text',
+        style: 'position: absolute; top: -9999px;', // 非表示にする
+    }).appendTo('body');
+
+    // 全てのキー入力を検知してフォーカスを当てる
+    $(document).on('keydown', () => {
+        $input.focus();
+    });
+
+    // 入力イベント（半角英数字のみ許可、全角→半角自動変換）
+    $input.on('input', () => {
+        let rawValue = $input.val();
+
+        // 全角英数字→半角に変換
+        const halfWidthValue = rawValue.replace(/[Ａ-Ｚａ-ｚ０-９]/g, s =>
+            String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+        );
+
+        // 半角英数字以外を除去
+        const cleanedValue = halfWidthValue.replace(/[^0-9a-zA-Z]/g, '');
+
+        $input.val(cleanedValue); // 入力内容を置き換え
+
+        // 13桁（ISBNコード）を検出
+        if (cleanedValue.length === 13) {
+            console.log('手入力: ISBNコード', cleanedValue);
+            Detected(cleanedValue);
+            $input.val('');
+            setTimeout(() => $input.focus(), 100);
+        }
+    });
+}
+InitManualBarcodeReader();
 
 // バーコード検知時の処理
 function Detected(resultCode) {

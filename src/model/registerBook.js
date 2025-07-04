@@ -3,11 +3,9 @@ const app = express();
 const mysql = require('mysql2');
 const log4js = require('log4js');
 const logger = log4js.getLogger('http');
-app.use(express.json()); // JSON ボディを解析するためのミドルウェア
 
 // 本の登録エンドポイント
 app.RegisterBook = async (req, res) => {
-
     // データベース接続関数
     function Connect() {
         return mysql.createConnection({
@@ -54,7 +52,6 @@ async function RegisterBooksToDB(res, db, books) {
         for (const book of books) {
             const { isbn, title, author } = book;
 
-            // ISBN・タイトル・著者がすべて揃っていなければスキップ
             if (!isbn || !title || !author) {
                 console.warn('Invalid book data:', book);
                 continue;
@@ -76,7 +73,6 @@ async function RegisterBooksToDB(res, db, books) {
                 'INSERT INTO BOOKS (ID, BOOK_NAME, WRITTER) VALUES (?, ?, ?)',
                 [isbn, title, author]
             );
-            // ログに出力
             logger.info(`${date} にISBN ${isbn} の本が正常に登録されました`);
             console.log(`${date} にISBN ${isbn} の本が正常に登録されました`);
         }
@@ -84,7 +80,6 @@ async function RegisterBooksToDB(res, db, books) {
         // 全て正常に登録できた場合のみSUCCESSを返す
         res.send({ result: 'SUCCESS' });
     } catch (error) {
-        // 失敗時処理
         console.error('エラー:', error);
         throw error; // エラーを上位に投げる
     }
