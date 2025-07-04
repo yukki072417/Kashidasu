@@ -10,7 +10,7 @@ const updateBook = require('../model/updateBook');
 const registerBook = require('../model/registerBook');
 const deleteBook = require('../model/deleteBook');
 const updateSettings = require('../model/updateSettings');
-const userRegister = require('../model/registerUser');
+const registerUser = require('../model/registerUser');
 
 // ミドルウェアを指定
 router.use(express.urlencoded({ extended: true }));
@@ -115,6 +115,9 @@ router.get('/scanning-registration', requireAuth, (req, res) => {
 router.get('/collective-registration', requireAuth, (req, res) => {
     res.render('Registers/CollectiveRegister');
 });
+
+// ユーザー登録エンドポイント
+router.post('/register-user', (req, res) => registerUser.RegisterUser(req, res));
 
 /// モジュールをエクスポート
 module.exports = router;

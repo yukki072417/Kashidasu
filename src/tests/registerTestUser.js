@@ -2,9 +2,9 @@ const mysql = require("mysql2/promise");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const fs = require("fs");
-require("dotenv").config();
+require("dotenv").config({path: "/usr/app/.env"});
 
-// RSA公開鍵のパス
+// 公開鍵のパス
 const PUBLIC_KEY_PATH = "/usr/app/certs/rsa_public.pem";
 
 // 公開鍵を取得する関数
@@ -40,19 +40,14 @@ async function connectDB() {
   });
 }
 
-// ユーザー登録のモデル関数
+// ユーザー登録関数
 async function registerUserModel(id, password, lastName, firstName) {
   const db = await connectDB();
-
   try {
-    // パスワードをハッシュ化
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 名前をRSA暗号化
     const encryptedLastName = encryptRSA(lastName);
     const encryptedFirstName = encryptRSA(firstName);
 
-    // データベースに挿入
     const query = `
       INSERT INTO ADMIN_USER (ID, PASSWORD, LAST_NAME, FIRST_NAME)
       VALUES (?, ?, ?, ?)
@@ -63,29 +58,19 @@ async function registerUserModel(id, password, lastName, firstName) {
       encryptedLastName,
       encryptedFirstName,
     ]);
-
-    return { result: "SUCCESS" };
+    console.log("✅ ユーザー登録成功");
   } catch (error) {
     if (error.code === "ER_DUP_ENTRY") {
-      return { result: "FAILED", message: "USER_ALREADY_EXISTS" };
+      console.error("⚠️ ユーザーIDは既に存在しています");
+    } else {
+      console.error("❌ ユーザー登録中にエラーが発生しました:", error.message);
     }
-    console.error("ユーザー登録中にエラーが発生しました:", error);
-    return { result: "FAILED", message: error.message };
   } finally {
     await db.end();
   }
 }
 
-// エクスポートするAPI関数
-async function RegisterUser(req, res) {
-  const data = req.body;
-  const result = await registerUserModel(
-    data.id,
-    data.password,
-    data.last_name,
-    data.first_name
-  );
-  res.send(result);
-}
-
-module.exports = { RegisterUser };
+// テストユーザー登録の実行
+(async () => {
+  await registerUserModel("testuser01", "testpassword", "テスト姓", "テスト名");
+})();
