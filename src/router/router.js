@@ -10,7 +10,7 @@ const updateBook = require('../model/updateBook');
 const registerBook = require('../model/registerBook');
 const deleteBook = require('../model/deleteBook');
 const updateSettings = require('../model/updateSettings');
-const mysql = require('mysql2/promise'); // 追加
+const userRegister = require('../model/registerUser');
 
 // ミドルウェアを指定
 router.use(express.urlencoded({ extended: true }));
@@ -18,7 +18,6 @@ router.use(express.json());
 
 // ログインページを表示
 router.get('/login', (req, res) => {
-
     //デバッグモード判定
     if(process.env.DEBUG_MODE == 'true'){
       req.session.admin_authed = true
@@ -34,13 +33,11 @@ router.get('/login', (req, res) => {
     res.render('Login');
 });
 
-// ユーザーのセッションを確認
-const requireAuth = (req, res, next) => {
-    if (req.session.admin_authed)
-        next();
-    else
-        res.redirect('/login');
-};
+// ユーザーのセッションを確認（auth.jsからインポート）
+const requireAuth = auth.requireAuth;
+
+// 管理者追加
+router.post('/register-admin', (req, res) => userRegister.registerUser(req, res));
 
 // データベースで書籍を検索
 router.post('/search-book', serachBook.SearchBook);
@@ -85,35 +82,8 @@ router.get('/register', requireAuth, (req, res) => {
     res.render('Register');
 });
 
-// メインページへルーティング
-router.get('/main', requireAuth, async (req, res) => {
-    try {
-        const db = await mysql.createConnection({
-            host: 'db',
-            user: 'root',
-            password: process.env.ROOT_PASSWORD,
-            database: 'KASHIDASU',
-        });
-
-        const [rows] = await db.execute(
-            'SELECT FIRST_NAME, LAST_NAME FROM ADMIN_USER WHERE ID = ?',
-            [req.session.admin_id]
-        );
-        await db.end();
-
-        let firstName = '';
-        let lastName = '';
-        if (rows.length > 0) {
-            firstName = rows[0].FIRST_NAME;
-            lastName = rows[0].LAST_NAME;
-        }
-
-        res.render('Main', { resData: { id: req.session.admin_id, firstName, lastName } });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('DB error');
-    }
-});
+// メインページへルーティング（認証＋複合化した名前を渡す）
+router.get('/main', requireAuth, auth.renderMainPage);
 
 // QRコード読み取りページへルーティング
 router.get('/read-code', (req, res) => {
