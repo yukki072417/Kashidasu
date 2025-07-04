@@ -23,9 +23,12 @@ generate_certificate() {
 }
 
 # サーバ証明書の生成（存在しなければ）
-if [ ! -f certs/server.crt ]; then
+if [ ! -f certs/server.key ] || [ ! -f certs/server.crt ]; then
   generate_certificate "server"
 fi
+
+# secretKey.sh を実行（エラー時は停止）
+sh /root/ca/secretKey.sh || exit 1
 
 echo "CAおよびSAN設定付きサーバ証明書の生成が完了しました."
 exec "$@"
