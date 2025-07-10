@@ -13,42 +13,20 @@
 
 <body>
     <script src='/js/jquery-3.7.1.min.js'></script>
-    <!-- <script src='/js/Settings.js'></script> -->
-    
+
     <%- include('Header') %>
-
-    <button class='animation-btn' onclick='location.href = "/main" '>←戻る</button>
-    <div class='main'>
-
-        <!-- アカウントのセットアップ -->
-        
-
-    </div>  
-    
-    <%- include('Footer') %>
-
-</body>
-
-=======
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>蔵書情報編集ページ</title>
-    <link rel='stylesheet' href='/styles/EditBook.css'>
-    <link rel='stylesheet' href='/fonts/fonts.css'>
-    <meta name='robots' content='noindex' />
-    
-</head>
-<body>
-    <script src='/js/jquery-3.7.1.min.js'></script>
-    <script src='/js/Settings.js'></script>
-    
-    <%- include('Header') %>
-    <button class='animation-btn' onclick='location.href = "/book-list" '>←戻る</button>
-    <div id='main'>
-        
+    <button class='animation-btn' onclick='location.href = "/register" '>←戻る</button>
+    <div class="main">
+        <form method='post'>
+                <h2>ユーザー一括登録</h2>
+                <div id='input-form'>
+                    <!-- ここに一括登録用のcsvファイルを読み込みボタンを置く -->
+                    <input type="file" id="csv-input" accept="text/csv">
+                    <input type="button" onclick="SelectFile()" id="file-selecter" value="ファイルを選択">
+                </div>
+                <input type="button" id="submit-btn" onclick="RegisterBooksByFile()" value="上書き登録">
+                <h3 id="selected-file-name"></h3>
+            </form>
     </div>
     <%- include('Footer') %>
-
 </body>
-</html>

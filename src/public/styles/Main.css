@@ -39,9 +39,9 @@ body{
     background-size: 150px;
 }
 #settings{
-    /* background: url('/images/.jpg'); */
-    /* background-repeat: no-repeat; */
-    /* background-size: 150px; */
+    /* background: url('/images/.jpg');
+    background-repeat: no-repeat;
+    background-size: 150px; */
 }
 #read-code:hover, #read-code:active{
     background: url('/images/ReadCode_pushed.jpg');
@@ -64,7 +64,8 @@ body{
     background-size: 150px;
 }
 #settings:hover{
-    
+    border: solid gray 3px;
+    border-radius: 10px;
 }
 
 @media screen and (max-width: 600px) {

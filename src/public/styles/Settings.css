@@ -1,0 +1,127 @@
+/* Bellow code writing for registerBook page */
+
+.form-group{
+    width: 300px;
+    height: 25px;
+    
+    margin: auto;
+    padding-left: 100px;
+    margin-top:    20px;
+    margin-bottom: 20px;
+    
+    text-align: left;
+}
+
+#submit-btn{
+    margin-top: 10px;
+    width: 100px;
+    height: 30px;
+
+    font-size: 16px;
+}
+
+.form-item{
+    width: 200px;
+    height: 25px;
+}
+
+.guidance-button{
+    width: 150px;
+    height: 150px;
+
+    margin-top:   75px;
+    margin-left:  75px;
+    margin-right: 75px;
+
+    border: solid 3px rgb(188, 188, 188);
+}
+
+.guidance-button:hover{
+    background-color: rgb(210, 210, 210);
+}
+
+.main{
+    display: flex;
+    justify-content: center;
+}
+
+#input-form{
+    text-align: center;
+}
+
+.form-item{
+    width: 175px;
+    height: 25px;
+
+    margin-top: 15px;
+}
+
+#submit-btn{
+    display: block;
+    
+    margin: auto;
+    margin-top: 15px;
+
+    text-align: center;
+
+    background-color: rgb(130, 200, 255);
+
+    width: 120px;
+    height: 40px;
+    
+    border-style: none;
+    border-radius: 7.5px;
+}
+
+#submit-btn:hover{
+    background-color: rgb(111, 170, 220);
+}
+
+h2{
+    text-align: center;
+}
+
+#csv-input{
+    display: none;
+}
+#file-selecter{
+    width: 250px;
+    height: 100px;
+
+    font-size: 26px;
+    border-radius: 10px;
+
+    background-color: white;
+
+    box-shadow: 0px 5px gray;
+}
+
+#file-selecter:hover{
+    transform: translateY(5px);
+    box-shadow: 0px 0px gray;
+}
+
+#scanning-registration{
+    background: url('/images/scanRegisteraion.png');
+
+    background-repeat: no-repeat;
+    background-size: 150px;
+}
+#scanning-registration:hover{
+    background: url('/images/scanRegisteration_hover.png');
+
+    background-repeat: no-repeat;
+    background-size: 150px;
+}
+#collective-registration{
+    background: url('/images/csvRegisteration.png');
+
+    background-repeat: no-repeat;
+    background-size: 150px;
+}
+#collective-registration:hover{
+    background: url('/images/csvRegisteration_hover.png');
+
+    background-repeat: no-repeat;
+    background-size: 150px;
+}

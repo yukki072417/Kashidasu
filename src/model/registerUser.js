@@ -41,16 +41,16 @@ async function connectDB() {
   });
 }
 
+//初期設定アカウントを追加
 async function RegisterInitUser() {
-
   const db = await connectDB();
-  const isInitUserExist = db.query('SELECT * FROM ADMIN_USER WHERE ID = "1234567890"')
-  
-  if((await isInitUserExist).length == 0){
+  const [isInitUserExist, fields] = await db.query(
+    "SELECT * FROM ADMIN_USER WHERE ID = '1234567890'"
+  );
+  if(isInitUserExist.length == 0){
     await registerUserModel('1234567890', 'PASSWORD', '初期設定', 'アカウント'); 
-    console.log('初期設定アカウントを灯籠')
+    console.log('初期設定アカウント登録')
   }
-
 }
 
 // ユーザー登録のモデル関数

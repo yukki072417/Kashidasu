@@ -120,5 +120,11 @@ router.get('/collective-registration', requireAuth, (req, res) => {
 //ここは必ず正式稼働時には、RequireAuthを付け加える
 router.post('/register-user', (req, res) => registerUser.RegisterUser(req, res));
 
+// 設定ページへルーティング
+router.get('/settings', (req, res) => res.render('Settings'));
+
+// 設定を更新する
+router.post('/update-settings', (req, res) => updateSettings.UpdateSettings(req, res));
+
 /// モジュールをエクスポート
 module.exports = router;
