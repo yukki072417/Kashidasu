@@ -117,6 +117,7 @@ router.get('/collective-registration', requireAuth, (req, res) => {
 });
 
 // ユーザー登録エンドポイント
+//ここは必ず正式稼働時には、RequireAuthを付け加える
 router.post('/register-user', (req, res) => registerUser.RegisterUser(req, res));
 
 /// モジュールをエクスポート
