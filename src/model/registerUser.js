@@ -40,6 +40,19 @@ async function connectDB() {
   });
 }
 
+async function registerInitUser() {
+  const db = await connectDB();
+  const PASSWORD = await bcrypt.hash('1234567890', 10);
+  const LAST_NAME = await encryptRSA('初期設定');
+  const FIRST_NAME = await encryptRSA('アカウント');
+
+  try {
+    const isAdminExist = db.query('SELECT ID FROM ADMIN_USER WHERE = ?', ['1234567890']);
+    if (isAdminExist.length == 0) db.query('INSERT INTO ADMIN_USER (ID, PASSWORD, LAST_NAME, FIRST_NAME) VALUES (?, ?, ?, ?)', ['1234567890', PASSWORD, LAST_NAME, FIRST_NAME]);
+  }catch(e){
+  }
+}
+
 // ユーザー登録のモデル関数
 async function registerUserModel(id, password, lastName, firstName) {
   const db = await connectDB();

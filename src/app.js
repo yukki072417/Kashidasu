@@ -10,11 +10,17 @@ const app = express();
 const userRouter = require('./router/router');
 
 const logDir = path.join(__dirname, '../logs');
+const mysqlDatasDir = path.join(__dirname, '../mysql_datas')
 
 // logsディレクトリが存在しない場合は作成
 if (!fs.existsSync(logDir)) {
     console.log('logsディレクトリを生成');
     fs.mkdirSync(logDir);
+}
+
+if(!fs.existsSync(mysqlDatasDir)){
+    console.log('mysqlディレクトリを生成')
+    fs.mkdirSync(mysqlDatasDir)
 }
 
 // log4jsの設定ファイルを読み込む
