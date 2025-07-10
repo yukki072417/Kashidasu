@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   ca:
     build:
@@ -33,6 +34,8 @@ services:
       - ./src:/usr/app/src
       - ./logs:/usr/app/logs
       - ./.env:/usr/app/.env
+    entrypoint: ["sh", "/usr/app/wait-for-services.sh"]
     command: ["npm", "start"]
+
 volumes:
   mysql_data:
