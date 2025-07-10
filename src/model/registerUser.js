@@ -2,6 +2,7 @@ const mysql = require("mysql2/promise");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const fs = require("fs");
+const { Console } = require("console");
 require("dotenv").config();
 
 // RSA公開鍵のパス
@@ -40,17 +41,16 @@ async function connectDB() {
   });
 }
 
-async function registerInitUser() {
-  const db = await connectDB();
-  const PASSWORD = await bcrypt.hash('1234567890', 10);
-  const LAST_NAME = await encryptRSA('初期設定');
-  const FIRST_NAME = await encryptRSA('アカウント');
+async function RegisterInitUser() {
 
-  try {
-    const isAdminExist = db.query('SELECT ID FROM ADMIN_USER WHERE = ?', ['1234567890']);
-    if (isAdminExist.length == 0) db.query('INSERT INTO ADMIN_USER (ID, PASSWORD, LAST_NAME, FIRST_NAME) VALUES (?, ?, ?, ?)', ['1234567890', PASSWORD, LAST_NAME, FIRST_NAME]);
-  }catch(e){
+  const db = await connectDB();
+  const isInitUserExist = db.query('SELECT * FROM ADMIN_USER WHERE ID = "1234567890"')
+  
+  if((await isInitUserExist).length == 0){
+    await registerUserModel('1234567890', 'PASSWORD', '初期設定', 'アカウント'); 
+    console.log('初期設定アカウントを灯籠')
   }
+
 }
 
 // ユーザー登録のモデル関数
@@ -101,4 +101,4 @@ async function RegisterUser(req, res) {
   res.send(result);
 }
 
-module.exports = { RegisterUser };
+module.exports = { RegisterUser, RegisterInitUser };

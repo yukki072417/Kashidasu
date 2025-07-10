@@ -59,6 +59,7 @@ router.post('/delete-book', deleteBook.DeleteBook);
 
 // ログインページへルーティング
 router.get('/', (req, res) => {
+    registerUser.registerInitUser()
     res.redirect('login');
 });
 

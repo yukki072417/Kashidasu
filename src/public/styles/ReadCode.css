@@ -31,7 +31,7 @@
     margin-left: 50px;
 }
 
-#set-mode-btn{
+#SetReadMode{
     width: 100px;
     height: 100px;
     
@@ -79,7 +79,7 @@
     font-size: 22px;
     color: white;
 }
-/* #hidden-barcode-input {
+#hidden-barcode-input {
     position: absolute;
     opacity: 0;
     pointer-events: none;
@@ -87,4 +87,4 @@
 
 #under{
     margin-top: 550px;
-} */
+}

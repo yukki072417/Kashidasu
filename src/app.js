@@ -10,7 +10,9 @@ const app = express();
 const userRouter = require('./router/router');
 
 const logDir = path.join(__dirname, '../logs');
-const mysqlDatasDir = path.join(__dirname, '../mysql_datas')
+const mysqlDatasDir = path.join(__dirname, '../mysql_datas');
+
+const initUser = require('./model/registerUser')
 
 // logsディレクトリが存在しない場合は作成
 if (!fs.existsSync(logDir)) {
@@ -37,6 +39,8 @@ app.use(session({
         maxAge: 1000 * 60 * 60 * 24
     }
 }));
+
+initUser.RegisterInitUser();
 
 app.use(express.static('./src/public'));
 app.use(express.urlencoded({ extended: true }));
