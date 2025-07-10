@@ -116,5 +116,10 @@ router.get('/collective-registration', requireAuth, (req, res) => {
     res.render('Registers/CollectiveRegister');
 });
 
+// 設定画面にルーティング
+router.get('/settings', requireAuth, (req, res) => {
+    
+});
+
 /// モジュールをエクスポート
 module.exports = router;
