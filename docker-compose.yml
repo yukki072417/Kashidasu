@@ -31,6 +31,7 @@ services:
     volumes:
       - ./certs:/usr/app/certs
       - ./src:/usr/app/src
+      - ./app.js:/usr/app/app.js
       - ./logs:/usr/app/logs
     command: node app.js
     develop:
