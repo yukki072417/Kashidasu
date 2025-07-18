@@ -1,5 +1,8 @@
-# Raspberry Pi 5 (arm64) 用
-FROM arm64v8/node:23
+# Raspberry Pi 5 (arm64) 用, Mac(Apple silicon)専用
+# FROM arm64v8/node:23
+
+# Mac(Intel chip), Windows, Linux専用
+FROM node:23
 
 WORKDIR /usr/app/
 
