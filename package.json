@@ -13,17 +13,18 @@
   "license": "ISC",
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",
-    "canvas": "^3.1.0",
+    "canvas": "^3.1.2",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
     "express-session": "^1.18.0",
-    "jsbarcode": "^3.11.6",
+    "jsbarcode": "^3.12.1",
     "log4js": "^6.9.1",
     "mysql2": "^3.11.3",
     "npm": "^10.9.0",
     "pdf-lib": "^1.17.1",
     "pdf-poppler": "^0.2.1",
-    "pdf2pic": "^3.1.3"
+    "pdf2pic": "^3.1.3",
+    "pureimage": "^0.4.18"
   }
 }

@@ -8,22 +8,17 @@ WORKDIR /usr/app/
 
 COPY . /usr/app/
 
-# 必要なシステムパッケージのインストール
 RUN apt-get update && apt-get install -y \
-    libcairo2-dev \
-    libjpeg-dev \
-    libpango1.0-dev \
-    libgif-dev \
-    build-essential \
-    g++ \
-    graphicsmagick \
     imagemagick \
-    poppler-utils \
-    libpoppler-cpp-dev \
-    libmysqlclient-dev \
+    liblcms2-2 \
+    libfontconfig1 \
+    fontconfig-config \
+    libjbig0 \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
+RUN rm -f /etc/fonts/conf.d/*.conf \
+&& dpkg-reconfigure fontconfig
 # node_modules やキャッシュのクリーンアップ
 RUN rm -rf node_modules package-lock.json && npm cache clean --force
 
