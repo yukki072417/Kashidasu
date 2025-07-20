@@ -31,5 +31,5 @@ RUN chmod +x /usr/app/wait-for-services.sh
 COPY . /usr/app/
 
 # 起動時に依存サービスを待ってから nodemon を実行
-ENTRYPOINT ["sh", "/usr/app/wait-for-services.sh"]
+ENTRYPOINT ["bash", "/usr/app/wait-for-services.sh"]
 CMD ["nodemon", "src/app.js"]
