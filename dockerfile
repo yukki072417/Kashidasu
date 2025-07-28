@@ -1,4 +1,4 @@
-FROM node:23
+FROM --platform=linux/arm64 node:23-bullseye-slim
 WORKDIR /usr/app/
 
 # netcat は debian でパッケージ名が netcat-openbsd
