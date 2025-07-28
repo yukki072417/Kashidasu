@@ -101,7 +101,27 @@ h2{
     box-shadow: 0px 0px gray;
 }
 
-.guidance-text{
-    text-align: center;
-    font-size: 22px;    
+#scanning-registration{
+    background: url('/images/scanRegisteraion.png');
+
+    background-repeat: no-repeat;
+    background-size: 150px;
+}
+#scanning-registration:hover{
+    background: url('/images/scanRegisteration_hover.png');
+
+    background-repeat: no-repeat;
+    background-size: 150px;
+}
+#collective-registration{
+    background: url('/images/csvRegisteration.png');
+
+    background-repeat: no-repeat;
+    background-size: 150px;
+}
+#collective-registration:hover{
+    background: url('/images/csvRegisteration_hover.png');
+
+    background-repeat: no-repeat;
+    background-size: 150px;
 }

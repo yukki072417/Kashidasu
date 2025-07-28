@@ -1,7 +1,7 @@
 # Kashidasu
-csv
+*.csv
 certs
-mysql_data
+mysql_datas
 
 # Logs
 logs

@@ -1,15 +1,16 @@
 const express = require('express');
 const router = express.Router();
 
-const generate = require('../generater/outputCard');
+const generate = require('../services/outputCard');
 const auth = require('../model/auth');
-const serachBook = require('../model/serachBook');
+const serachBook = require('../model/searchBook');
 const lendBook = require('../model/lendBook');
 const returnBook = require('../model/returnBook');
 const updateBook = require('../model/updateBook');
 const registerBook = require('../model/registerBook');
 const deleteBook = require('../model/deleteBook');
 const updateSettings = require('../model/updateSettings');
+const registerUser = require('../model/registerUser');
 
 // ミドルウェアを指定
 router.use(express.urlencoded({ extended: true }));
@@ -17,7 +18,6 @@ router.use(express.json());
 
 // ログインページを表示
 router.get('/login', (req, res) => {
-
     //デバッグモード判定
     if(process.env.DEBUG_MODE == 'true'){
       req.session.admin_authed = true
@@ -33,13 +33,11 @@ router.get('/login', (req, res) => {
     res.render('Login');
 });
 
-// ユーザーのセッションを確認
-const requireAuth = (req, res, next) => {
-    if (req.session.admin_authed)
-        next();
-    else
-        res.redirect('/login');
-};
+// ユーザーのセッションを確認（auth.jsからインポート）
+const requireAuth = auth.requireAuth;
+
+// 管理者追加
+router.post('/register-admin', (req, res) => userRegister.registerUser(req, res));
 
 // データベースで書籍を検索
 router.post('/search-book', serachBook.SearchBook);
@@ -84,10 +82,8 @@ router.get('/register', requireAuth, (req, res) => {
     res.render('Register');
 });
 
-// メインページへルーティング
-router.get('/main', requireAuth, (req, res) => {
-    res.render('Main', { resData: { id: req.session.admin_id } });
-});
+// メインページへルーティング（認証＋複合化した名前を渡す）
+router.get('/main', requireAuth, auth.renderMainPage);
 
 // QRコード読み取りページへルーティング
 router.get('/read-code', (req, res) => {
@@ -119,6 +115,16 @@ router.get('/scanning-registration', requireAuth, (req, res) => {
 router.get('/collective-registration', requireAuth, (req, res) => {
     res.render('Registers/CollectiveRegister');
 });
+
+// ユーザー登録エンドポイント
+//ここは必ず正式稼働時には、RequireAuthを付け加える
+router.post('/register-user', (req, res) => registerUser.RegisterUser(req, res));
+
+// 設定ページへルーティング
+router.get('/settings', (req, res) => res.render('Settings'));
+
+// 設定を更新する
+router.post('/update-settings', (req, res) => updateSettings.UpdateSettings(req, res));
 
 /// モジュールをエクスポート
 module.exports = router;

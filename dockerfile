@@ -1,32 +1,35 @@
-# Raspberry Pi 5 (arm64) 用, Mac(Apple silicon)専用
-# FROM arm64v8/node:23
-
-# Mac(Intel chip), Windows, Linux専用
-FROM node:23
-
+FROM --platform=linux/arm64 node:23-bullseye-slim
 WORKDIR /usr/app/
 
-COPY . /usr/app/
-
-RUN apt-get update && apt-get install -y \
+# netcat は debian でパッケージ名が netcat-openbsd
+# 最終行にバックスラッシュを残さないように注意
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+    netcat-openbsd \
+    libcairo2-dev \
+    libjpeg-dev \
+    libpango1.0-dev \
+    libgif-dev \
+    build-essential \
+    graphicsmagick \
     imagemagick \
-    liblcms2-2 \
-    libfontconfig1 \
-    fontconfig-config \
-    libjbig0 \
+    ghostscript \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-RUN rm -f /etc/fonts/conf.d/*.conf \
-&& dpkg-reconfigure fontconfig
-# node_modules やキャッシュのクリーンアップ
-RUN rm -rf node_modules package-lock.json && npm cache clean --force
+# nodemon と node-gyp をグローバルインストール
+RUN npm install -g nodemon node-gyp
 
-# node-gyp のインストール（ネイティブモジュールのビルドに必要）
-RUN npm install -g node-gyp
-
-# 依存関係のインストール
+# 依存パッケージを先にインストール
+COPY package*.json ./
 RUN npm install
 
-# アプリケーション起動（必要に応じて）
-# CMD ["npm", "start"]
+# 待機スクリプトとアプリ本体をコピー
+COPY wait-for-services.sh /usr/app/wait-for-services.sh
+RUN chmod +x /usr/app/wait-for-services.sh
+
+COPY . /usr/app/
+
+# 起動時に依存サービスを待ってから nodemon を実行
+ENTRYPOINT ["bash", "/usr/app/wait-for-services.sh"]
+CMD ["nodemon", "src/app.js"]

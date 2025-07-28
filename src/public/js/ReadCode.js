@@ -1,70 +1,26 @@
-let userBarcode = null;
-let bookBarcode = null;
-let userCodeReaded = false;
-let readMode = 'lend';
-const setModeBtn = '#set-mode-btn';
+// 状態管理用の変数
+let userBarcode = null; // 10桁のバーコード（ユーザーカード）
+let isbnBarcode = null; // 13桁のISBNコード（本のバーコード）
+let isUserBarcodeRead = false; // ユーザーカードが読み取られたかどうか
+let currentMode = 'lend'; // 'lend' または 'return'
 
-const LendModeButton = '/images/LendButtonImage.png';
-const ReturnModeButton = '/images/ReturnButtonImage.png';
-
-window.addEventListener('load', async () => {
-    RequestCameraPermission();
-    
-    alert('ユーザーカードを読み込んでください')
-});
-
-function SetReadMode() {
-    if ($(setModeBtn).attr('class') === 'lend') {
-        SetReturnMode();
-    } else {
-        SetLendMode();
-    }
-}
-
-function SetLendMode() {
-    $(setModeBtn).attr('src', LendModeButton);
-    $(setModeBtn).attr('class', 'lend');
-
-    readMode = 'lend';
-    alert('貸出モードになりました');
-}
-
-function SetReturnMode() {
-    $(setModeBtn).attr('src', ReturnModeButton);
-    $(setModeBtn).attr('class', 'return');
-
-    readMode = 'return';
-    alert('返却モードになりました');
-}
-
-async function RequestCameraPermission() {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        StopStream(stream);
-    } catch (error) {
-        alert('カメラの許可が必要です。設定を確認してください');
-        return;
-    }
-    InitQuagga('code_128_reader');
-}
-
-function StopStream(stream) {
-    stream.getTracks().forEach((track) => track.stop());
-}
-
-function InitQuagga(readerType) {
+/**
+ * Quaggaの初期化
+ * @param {string} readerType - 使用するバーコードリーダーの種類（code_128_reader または ean_reader）
+ */
+function initializeQuagga(readerType) {
     Quagga.init({
         inputStream: {
             name: 'Live',
             type: 'LiveStream',
-            target: document.querySelector('#interactive')
+            target: document.querySelector('#interactive'),
         },
         decoder: {
             readers: [readerType],
         },
     }, (err) => {
         if (err) {
-            console.error(err);
+            console.error('Quagga初期化エラー:', err);
             return;
         }
         Quagga.start();
@@ -72,64 +28,127 @@ function InitQuagga(readerType) {
 
     Quagga.onDetected((result) => {
         if (result.codeResult.code) {
-            Quagga.stop();
-            Detected(result.codeResult.code);
+            Quagga.offDetected(); // 一時的に検出を停止
+            handleBarcodeDetected(result.codeResult.code);
         }
     });
 }
 
-async function Detected(result) {
-    if (!userCodeReaded) {
-        userBarcode = result;
-        userCodeReaded = true;
+/**
+ * 手入力バーコード処理の初期化
+ */
+function initializeManualBarcodeReader() {
+    const $input = $('#hidden-barcode-input');
 
-        alert('ユーザーカードのバーコードが読み取られました。\n2秒後に本のバーコードの読み取りを開始します。');
+    $(document).on('keydown', () => {
+        $input.focus();
+    });
 
-        setTimeout(() => {
-            InitQuagga('ean_reader');
-            alert('本のバーコードを読み取ってください');
-        }, 2000);
+    $input.on('input', () => {
+        const cleanedValue = cleanInputValue($input.val());
+        $input.val(cleanedValue);
+
+        if (!isUserBarcodeRead && cleanedValue.length === 10) {
+            handleBarcodeDetected(cleanedValue);
+            $input.val('');
+        } else if (isUserBarcodeRead && cleanedValue.length === 13) {
+            handleBarcodeDetected(cleanedValue);
+            $input.val('');
+        }
+    });
+}
+
+/**
+ * 入力値をクリーンアップ（全角→半角変換、不要な文字を除去）
+ */
+function cleanInputValue(value) {
+    const halfWidthValue = value.replace(/[Ａ-Ｚａ-ｚ０-９]/g, (s) =>
+        String.fromCharCode(s.charCodeAt(0) - 0xFEE0)
+    );
+    return halfWidthValue.replace(/[^0-9a-zA-Z]/g, '');
+}
+
+/**
+ * バーコード検知時の処理
+ */
+function handleBarcodeDetected(resultCode) {
+    if (!isUserBarcodeRead && resultCode.length === 10) {
+        userBarcode = resultCode;
+        isUserBarcodeRead = true;
+        alert(`ユーザーカードが読み取られました: ${userBarcode}`);
+        restartQuagga('ean_reader'); // ISBNコードの読み取りへ
+    } else if (isUserBarcodeRead && resultCode.length === 13) {
+        isbnBarcode = resultCode;
+        alert(`ISBNコードが読み取られました: ${isbnBarcode}`);
+        processingBook(userBarcode, isbnBarcode);
     } else {
-        bookBarcode = result;
-        SendData(userBarcode, bookBarcode);
+        alert('無効なバーコードが読み取られました。再試行してください。');
+        restartQuagga(isUserBarcodeRead ? 'ean_reader' : 'code_128_reader');
     }
 }
 
-function SendData(userBarcode, bookBarcode) {
-    const data = {
-        book_id: bookBarcode,
-        user_id: userBarcode
-    };
-    const endpoint = readMode === 'lend' ? '/lend' : '/return';
-
-    if (SendData.isSending) return; // 二重送信を防止
-    SendData.isSending = true;
-
-    $.ajax({
-        url: endpoint,
-        type: 'POST',
-        data: data,
-        success: function(result) {
-            console.dir(result);
-            alert('本のバーコードも読み取られました');
-        },
-        error: function(xhr, status, error) {
-            console.error('JSONパースエラー:', error);
-        }
-    })
-    .done(function(result) {
-
-        if (result.result === 'SUCCESS' && readMode == 'lend') alert('正常に貸出が完了しました');
-        else if (result.result === 'FAILED' && result.message == 'BOOK_ALRADY_LENDING') alert('エラー: この本はすでに貸出中です\n先に返却してください');
-        
-        if (result.result == 'SUCCESS' && readMode == 'return') alert('正常に返却が完了しました');
-        else if (result.result == 'FAILED' && result.message == 'BOOK_NOT_EXIST') alert('エラー: この本は存在しません\n正常に読み込まれていないか、本が登録されていません\n読み取られたISBNコード: ' + result.requested_data);
-        
-        // location.reload();
-
-    })
-    .always(() => {
-        SendData.isSending = false; // リクエスト完了後に解除
-    });
+/**
+ * Quaggaを再起動して次のバーコードを読み取る
+ */
+function restartQuagga(readerType) {
+    Quagga.stop();
+    initializeQuagga(readerType);
 }
-SendData.isSending = false; // フラグを初期化
+
+/**
+ * 本の登録処理
+ */
+function processingBook(userBarcode, isbnBarcode) {
+    const data = {
+        user_id: userBarcode,
+        book_id: isbnBarcode,
+    };
+
+    fetch(`/${currentMode}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+        .then(async (response) => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const json = await response.json();
+            switch (json.message) {
+                case 'BOOK_NOT_EXIST':
+                    alert('エラー: 本が存在しません');
+                    break;
+                case 'BOOK_ALRADY_LENDING':
+                    alert('エラー: この本はすでに借りられています');
+                    break;
+                case 'BOOK_NOT_LENDING':
+                    alert('エラー: この本は貸出されていません');
+                    break;
+                default:
+                    alert(`本が正常に${currentMode === 'lend' ? '貸出' : '返却'}されました。`);
+            }
+            location.reload();
+        })
+        .catch((error) => {
+            console.error('Fetch error:', error);
+            alert('本の登録中にエラーが発生しました。');
+            location.reload();
+        });
+}
+
+/**
+ * DOMが読み込まれてから初期化
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    initializeQuagga('code_128_reader'); // 最初はユーザーカード
+    initializeManualBarcodeReader();     // 手入力処理
+
+    // モード切り替えボタンの処理
+    const toggleBtn = document.getElementById('toggle-mode-btn');
+    toggleBtn.addEventListener('click', () => {
+        currentMode = currentMode === 'lend' ? 'return' : 'lend';
+        toggleBtn.textContent = `${currentMode === 'lend' ? '貸出モード' : '返却モード'}`;
+    });
+});
