@@ -100,7 +100,7 @@ async function createPdf(outputPath, studentData) {
 app.GenerateCard = async (req, res) => {
   try {
     const studentData = req.body;
-    const pdfFilename = `kashidasu_card_${studentData.id}.pdf`;
+    const pdfFilename = `kashidasu_card.pdf`;
     const pdfOutputPath = path.join(OUTPUT_DIR, pdfFilename);
 
     const pdfCreated = await createPdf(pdfOutputPath, studentData);
