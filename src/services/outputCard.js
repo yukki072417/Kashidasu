@@ -1,13 +1,16 @@
-const PImage = require('pureimage');
+const { PDFDocument } = require('pdf-lib');
+const { fromPath } = require('pdf2pic');
+const bwipjs = require('bwip-js');
+const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const JsBarcode = require('jsbarcode');
 const { createCanvas } = require('canvas'); // JsBarcode 用
 
+const app = express();
 const width = 400;
 const height = 200;
 const OUTPUT_DIR = '/usr/app/src/public/pdf';
-const PNG_OUTPUT_PATH = path.join(OUTPUT_DIR, 'kashidasu_card.png');
 
 function ensureDirectoryExists(dirPath) {
   if (!fs.existsSync(dirPath)) {
@@ -15,55 +18,125 @@ function ensureDirectoryExists(dirPath) {
   }
 }
 
-async function generateCardImage(studentData) {
+async function Generating(studentID) {
+  ensureDirectoryExists(OUTPUT_DIR);
+  const barcodePath = path.join(OUTPUT_DIR, `card_barcode_${studentID}.png`);
+
   try {
-    ensureDirectoryExists(OUTPUT_DIR);
-
-    const img = PImage.make(width, height);
-    const ctx = img.getContext('2d');
-
-    // 背景
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, width, height);
-
-    // テキスト
-    ctx.fillStyle = 'black';
-    ctx.font = '26pt Arial';
-    ctx.fillText('Kashidasuカード', 20, 40);
-    ctx.font = '20pt Arial';
-    ctx.fillText(`id: ${studentData.id}`, 20, 80);
-    ctx.fillText(`${studentData.gread}年 ${studentData.class}組 ${studentData.number}番`, 20, 120);
-
-    // バーコード生成（canvas を使って PNG にして貼り付け）
-    const barcodeCanvas = createCanvas(180, 50);
-    JsBarcode(barcodeCanvas, studentData.id, {
-      format: "CODE128",
-      lineColor: "#000",
-      width: 2,
-      height: 50,
-      displayValue: true,
-      fontSize: 12
+    const pngBuffer = await bwipjs.toBuffer({
+      bcid:        'code128',
+      text:        studentID,
+      scale:       2,
+      height:      10,
+      includetext: true,
+      textxalign:  'center',
+      textsize:    13,
     });
 
-    const barcodeBuffer = barcodeCanvas.toBuffer('image/png');
-    const barcodeImg = await PImage.decodePNGFromStream(fs.createReadStream(
-      await saveTempBarcode(barcodeBuffer)
-    ));
-    ctx.drawImage(barcodeImg, 180, 130);
+    fs.writeFileSync(barcodePath, pngBuffer);
+    return barcodePath;
+  } catch (error) {
+    console.error('バーコード生成中にエラーが発生:', error);
+    throw error;
+  }
+}
+
+async function createPdf(outputPath, studentData) {
+  try {
+    ensureDirectoryExists(path.dirname(outputPath));
+    if (fs.existsSync(outputPath)) {
+      fs.unlinkSync(outputPath);
+    }
+
+    const pdfDoc = await PDFDocument.create();
+    pdfDoc.registerFontkit(fontkit);
+    const page = pdfDoc.addPage([width, height]);
+
+    const boldFontPath = path.join(__dirname, '../public/fonts/MPLUSRounded1c-Bold.ttf');
+    const boldFontBytes = await fs.promises.readFile(boldFontPath);
+    const boldFontFamily = await pdfDoc.embedFont(boldFontBytes);
+
 
     // PNG 保存
     const out = fs.createWriteStream(PNG_OUTPUT_PATH);
     await PImage.encodePNGToStream(img, out);
 
-    return PNG_OUTPUT_PATH;
+    const barcodePath = await Generating(studentData.id);
+    const barcodeBytes = await fs.promises.readFile(barcodePath);
+    const barcodeImage = await pdfDoc.embedPng(barcodeBytes);
+    const barcodeDims = barcodeImage.scale(1);
+
+    page.drawText('Kashidasuカード', {
+      x: 20,
+      y: 160,
+      font: boldFontFamily,
+      size: 26,
+    });
+    page.drawText(`id: ${studentData.id}`, {
+      x: 20,
+      y: 120,
+      font: lightFontFamily,
+      size: 20,
+    });
+    page.drawText(`${studentData.gread}年 ${studentData.class}組 ${studentData.number}番`, {
+      x: 20,
+      y: 80,
+      font: lightFontFamily,
+      size: 20,
+    });
+    page.drawImage(barcodeImage, {
+      x: 180,
+      y: 10,
+      width: barcodeDims.width,
+      height: barcodeDims.height,
+    });
+
+    const pdfBytes = await pdfDoc.save();
+    await fs.promises.writeFile(outputPath, pdfBytes);
+    return true;
+    
   } catch (error) {
     console.error('PNG生成中にエラーが発生:', error);
     throw error;
   }
 }
 
-async function saveTempBarcode(buffer) {
-  const tempPath = path.join(OUTPUT_DIR, 'temp_barcode.png');
-  await fs.promises.writeFile(tempPath, buffer);
-  return tempPath;
+async function convertPdfToPng(pdfPath, outputDir) {
+  try {
+    const options = {
+      density: 300,
+      saveFilename: "kashidasu_card",
+      savePath: outputDir,
+      format: "png",
+      width: 400,
+      height: 200,
+    };
+    
+    const convert = fromPath(pdfPath, options);
+    await convert.bulk(-1);
+  } catch (error) {
+    console.error('PNG変換中にエラーが発生しました:', error);
+  }
 }
+
+app.GenerateCard = async (req, res) => {
+  try {
+    const studentData = req.body;
+    const pdfFilename = `kashidasu_card_${studentData.id}.pdf`;
+    const pdfOutputPath = path.join(OUTPUT_DIR, pdfFilename);
+    const pngOutputDir = OUTPUT_DIR;
+
+    const pdfCreated = await createPdf(pdfOutputPath, studentData);
+    if (!pdfCreated) {
+      throw new Error('PDF生成に失敗しました');
+    }
+
+    await convertPdfToPng(pdfOutputPath, pngOutputDir);
+    res.status(200).send({ id: 'Complete' });
+  } catch (error) {
+    console.error('リクエスト処理中にエラーが発生:', error);
+    res.status(500).send({ error: 'PDF生成中にエラーが発生しました' });
+  }
+};
+
+module.exports = app;
