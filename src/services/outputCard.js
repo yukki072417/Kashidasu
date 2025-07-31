@@ -4,8 +4,6 @@ const bwipjs = require('bwip-js');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const JsBarcode = require('jsbarcode');
-const { createCanvas } = require('canvas'); // JsBarcode 用
 
 const app = express();
 const width = 400;
@@ -122,7 +120,7 @@ async function convertPdfToPng(pdfPath, outputDir) {
 app.GenerateCard = async (req, res) => {
   try {
     const studentData = req.body;
-    const pdfFilename = `kashidasu_card_${studentData.id}.pdf`;
+    const pdfFilename = `kashidasu_card.pdf`;
     const pdfOutputPath = path.join(OUTPUT_DIR, pdfFilename);
     const pngOutputDir = OUTPUT_DIR;
 

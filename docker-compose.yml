@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   ca:
     build:
@@ -10,11 +8,12 @@ services:
     restart: "no"
 
   db:
-    image: arm64v8/mysql:8.0
+    image: mysql:8.0
+    # image: arm64v8/mysql:8.0
     container_name: db
     volumes:
       - ./db/:/docker-entrypoint-initdb.d
-      - mysql_data:/var/lib/mysql
+      - ./mysql_datas:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
       TZ: ${TIME_ZONE}

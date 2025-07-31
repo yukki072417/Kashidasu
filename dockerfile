@@ -1,20 +1,19 @@
-FROM arm64v8/node:20-bullseye-slim
+FROM node:20-bullseye-slim
+# FROM arm64v8/node:20-bullseye-slim
 
 WORKDIR /usr/app/
 
-# 依存するパッケージを修正
+# 必要なパッケージをインストール
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    netcat-openbsd && \
+    default-mysql-client && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
- 
+
 COPY package*.json ./
 RUN npm install
 
 # アプリケーションコードの配置
 COPY . /usr/app/
-
-ENTRYPOINT ["bash", "/usr/app/wait-for-services.sh"]
 
 CMD ["nodemon", "src/app.js"]
