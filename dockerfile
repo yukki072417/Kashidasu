@@ -1,8 +1,8 @@
-FROM --platform=linux/arm64 node:23-bullseye-slim
+# Raspberry Pi 5 (ARM64) に最適化されたNode.jsイメージを使用
+FROM arm64v8/node:20-bullseye-slim
+
 WORKDIR /usr/app/
 
-# netcat は debian でパッケージ名が netcat-openbsd
-# 最終行にバックスラッシュを残さないように注意
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     netcat-openbsd \
@@ -17,19 +17,16 @@ RUN apt-get update \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-# nodemon と node-gyp をグローバルインストール
+# nodemon, node-gyp をグローバルにインストール
 RUN npm install -g nodemon node-gyp
 
-# 依存パッケージを先にインストール
 COPY package*.json ./
 RUN npm install
 
-# 待機スクリプトとアプリ本体をコピー
-COPY wait-for-services.sh /usr/app/wait-for-services.sh
+COPY wait-for-services.sh /usr/app/
 RUN chmod +x /usr/app/wait-for-services.sh
 
 COPY . /usr/app/
 
-# 起動時に依存サービスを待ってから nodemon を実行
 ENTRYPOINT ["bash", "/usr/app/wait-for-services.sh"]
 CMD ["nodemon", "src/app.js"]
