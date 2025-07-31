@@ -115,10 +115,6 @@ dist
 
 # vuepress v2.x temp and cache directory
 .temp
-<<<<<<< HEAD
-.cache
-=======
->>>>>>> origin/release/1.0
 
 # Docusaurus cache and generated files
 .docusaurus

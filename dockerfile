@@ -1,8 +1,8 @@
 #本番環境用
-# FROM arm64v8/node:20-bullseye-slim
+FROM arm64v8/node:20-bullseye-slim
 
 #開発環境用
-FROM node:20-bullseye-slim
+# FROM node:20-bullseye-slim
 
 WORKDIR /usr/app/
 
@@ -17,10 +17,12 @@ RUN apt-get update \
     ghostscript \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
-
+ 
 COPY package*.json ./
 RUN npm install
 
+# アプリケーションコードの配置
 COPY . /usr/app/
 
-CMD ["npm", "start"]
+ENTRYPOINT ["bash", "/usr/app/wait-for-services.sh"]
+CMD ["nodemon", "src/app.js"]
