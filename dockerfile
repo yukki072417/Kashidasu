@@ -16,4 +16,5 @@ RUN npm install
 COPY . /usr/app/
 
 ENTRYPOINT ["bash", "/usr/app/wait-for-services.sh"]
+
 CMD ["nodemon", "src/app.js"]

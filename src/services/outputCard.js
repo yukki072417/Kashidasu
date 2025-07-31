@@ -4,7 +4,8 @@ const bwipjs = require('bwip-js');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const fontkit = require('@pdf-lib/fontkit');
+const JsBarcode = require('jsbarcode');
+const { createCanvas } = require('canvas'); // JsBarcode 用
 
 const app = express();
 const width = 400;
@@ -55,9 +56,10 @@ async function createPdf(outputPath, studentData) {
     const boldFontBytes = await fs.promises.readFile(boldFontPath);
     const boldFontFamily = await pdfDoc.embedFont(boldFontBytes);
 
-    const lightFontPath = path.join(__dirname, '../public/fonts/MPLUSRounded1c-Light.ttf');
-    const lightFontBytes = await fs.promises.readFile(lightFontPath);
-    const lightFontFamily = await pdfDoc.embedFont(lightFontBytes);
+
+    // PNG 保存
+    const out = fs.createWriteStream(PNG_OUTPUT_PATH);
+    await PImage.encodePNGToStream(img, out);
 
     const barcodePath = await Generating(studentData.id);
     const barcodeBytes = await fs.promises.readFile(barcodePath);
@@ -92,8 +94,9 @@ async function createPdf(outputPath, studentData) {
     const pdfBytes = await pdfDoc.save();
     await fs.promises.writeFile(outputPath, pdfBytes);
     return true;
+    
   } catch (error) {
-    console.error('PDF生成中にエラーが発生:', error);
+    console.error('PNG生成中にエラーが発生:', error);
     throw error;
   }
 }
