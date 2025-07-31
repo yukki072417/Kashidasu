@@ -1,4 +1,8 @@
-FROM arm64v8/node:20-bullseye-slim
+#本番環境用
+# FROM arm64v8/node:20-bullseye-slim
+
+#開発環境用
+FROM node:20-bullseye-slim
 
 WORKDIR /usr/app/
 
