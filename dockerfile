@@ -13,10 +13,16 @@ RUN apt-get update \
     ghostscript \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
-
+ 
 COPY package*.json ./
-RUN npm install
+RUN npm install pdf-lib
 
+# 起動スクリプトなどの準備
+COPY wait-for-services.sh /usr/app/
+RUN chmod +x /usr/app/wait-for-services.sh
+
+# アプリケーションコードの配置
 COPY . /usr/app/
 
-CMD ["npm", "start"]
+ENTRYPOINT ["bash", "/usr/app/wait-for-services.sh"]
+CMD ["nodemon", "src/app.js"]
