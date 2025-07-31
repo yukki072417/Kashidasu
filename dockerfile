@@ -1,19 +1,19 @@
-# Raspberry Pi 5（ARM64）に適したNode.jsベースイメージ
-FROM arm64v8/node:20-bullseye-slim
+FROM node:20-bullseye-slim
 
 WORKDIR /usr/app/
 
-# 必要なツールのインストール（今回は canvas 不使用なので画像系ライブラリは不要）
+# 必要な依存パッケージ + GraphicsMagick + Ghostscript
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
+    build-essential \
     netcat-openbsd \
+    python3 \
+    g++ \
+    graphicsmagick \
+    ghostscript \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
-
-# nodemon をグローバルにインストール
-RUN npm install -g nodemon
-
-# パッケージのインストール（`pdf-lib` を含める）
+ 
 COPY package*.json ./
 RUN npm install pdf-lib
 
