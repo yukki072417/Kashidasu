@@ -1,5 +1,5 @@
-FROM node:20-bullseye-slim
-# FROM arm64v8/node:20-bullseye-slim
+# FROM node:20-bullseye-slim
+FROM arm64v8/node:20-bullseye-slim
 
 WORKDIR /usr/app/
 
