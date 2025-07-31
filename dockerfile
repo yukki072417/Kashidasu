@@ -1,26 +1,19 @@
-#本番環境用
-# FROM arm64v8/node:20-bullseye-slim
-
-#開発環境用
-FROM node:20-bullseye-slim
+FROM arm64v8/node:20-bullseye-slim
 
 WORKDIR /usr/app/
 
-# 必要な依存パッケージ + GraphicsMagick + Ghostscript
-RUN apt-get update \
- && apt-get install -y --no-install-recommends \
-    build-essential \
-    netcat-openbsd \
-    python3 \
-    g++ \
-    graphicsmagick \
-    ghostscript \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
-
+# 依存するパッケージを修正
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    netcat-openbsd && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+ 
 COPY package*.json ./
 RUN npm install
 
+# アプリケーションコードの配置
 COPY . /usr/app/
 
-CMD ["npm", "start"]
+ENTRYPOINT ["bash", "/usr/app/wait-for-services.sh"]
+CMD ["nodemon", "src/app.js"]
