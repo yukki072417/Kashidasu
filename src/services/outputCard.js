@@ -1,9 +1,9 @@
 const { PDFDocument } = require('pdf-lib');
-const { fromPath } = require('pdf2pic');
 const bwipjs = require('bwip-js');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const fontkit = require('@pdf-lib/fontkit');
 
 const app = express();
 const width = 400;
@@ -54,10 +54,9 @@ async function createPdf(outputPath, studentData) {
     const boldFontBytes = await fs.promises.readFile(boldFontPath);
     const boldFontFamily = await pdfDoc.embedFont(boldFontBytes);
 
-
-    // PNG 保存
-    const out = fs.createWriteStream(PNG_OUTPUT_PATH);
-    await PImage.encodePNGToStream(img, out);
+    const lightFontPath = path.join(__dirname, '../public/fonts/MPLUSRounded1c-Light.ttf');
+    const lightFontBytes = await fs.promises.readFile(lightFontPath);
+    const lightFontFamily = await pdfDoc.embedFont(lightFontBytes);
 
     const barcodePath = await Generating(studentData.id);
     const barcodeBytes = await fs.promises.readFile(barcodePath);
@@ -92,44 +91,23 @@ async function createPdf(outputPath, studentData) {
     const pdfBytes = await pdfDoc.save();
     await fs.promises.writeFile(outputPath, pdfBytes);
     return true;
-    
   } catch (error) {
-    console.error('PNG生成中にエラーが発生:', error);
+    console.error('PDF生成中にエラーが発生:', error);
     throw error;
-  }
-}
-
-async function convertPdfToPng(pdfPath, outputDir) {
-  try {
-    const options = {
-      density: 300,
-      saveFilename: "kashidasu_card",
-      savePath: outputDir,
-      format: "png",
-      width: 400,
-      height: 200,
-    };
-    
-    const convert = fromPath(pdfPath, options);
-    await convert.bulk(-1);
-  } catch (error) {
-    console.error('PNG変換中にエラーが発生しました:', error);
   }
 }
 
 app.GenerateCard = async (req, res) => {
   try {
     const studentData = req.body;
-    const pdfFilename = `kashidasu_card.pdf`;
+    const pdfFilename = `kashidasu_card_${studentData.id}.pdf`;
     const pdfOutputPath = path.join(OUTPUT_DIR, pdfFilename);
-    const pngOutputDir = OUTPUT_DIR;
 
     const pdfCreated = await createPdf(pdfOutputPath, studentData);
     if (!pdfCreated) {
       throw new Error('PDF生成に失敗しました');
     }
 
-    await convertPdfToPng(pdfOutputPath, pngOutputDir);
     res.status(200).send({ id: 'Complete' });
   } catch (error) {
     console.error('リクエスト処理中にエラーが発生:', error);

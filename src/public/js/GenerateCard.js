@@ -46,8 +46,8 @@ function SendContent() {
 
 // ダウンロード自体の処理
 window.download = function() {
-    const fileUrl = '/pdf/kashidasu_card.1.png';
-    const fileName = 'kashidasu_card.1.png';
+    const fileUrl = '/pdf/kashidasu_card.png';
+    const fileName = 'kashidasu_card.png';
 
     const link = document.createElement('a');
     link.href = fileUrl;
@@ -62,14 +62,12 @@ window.download = function() {
 // 生成されたカード画像を画面に表示し、ボタンを「ダウンロードする」に切り替える関数
 function ShowImage() {
     $(function () {
-        // すでに画像が表示されていれば削除
-        if ($('#card').length) {
-            $('#card').remove();
-        }
+        // すでに表示されていれば削除
+        $('#card').remove();
 
-        // 生成された画像を表示
-        $('#image').append('<img id="card" src="/pdf/kashidasu_card.1.png">');
-        
+        // PDFを表示
+        $('#image').append('<iframe id="card" src="/pdf/kashidasu_card.pdf" width="600" height="400"></iframe>');
+
         // ボタンの表示・動作を「ダウンロードする」に変更
         $('#form-submit').removeAttr('value');
         $('#form-submit').removeAttr('onclick');
