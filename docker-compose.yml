@@ -8,8 +8,8 @@ services:
     restart: "no"
 
   db:
-    image: mysql:8.0
-    # image: arm64v8/mysql:8.0
+    # image: mysql:8.0
+    image: arm64v8/mysql:8.0
     container_name: db
     volumes:
       - ./db/:/docker-entrypoint-initdb.d
