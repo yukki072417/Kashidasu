@@ -12,7 +12,7 @@ const userRouter = require('./router/router');
 const logDir = path.join(__dirname, '../logs');
 const mysqlDatasDir = path.join(__dirname, '../mysql_datas');
 
-const initUser = require('./model/registerUser')
+const initUser = require('./model/registerUser');
 
 // logsディレクトリが存在しない場合は作成
 if (!fs.existsSync(logDir)) {
