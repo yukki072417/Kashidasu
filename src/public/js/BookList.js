@@ -104,7 +104,7 @@ function SetTable(data) {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 d2.setHours(0, 0, 0, 0);
-
+                
                 $lendDateCell = $('<td>').text(`${lendDate} → ${lendDatePlusDeadline}`);
                 if (d2.getTime() === today.getTime()) {
                     $lendDateCell.css('color', 'red');

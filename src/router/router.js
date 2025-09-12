@@ -17,21 +17,7 @@ router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
 
 // ログインページを表示
-router.get('/login', (req, res) => {
-    //デバッグモード判定
-    if(process.env.DEBUG_MODE == 'true'){
-      req.session.admin_authed = true
-      req.session.admin_id = 'yukki072417'
-    }
-
-    // ユーザーがログイン済みの場合の処理
-    if (req.session.admin_authed == true) {
-        // メインページへリダイレクト
-        return res.redirect('/main');
-    }
-    // ログインページをレンダリング
-    res.render('Login');
-});
+router.get('/login', (req, res) => res.render('Login'));
 
 // ユーザーのセッションを確認（auth.jsからインポート）
 const requireAuth = auth.requireAuth;
