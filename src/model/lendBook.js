@@ -4,6 +4,8 @@ const mysql = require('mysql2/promise');
 const log4js = require('log4js');
 const logger = log4js.getLogger('http');
 
+app.use(express.json());
+
 // データベース接続関数
 async function Connect() {
     return mysql.createConnection({
@@ -15,10 +17,11 @@ async function Connect() {
 }
 
 // 本の貸出処理
-app.LendBook = async (req, res) => {
+const LendBook = async (req, res) => {
     const db = await Connect();
-
+    console.log('LendBook関数呼ばれた');
     try {
+        console.log('リクエストボディ', req.body);
         const userCode = req.body.user_id;
         const bookCode = req.body.book_id;
 
@@ -69,4 +72,12 @@ app.LendBook = async (req, res) => {
     }
 };
 
-module.exports = app;
+module.exports = { LendBook };
+// ルートに紐付け
+// app.post('/lend', app.LendBook);
+
+// サーバー起動
+// const port = 3000;
+// app.listen(port, () => {
+//     console.log(`Server running at http://localhost:${port}`);
+// });
