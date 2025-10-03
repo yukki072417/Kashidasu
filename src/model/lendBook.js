@@ -35,9 +35,9 @@ const LendBook = async (req, res) => {
             return res.send({ result: 'FAILED', message: 'BOOK_NOT_EXIST' });
         }
 
-        // 本がすでに貸出中かチェック
+        // 本がすでに貸出中かチェック (LEND_DAY がある＝まだ返却されていないとみなす)
         const [lendRows] = await db.query(
-            'SELECT * FROM LENDING_BOOK WHERE BOOK_ID = ? AND RETURN_DAY >= CURDATE()',
+            'SELECT * FROM LENDING_BOOK WHERE BOOK_ID = ?',
             [bookCode]
         );
         if (lendRows.length > 0) {
@@ -48,21 +48,21 @@ const LendBook = async (req, res) => {
         const [adminRows] = await db.query('SELECT * FROM ADMIN_USER WHERE ID = ?', [userCode]);
         const isLibrarian = adminRows.length > 0; // trueなら図書委員
 
-        // 貸出期間を設定
+        // 貸出期間を設定（今回は返却予定日は DB に保存しない）
         const today = new Date();
         const lendPeriod = isLibrarian ? 21 : 14; // 21日=3週間, 14日=2週間
         const returnDate = new Date(today.getTime() + lendPeriod * 24 * 60 * 60 * 1000);
-        const formattedReturnDate = returnDate.toISOString().slice(0, 10); // YYYY-MM-DD形式
+        const formattedReturnDate = returnDate.toISOString().slice(0, 10);
 
         const formattedToday = today.toISOString().slice(0, 10);
 
-        // DBに登録
+        // DBに登録（RETURN_DAYを削除してLEND_DAYのみ保存）
         await db.query(
-            'INSERT INTO LENDING_BOOK (BOOK_ID, USER_ID, LEND_DAY, RETURN_DAY) VALUES (?, ?, ?, ?)',
-            [bookCode, userCode, formattedToday, formattedReturnDate]
+            'INSERT INTO LENDING_BOOK (BOOK_ID, USER_ID, LEND_DAY) VALUES (?, ?, ?)',
+            [bookCode, userCode, formattedToday]
         );
 
-        logger.info(`${formattedToday} 学籍番号 ${userCode} が ISBN ${bookCode} を貸出しました (返却予定: ${formattedReturnDate})`);
+        logger.info(`${formattedToday} 学籍番号 ${userCode} が ISBN ${bookCode} を貸出しました`);
         res.send({ result: 'SUCCESS', return_date: formattedReturnDate, is_librarian: isLibrarian });
     } catch (error) {
         console.error('貸出処理エラー:', error);
@@ -73,11 +73,3 @@ const LendBook = async (req, res) => {
 };
 
 module.exports = { LendBook };
-// ルートに紐付け
-// app.post('/lend', app.LendBook);
-
-// サーバー起動
-// const port = 3000;
-// app.listen(port, () => {
-//     console.log(`Server running at http://localhost:${port}`);
-// });
