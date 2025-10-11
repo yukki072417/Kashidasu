@@ -17,7 +17,7 @@
     <%- include('Header') %>
     <button class='animation-btn' onclick='location.href = "/register" '>←戻る</button>
     <div class="main">
-        <form method='post'>
+        <div class="settings-item">
             <h2>ユーザー一括登録</h2>
             <div id='input-form'>
                 <!-- ここに一括登録用のcsvファイルを読み込みボタンを置く -->
@@ -26,7 +26,11 @@
             </div>
             <input type="button" id="submit-btn" onclick="RegisterBooksByFile()" value="上書き登録">
             <h3 id="selected-file-name"></h3>
-        </form>
+        </div>
+        <div class="settings-item">
+            <h2>名前の変更</h2>
+
+        </div>
     </div>
     <%- include('Footer') %>
 </body>

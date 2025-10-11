@@ -1,17 +1,8 @@
 /* Bellow code writing for registerBook page */
-
-.form-group{
-    width: 300px;
-    height: 25px;
-    
-    margin: auto;
-    padding-left: 100px;
-    margin-top:    20px;
-    margin-bottom: 20px;
-    
-    text-align: left;
+.settings-item{
+    width: 600px;
+    border: solid black 2px;
 }
-
 #submit-btn{
     margin-top: 10px;
     width: 100px;
@@ -38,11 +29,6 @@
 
 .guidance-button:hover{
     background-color: rgb(210, 210, 210);
-}
-
-.main{
-    display: flex;
-    justify-content: center;
 }
 
 #input-form{
