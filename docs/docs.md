@@ -65,12 +65,3 @@ Kashidasuのプロジェクトディレクトリで
     └── views/
         └── ejsファイルが格納されたディレクトリ。実質htmlが格納されている
 ```
-## ディレクトリ別ファイル構成
-```
-src
-  generator
-    outputCart.js（カードの生成処理が書かれている）
-  model
-    auth.js（ログイン認証をする処理が書かれている）
-    deleteBook.js（本を削除する処理が書かれている）
-```
