@@ -22,7 +22,7 @@ $(document).ready(() => {
 
     $('#toggle-overdue').on('click', () => {
         showOnlyOverdue = !showOnlyOverdue;
-        $('#toggle-overdue').text(showOnlyOverdue ? '全ての本を表示' : '期限切れ本だけ表示');
+        $('#toggle-overdue').text(showOnlyOverdue ? '全ての本を表示' : '期限切れの本だけ表示');
         LoadBooks(currentPage);
     });
 });
@@ -64,77 +64,73 @@ function SetTable(data) {
     data.forEach(book => {
         if (book && book.book_name) {
             const today = new Date();
-            const deadlineRaw = book.deadline;
+
+            // --- 各本ごとの貸出日・返却期限を個別に扱う ---
+            const lendDateRaw = book.lend_date || null;
+            const deadlineRaw = book.deadline || null;
+
+            const lendDate = lendDateRaw ? new Date(lendDateRaw) : null;
             const deadline = deadlineRaw ? new Date(deadlineRaw) : null;
 
+            // 「期限切れのみ表示」オプションが有効なとき
             if (showOnlyOverdue) {
-                if (!deadline || isNaN(deadline.getTime()) || deadline >= today) return;
-            }
-
-            const $row = $('<tr>');
-
-            const bookID = book.book_id;
-            const bookName = book.book_name;
-            const writter = book.book_auther;
-            const isLending = book.book_is_lending;
-            const lendingUser = book.lending_user_id;
-            const lendDateRaw = book.lend_date;
-
-            let lendDate = null;
-            let $lendDateCell = null;
-
-            if (lendDateRaw) {
-                const d = new Date(lendDateRaw);
-                const yy = String(d.getFullYear()).slice(-2);
-                const mm = String(d.getMonth() + 1).padStart(2, '0');
-                const dd = String(d.getDate()).padStart(2, '0');
-                lendDate = `${yy}/${mm}/${dd}`;
-
-                const d2 = new Date(d);
-
-                // 図書委員は21日、それ以外は14日
-                const extendDays = book.is_admin ? 21 : 14;
-                d2.setDate(d2.getDate() + extendDays);
-
-                const yy2 = String(d2.getFullYear()).slice(-2);
-                const mm2 = String(d2.getMonth() + 1).padStart(2, '0');
-                const dd2 = String(d2.getDate()).padStart(2, '0');
-                const lendDatePlusDeadline = `${yy2}/${mm2}/${dd2}`;
-
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                d2.setHours(0, 0, 0, 0);
-                
-                $lendDateCell = $('<td>').text(`${lendDate} → ${lendDatePlusDeadline}`);
-                if (d2.getTime() === today.getTime()) {
-                    $lendDateCell.css('color', 'red');
+                if (!deadline || isNaN(deadline.getTime()) || deadline >= today) {
+                    // 期限がない or 未到来 → 表示しない
+                    return;
                 }
             }
 
-            const $statusCell = $('<td>').text(isLending ? '貸出中' : '空き');
-            const $lendingUserCell = $('<td>').text(lendingUser);
-            if (isLending) {
-                $lendingUserCell.css('color', 'red');
-                $statusCell.css('color', 'red');
-            } else {
-                $lendingUserCell.text('空き');
+            const $row = $('<tr>');
+            const bookID = book.book_id;
+            const bookName = book.book_name;
+            const writter = book.book_auther || '';
+
+            // ステータス
+            const $statusCell = $('<td>').text(book.book_is_lending ? '貸出中' : '在庫');
+
+            // 貸出ユーザー
+            const $lendingUserCell = $('<td>').text(book.lending_user_id || '');
+
+            // --- 日付表示 ---
+            let lendDateStr = '';
+            if (lendDate && !isNaN(lendDate.getTime())) {
+                const yy = String(lendDate.getFullYear()).slice(-2);
+                const mm = String(lendDate.getMonth() + 1).padStart(2, '0');
+                const dd = String(lendDate.getDate()).padStart(2, '0');
+                lendDateStr = `${yy}/${mm}/${dd}`;
             }
 
-            const $editButton = $('<button>')
-                .text('編集')
-                .addClass('edit-btn')
-                .on('click', () => {
-                    const params = $.param({ ID: bookID });
-                    window.location.href = `/edit?${params}`;
-                });
+            let deadlineStr = '';
+            if (deadline && !isNaN(deadline.getTime())) {
+                const yy = String(deadline.getFullYear()).slice(-2);
+                const mm = String(deadline.getMonth() + 1).padStart(2, '0');
+                const dd = String(deadline.getDate()).padStart(2, '0');
+                deadlineStr = `${yy}/${mm}/${dd}`;
+            } else if (lendDate && !isNaN(lendDate.getTime())) {
+                // サーバが deadline を返さない場合の補助計算（14日後 or 21日後）
+                const tmp = new Date(lendDate);
+                const extendDays = book.is_admin ? 21 : 14;
+                tmp.setDate(tmp.getDate() + extendDays);
+                const yy = String(tmp.getFullYear()).slice(-2);
+                const mm = String(tmp.getMonth() + 1).padStart(2, '0');
+                const dd = String(tmp.getDate()).padStart(2, '0');
+                deadlineStr = `${yy}/${mm}/${dd}`;
+            }
+
+            // --- 行生成 ---
+            const $editButton = $('<button>').text('編集').on('click', () => {
+                const params = $.param({ ID: bookID });
+                window.location.href = `/edit?${params}`;
+            });
 
             $row.append($('<td>').text(bookName));
             $row.append($('<td>').text(writter));
             $row.append($('<td>').text(bookID));
             $row.append($statusCell);
             $row.append($lendingUserCell);
+            $row.append($('<td>').text(lendDateStr));
+            $row.append($('<td>').text(deadlineStr));
             $row.append($('<td>').append($editButton));
-            if ($lendDateCell) $row.append($lendDateCell);
 
             $('#table').append($row);
         }
