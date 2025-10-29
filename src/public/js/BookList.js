@@ -3,6 +3,7 @@ let totalRecords = 0; // 総レコード数
 let showOnlyOverdue = false; // 期限切れ本のみ表示するかどうか
 
 $(document).ready(() => {
+
     LoadBooks(currentPage); // ページ読み込み時に本一覧を取得
 
     $('#next').on('click', () => {
@@ -106,6 +107,7 @@ function SetTable(data) {
                 const mm = String(deadline.getMonth() + 1).padStart(2, '0');
                 const dd = String(deadline.getDate()).padStart(2, '0');
                 deadlineStr = `${yy}/${mm}/${dd}`;
+                console.log(deadline);
             } else if (lendDate && !isNaN(lendDate.getTime())) {
                 // サーバが deadline を返さない場合の補助計算（14日後 or 21日後）
                 const tmp = new Date(lendDate);
@@ -136,3 +138,16 @@ function SetTable(data) {
         }
     });
 }
+
+
+// リクエストを送信して、返却されるレスポンスを確認する Wed/29/10
+async function test(){
+    
+    const response = await fetch('https://localhost/admin-auth', {
+        method: 'GET',
+        headers: 'Content-Type: Application/json'
+    });
+    
+    console.log(response.json());
+}
+test();

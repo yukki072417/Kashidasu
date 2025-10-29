@@ -47,14 +47,15 @@ const LendBook = async (req, res) => {
         // 図書委員か判定
         const [adminRows] = await db.query('SELECT * FROM ADMIN_USER WHERE ID = ?', [userCode]);
         const isLibrarian = adminRows.length > 0; // trueなら図書委員
+        console.log(adminRows);
         
         // 貸出期間を設定（今回は返却予定日は DB に保存しない）
-        const today = new Date();
-        const lendPeriod = isLibrarian ? 21 : 14; // 21日=3週間, 14日=2週間
-        const returnDate = new Date(today.getTime() + lendPeriod * 24 * 60 * 60 * 1000);
-        const formattedReturnDate = returnDate.toISOString().slice(0, 10);
+        // const today = new Date();
+        // const lendPeriod = isLibrarian ? 21 : 14; // 21日=3週間, 14日=2週間
+        // const returnDate = new Date(today.getTime() + lendPeriod * 24 * 60 * 60 * 1000);
+        // const formattedReturnDate = returnDate.toISOString().slice(0, 10);
 
-        const formattedToday = today.toISOString().slice(0, 10);
+        // const formattedToday = today.toISOString().slice(0, 10);
 
         // DBに登録（RETURN_DAYを削除してLEND_DAYのみ保存）
         await db.query(

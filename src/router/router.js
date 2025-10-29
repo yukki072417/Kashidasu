@@ -11,6 +11,7 @@ const registerBook = require('../model/registerBook');
 const deleteBook = require('../model/deleteBook');
 const updateSettings = require('../model/updateSettings');
 const registerUser = require('../model/registerUser');
+const admin = require('../model/admin');
 
 // ミドルウェアを指定
 router.use(express.urlencoded({ extended: true }));
@@ -24,6 +25,9 @@ const requireAuth = auth.requireAuth;
 
 // 管理者追加
 router.post('/register-admin', (req, res) => userRegister.registerUser(req, res));
+
+// 図書委員判定
+router.post('/admin-auth', (req, res) => admin.AdminAuth(req, res) );
 
 // データベースで書籍を検索
 router.post('/search-book', serachBook.SearchBook);

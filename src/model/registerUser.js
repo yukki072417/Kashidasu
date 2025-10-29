@@ -45,10 +45,10 @@ async function connectDB() {
 async function RegisterInitUser() {
   const db = await connectDB();
   const [isInitUserExist, fields] = await db.query(
-    "SELECT * FROM ADMIN_USER WHERE ID = '1234567890'"
+    "SELECT * FROM ADMIN_USER WHERE ID = '3236541029'"
   );
   //await registerUserModel('3236541033', 'PASSWORD', '初期設定', 'アカウント'); 
-  await registerUserModel('3236541032', 'PASSWORD', '初期設定', 'アカウント'); 
+  // await registerUserModel('3236541032', 'PASSWORD', '初期設定', 'アカウント'); 
   await registerUserModel('3236541029', 'PASSWORD', '初期設定', 'アカウント'); 
   if(isInitUserExist.length == 0){
     //await registerUserModel('1234567890', 'PASSWORD', '初期設定', 'アカウント'); 
