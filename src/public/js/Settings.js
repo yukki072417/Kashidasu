@@ -1,10 +1,10 @@
 async function  ApplySettings() {
-    
+
     const data = {
-        'user_id': $('#user-id').val(),
-        'user_password': $('#user-password').val()
+        'first_name': $('#first_name').val(),
+        'last_name': $('#last_name').val()
     }
-    const response = await fetch('/settings-apply', {
+    const response = await fetch('/update-settings', {
         headers: {
             'Content-Type': 'application/json'
         },

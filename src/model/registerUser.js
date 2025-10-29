@@ -100,4 +100,4 @@ async function RegisterUser(req, res) {
   res.send(result);
 }
 
-module.exports = { RegisterUser, RegisterInitUser };
+module.exports = { RegisterUser, RegisterInitUser, encryptRSA };

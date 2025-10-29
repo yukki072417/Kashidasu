@@ -121,7 +121,9 @@ router.get('/collective-registration', requireAuth, (req, res) => {
 router.post('/register-user', (req, res) => registerUser.RegisterUser(req, res));
 
 // 設定ページへルーティング
-router.get('/settings', (req, res) => res.render('Settings'));
+router.get('/settings', requireAuth, (req, res) => {
+    res.render('Settings');
+});
 
 // 設定を更新する
 router.post('/update-settings', (req, res) => updateSettings.UpdateSettings(req, res));
