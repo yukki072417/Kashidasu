@@ -21,7 +21,6 @@ app.RegisterBook = async (req, res) => {
 
     // リクエストボディから本の配列を取得
     const books = req.body.books;
-    console.log(books);
 
     // リクエストのバリデーション（booksが配列でなければエラー）
     if (!books || !Array.isArray(books)) {

@@ -2,7 +2,6 @@ const mysql = require("mysql2/promise");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const fs = require("fs");
-const { Console } = require("console");
 require("dotenv").config();
 
 // RSA公開鍵のパス
@@ -44,8 +43,8 @@ async function connectDB() {
 //初期設定アカウントを追加
 async function RegisterInitUser() {
   const db = await connectDB();
-  const [isInitUserExist, fields] = await db.query(
-    "SELECT * FROM ADMIN_USER WHERE ID = '3236541029'"
+  const [isInitUserExist] = await db.query(
+    "SELECT * FROM ADMIN_USER WHERE ID = '1234567890'"
   );
   //await registerUserModel('3236541033', 'PASSWORD', '初期設定', 'アカウント'); 
   // await registerUserModel('3236541032', 'PASSWORD', '初期設定', 'アカウント'); 
