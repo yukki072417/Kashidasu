@@ -27,7 +27,7 @@ const requireAuth = auth.requireAuth;
 router.post('/register-admin', (req, res) => userRegister.registerUser(req, res));
 
 // 図書委員判定
-router.post('/admin-auth', (req, res) => admin.AdminAuth(req, res) );
+router.get('/admin-auth', (req, res) => admin.AdminAuth(req, res) );
 
 // データベースで書籍を検索
 router.post('/search-book', serachBook.SearchBook);

@@ -16,14 +16,12 @@ app.AdminAuth = async (req, res) => {
     }
 
     const db = await Connect()
-
     try {
         const rows = await db.query(
             'SELECT * FROM ADMIN_USER WHERE ID = ?',
-            [req.session.admin_id]
+            [req.query.student_id]
         );
-            console.log(rows);
-        if(rows.length > 0){
+        if(rows[0].length > 0){
             res.send({'result': 'SUCCESS', 'is_admin': true});
         }else{
             res.send({'result': 'SUCCESS', 'is_admin': false});
