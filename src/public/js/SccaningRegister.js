@@ -70,16 +70,45 @@ InitManualBarcodeReader();
 // バーコード検知時の処理
 function Detected(resultCode) {
     if (confirm(`ISBNコードは ${resultCode} でよろしいですか？`)) {
-        const title = prompt('本のタイトルを入力してください:');
-        const author = prompt('著者名を入力してください:');
-        if (title && author) {
-            RegisterBook(resultCode, title, author);
-        } else {
-            alert('タイトルと著者名は必須です。');
-            location.reload();
-        }
+        FetchBookInfo(resultCode);
+    } else {
+        location.reload();
     }
-    else location.reload();
+}
+
+// Google Books APIから本の情報を取得
+function FetchBookInfo(isbn) {
+    fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.items && data.items.length > 0) {
+                const book = data.items[0].volumeInfo;
+                const title = book.title || '';
+                const author = book.authors ? book.authors.join(', ') : '';
+                
+                if (title && author) {
+                    if (confirm(`タイトル: ${title}\n著者: ${author}\n\nこの情報で登録しますか？`)) {
+                        RegisterBook(isbn, title, author);
+                        return;
+                    }
+                }
+            }
+            // APIで情報が取得できない場合は手動入力
+            ManualInput(isbn);
+        })
+        .catch(() => ManualInput(isbn));
+}
+
+// 手動入力処理
+function ManualInput(isbn) {
+    const title = prompt('本のタイトルを入力してください:');
+    const author = prompt('著者名を入力してください:');
+    if (title && author) {
+        RegisterBook(isbn, title, author);
+    } else {
+        alert('タイトルと著者名は必須です。');
+        location.reload();
+    }
 }
 
 // 本の登録処理
@@ -103,12 +132,14 @@ function RegisterBook(isbn, title, author) {
         body: JSON.stringify(data),
     })
     .then(async response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        if(response.body.result == 'BOOK_ALRADY_EXIST') return alert('この本はすでに登録されています')
         const json = await response.json();
-        alert('本が正常に登録されました。');
+        if (json.result === 'BOOK_ALRADY_EXIST') {
+            alert('この本はすでに登録されています');
+        } else if (json.result === 'SUCCESS') {
+            alert('本が正常に登録されました。');
+        } else {
+            throw new Error('Registration failed');
+        }
         location.reload();
     })
     .catch(error => {
