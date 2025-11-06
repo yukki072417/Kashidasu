@@ -161,9 +161,8 @@ async function SetTable(data) {
         $row.append($('<td>').text(bookID));
         $row.append($statusCell);
         $row.append($lendingUserCell);
-        $row.append($('<td>').text(lendDateStr));
-        $row.append($('<td>').text(deadlineStr));
         $row.append($('<td>').append($editButton));
+        $row.append($('<td>').text(lendDateStr + "->" + deadlineStr));
 
         $('#table').append($row);
     } // for of end
