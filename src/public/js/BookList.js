@@ -5,7 +5,6 @@ let showOnlyOverdue = false; // 期限切れ本のみ表示するかどうか
 $(document).ready(() => {
     LoadBooks(currentPage); // ページ読み込み時に本一覧を取得
 
-    // 「次へ」ボタンのクリックイベント
     $('#next').on('click', () => {
         const maxPages = Math.ceil(totalRecords / 30);
         if (currentPage < maxPages) {
@@ -14,7 +13,6 @@ $(document).ready(() => {
         }
     });
 
-    // 「戻る」ボタンのクリックイベント
     $('#back').on('click', () => {
         if (currentPage > 1) {
             currentPage--;
@@ -22,19 +20,13 @@ $(document).ready(() => {
         }
     });
 
-    // 期限切れ表示切替ボタンのクリックイベント
     $('#toggle-overdue').on('click', () => {
         showOnlyOverdue = !showOnlyOverdue;
-        if (showOnlyOverdue) {
-            $('#toggle-overdue').text('全ての本を表示');
-        } else {
-            $('#toggle-overdue').text('期限切れ本だけ表示');
-        }
+        $('#toggle-overdue').text(showOnlyOverdue ? '全ての本を表示' : '期限切れの本だけ表示');
         LoadBooks(currentPage);
     });
 });
 
-// 本一覧をサーバーから取得する関数
 function LoadBooks(pageNum) {
     $.ajax({
         url: '/search-book',
@@ -46,9 +38,19 @@ function LoadBooks(pageNum) {
         }),
         success: function(data) {
             if (data && data.length > 0) {
-                totalRecords = data[0]['COUNT(ID)']; // 総レコード数を取得
-                SetTable(data.slice(1)); // テーブルに本データをセット
-                UpdatePageInfo(); // ページ情報を更新
+                totalRecords = data[0]['COUNT(ID)'];
+                // SetTable は async なので完了を待ってから UpdatePageInfo を呼ぶ
+                SetTable(data.slice(1)).then(() => {
+                    UpdatePageInfo();
+                }).catch(err => {
+                    console.error('SetTable エラー:', err);
+                    UpdatePageInfo(); // エラーでもページ情報は更新しておく
+                });
+            } else {
+                // データが空の場合でもテーブルとページ情報をリセット
+                totalRecords = 0;
+                $('#table tr:gt(0)').remove();
+                UpdatePageInfo();
             }
         },
         error: function(xhr, status, error) {
@@ -57,107 +59,128 @@ function LoadBooks(pageNum) {
     });
 }
 
-// ページ情報（現在のページ/最大ページ）を表示・ボタンの有効/無効を切り替える関数
 function UpdatePageInfo() {
-    const maxPages = Math.ceil(totalRecords / 30);
+    const maxPages = Math.max(1, Math.ceil(totalRecords / 30));
     $('.search p').text(`${currentPage}/${maxPages}`);
-
     $('#next').prop('disabled', currentPage >= maxPages);
     $('#back').prop('disabled', currentPage <= 1);
 }
 
-// 本データをテーブルに表示する関数
-function SetTable(data) {
-    $('#table tr:gt(0)').remove(); // 既存の本データ行を削除（ヘッダー以外）
+async function SetTable(data) {
+    $('#table tr:gt(0)').remove();
 
-    if (!Array.isArray(data)) {
-        data = [data];
-    }
+    if (!Array.isArray(data)) data = [data];
 
-    data.forEach(book => {
-        if (book && book.book_name) {
-            const today = new Date();
-            const deadlineRaw = book.deadline;
-            const deadline = deadlineRaw ? new Date(deadlineRaw) : null;
+    for (const book of data) {
+        if (!book || !book.book_name) continue;
 
-            // 期限切れだけ表示モードの場合、期限切れ本以外は表示しない
+        const today = new Date();
+
+        // --- 各本ごとの貸出日・返却期限を個別に扱う ---
+        const lendDateRaw = book.lend_date || null;
+        const lendDate = lendDateRaw ? new Date(lendDateRaw) : null;
+
+        // ここで期限切れフィルタを適用するため、期限（lendDate + 延長日数）を先に計算する
+        let deadlineStr = '';
+        let isOverdue = false;
+
+        if (lendDate && !isNaN(lendDate.getTime())) {
+            // 学籍番号は本来 book.lending_user_id などを使うべき
+            const studentIdForCheck = book.lending_user_id || '1234567890';
+
+            try {
+                const result = await authAdmin(studentIdForCheck);
+                console.log(result.is_admin);
+                const extendDays = result.is_admin ? 21 : 14;
+
+                const tmp = new Date(lendDate);
+                tmp.setDate(tmp.getDate() + extendDays);
+
+                const yy2 = String(tmp.getFullYear()).slice(-2);
+                const mm2 = String(tmp.getMonth() + 1).padStart(2, '0');
+                const dd2 = String(tmp.getDate()).padStart(2, '0');
+                deadlineStr = `${yy2}/${mm2}/${dd2}`;
+
+                // 期限切れか判定（今日の午夜と比較）
+                const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                isOverdue = tmp < todayMidnight;
+            } catch (e) {
+                console.error('authAdmin 取得失敗:', e);
+                // auth失敗時のデフォルト挙動：延長14日で計算
+                const tmp = new Date(lendDate);
+                tmp.setDate(tmp.getDate() + 14);
+                const yy2 = String(tmp.getFullYear()).slice(-2);
+                const mm2 = String(tmp.getMonth() + 1).padStart(2, '0');
+                const dd2 = String(tmp.getDate()).padStart(2, '0');
+                deadlineStr = `${yy2}/${mm2}/${dd2}`;
+                const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                isOverdue = tmp < todayMidnight;
+            }
+        } else {
+            // lendDate が無い場合は期限が不明（既存の deadline フィールドを使いたければここで処理）
             if (showOnlyOverdue) {
-                if (!deadline || isNaN(deadline.getTime()) || deadline >= today) return;
+                // 期限情報が無いものは期限切れ対象から除外（表示しない）
+                continue;
             }
+        }
 
-            const $row = $('<tr>'); // 新しい行を作成
+        // showOnlyOverdue オプションが有効で、かつ期限切れでないならスキップ
+        if (showOnlyOverdue && !isOverdue) {
+            continue;
+        }
 
-            // 本の各情報を取得
-            const bookID = book.book_id;
-            const bookName = book.book_name;
-            const writter = book.book_auther;
-            const isLending = book.book_is_lending;
-            const lendingUser = book.lending_user_id;
-            const lendDateRaw = book.lend_date;
+        // --- 行生成 ---
+        const $row = $('<tr>');
+        const bookID = book.book_id;
+        const bookName = book.book_name;
+        const writter = book.book_auther || '';
 
-            let lendDate = null;
-            let $lendDateCell = null;
-            if (lendDateRaw) {
-                // 貸出日がある場合、日付を「yy/mm/dd」形式に変換
-                const d = new Date(lendDateRaw);
-                const yy = String(d.getFullYear()).slice(-2);
-                const mm = String(d.getMonth() + 1).padStart(2, '0');
-                const dd = String(d.getDate()).padStart(2, '0');
-                lendDate = `${yy}/${mm}/${dd}`;
+        // ステータス
+        const $statusCell = $('<td>').text(book.book_is_lending ? '貸出中' : '在庫');
 
-                // 2週間後の日付を計算
-                const d2 = new Date(d);
-                d2.setDate(d2.getDate() + 14);
-                const yy2 = String(d2.getFullYear()).slice(-2);
-                const mm2 = String(d2.getMonth() + 1).padStart(2, '0');
-                const dd2 = String(d2.getDate()).padStart(2, '0');
-                const lendDatePlus2Weeks = `${yy2}/${mm2}/${dd2}`;
+        // 貸出ユーザー
+        const $lendingUserCell = $('<td>').text(book.lending_user_id || '');
+        console.log(book);
 
-                // 今日の日付（時刻を無視）
-                const today = new Date();
-                today.setHours(0,0,0,0);
-                d2.setHours(0,0,0,0);
+        // lendDate 表示フォーマット
+        let lendDateStr = '';
+        if (lendDate && !isNaN(lendDate.getTime())) {
+            const yy = String(lendDate.getFullYear()).slice(-2);
+            const mm = String(lendDate.getMonth() + 1).padStart(2, '0');
+            const dd = String(lendDate.getDate()).padStart(2, '0');
+            lendDateStr = `${yy}/${mm}/${dd}`;
+        }
 
-                // 「貸出日 → 2週間後」の形式で表示
-                $lendDateCell = $('<td>').text(`${lendDate} → ${lendDatePlus2Weeks}`);
-                // 返却期限が今日の場合は赤色で表示
-                if (d2.getTime() === today.getTime()) {
-                    $lendDateCell.css('color', 'red');
-                }
-            }
+        const $editButton = $('<button>').text('編集').on('click', () => {
+            const params = $.param({ ID: bookID });
+            window.location.href = `/edit?${params}`;
+        });
 
-            // 貸出状況を表示
-            const $statusCell = $('<td>').text(isLending ? '貸出中' : '空き');
-            const $lendingUserCell = $('<td>').text(lendingUser);
-            if (isLending) {
-                // 貸出中の場合は赤色で表示
-                $lendingUserCell.css('color', 'red');
-                $statusCell.css('color', 'red');
-            }
-            else {
-                $lendingUserCell.text('空き');
-            }
+        $row.append($('<td>').text(bookName));
+        $row.append($('<td>').text(writter));
+        $row.append($('<td>').text(bookID));
+        $row.append($statusCell);
+        $row.append($lendingUserCell);
+        $row.append($('<td>').append($editButton));
+        $row.append($('<td>').text(lendDateStr + "->" + deadlineStr));
 
-            // 編集ボタンを作成
-            const $editButton = $('<button>')
-                .text('編集')
-                .addClass('edit-btn')
-                .on('click', () => {
-                    const params = $.param({ ID: bookID });
-                    window.location.href = `/edit?${params}`;
-                });
+        $('#table').append($row);
+    } // for of end
+}
 
-            // 行に各セルを追加
-            $row.append($('<td>').text(bookName));         // 本のタイトル
-            $row.append($('<td>').text(writter));          // 著者
-            $row.append($('<td>').text(bookID));           // 本ID
-            $row.append($statusCell);                      // 貸出状況
-            $row.append($lendingUserCell);                 // 貸出ユーザー
-            $row.append($('<td>').append($editButton));    // 編集ボタン
-            if ($lendDateCell) $row.append($lendDateCell); // 貸出日→返却期限
-
-            // テーブルに行を追加
-            $('#table').append($row);
+// リクエストを送信して、返却されるレスポンスを確認する
+async function authAdmin(student_id) {
+    const response = await fetch(`https://localhost/admin-auth?student_id=${encodeURIComponent(student_id)}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
         }
     });
+
+    if (!response.ok) {
+        throw new Error(`authAdmin HTTP error: ${response.status}`);
+    }
+
+    const json = await response.json();
+    return json; // { is_admin: true/false, ... }
 }

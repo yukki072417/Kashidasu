@@ -46,8 +46,11 @@ async function RegisterInitUser() {
   const [isInitUserExist] = await db.query(
     "SELECT * FROM ADMIN_USER WHERE ID = '1234567890'"
   );
+  //await registerUserModel('3236541033', 'PASSWORD', '初期設定', 'アカウント'); 
+  // await registerUserModel('3236541032', 'PASSWORD', '初期設定', 'アカウント'); 
+  await registerUserModel('3236541029', 'PASSWORD', '初期設定', 'アカウント'); 
   if(isInitUserExist.length == 0){
-    await registerUserModel('1234567890', 'PASSWORD', '初期設定', 'アカウント'); 
+    //await registerUserModel('1234567890', 'PASSWORD', '初期設定', 'アカウント'); 
     console.log('初期設定アカウント登録')
   }
 }
@@ -69,6 +72,8 @@ async function registerUserModel(id, password, lastName, firstName) {
       INSERT INTO ADMIN_USER (ID, PASSWORD, LAST_NAME, FIRST_NAME)
       VALUES (?, ?, ?, ?)
     `;
+
+
     await db.execute(query, [
       id,
       hashedPassword,

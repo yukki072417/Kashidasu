@@ -99,6 +99,7 @@ function restartQuagga(readerType) {
  * 本の登録処理
  */
 function processingBook(userBarcode, isbnBarcode) {
+    console.log('currentMode:', currentMode);
     const data = {
         user_id: userBarcode,
         book_id: isbnBarcode,
