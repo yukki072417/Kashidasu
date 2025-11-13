@@ -136,7 +136,7 @@ async function SetTable(data) {
         const writter = book.book_auther || '';
 
         // ステータス
-        const $statusCell = $('<td>').text(book.book_is_lending ? '貸出中' : '在庫');
+        const $statusCell = $('<td>').text(book.book_is_lending ? '貸出中' : '空き');
 
         // 貸出ユーザー
         const $lendingUserCell = $('<td>').text(book.lending_user_id || '');
