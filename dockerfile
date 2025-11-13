@@ -1,4 +1,7 @@
+#IntelなどのCPUが使用されている場合こちらを使用する
 # FROM node:20-bullseye-slim
+
+# Apple Silicon, Raspberry piなどで稼働させる場合はこちら
 FROM arm64v8/node:20-bullseye-slim
 
 WORKDIR /usr/app/

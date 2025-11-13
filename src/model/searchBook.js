@@ -73,11 +73,14 @@ async function ManualSearchMode(db, bookID, res) {
 async function AutoSearchMode(db, bookNum, res) {
   // 全ての本の情報と貸出中かどうかを取得
   const [results] = await db.query(`
-    SELECT b.*, 
-    CASE WHEN l.BOOK_ID IS NOT NULL THEN TRUE ELSE FALSE END AS IS_LENDING 
-    FROM BOOKS b 
-    LEFT JOIN LENDING_BOOK l ON b.ID = l.BOOK_ID
+    SELECT 
+    b.*,
+    l.USER_ID,
+    CASE WHEN l.BOOK_ID IS NOT NULL THEN TRUE ELSE FALSE END AS IS_LENDING
+    FROM BOOKS b
+    LEFT JOIN LENDING_BOOK l ON b.ID = l.BOOK_ID;
   `);
+
   // 総レコード数を取得
   const [recordNum] = await db.query(`SELECT COUNT(ID) FROM BOOKS`);
 
@@ -101,7 +104,6 @@ async function AutoSearchMode(db, bookNum, res) {
       for (let i = 0; i < results.length; i++) {
         if (results[i].IS_LENDING == 1) {
           const lendingInfoContent = GetLendingInfo(results, lendingInformation);
-          results[i].USER_ID = lendingInfoContent.USER_ID;
           results[i].LEND_DAY = lendingInfoContent.LEND_DAY;
         }
       }
@@ -135,6 +137,7 @@ function GetLendingInfo(results, lendingInformation) {
 
 // DBから取得した本情報をフロント用に整形する関数
 function FormatResults(results) {
+
   // USER_IDが未定義の場合はnullにする
   if (results[0].USER_ID == undefined) results[0].USER_ID = null;
 
