@@ -41,6 +41,7 @@ function LoadBooks(pageNum) {
                 totalRecords = data[0]['COUNT(ID)'];
                 // SetTable は async なので完了を待ってから UpdatePageInfo を呼ぶ
                 SetTable(data.slice(1)).then(() => {
+                    console.log(data);
                     UpdatePageInfo();
                 }).catch(err => {
                     console.error('SetTable エラー:', err);
@@ -90,7 +91,6 @@ async function SetTable(data) {
 
             try {
                 const result = await authAdmin(studentIdForCheck);
-                console.log(result.is_admin);
                 const extendDays = result.is_admin ? 21 : 14;
 
                 const tmp = new Date(lendDate);
@@ -140,7 +140,6 @@ async function SetTable(data) {
 
         // 貸出ユーザー
         const $lendingUserCell = $('<td>').text(book.lending_user_id || '');
-        console.log(book);
 
         // lendDate 表示フォーマット
         let lendDateStr = '';
