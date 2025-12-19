@@ -11,9 +11,11 @@ const app = express();
 const logDir = path.join(__dirname, '../logs');
 const mysqlDatasDir = path.join(__dirname, '../mysql_datas');
 
-const userRoutes = require('./routes/userRoutes');
-const bookRoutes = require('./routes/bookRoutes');
-const adminRoutes = require('./routes/adminRoutes');
+const userRoutes = require('./router/userRoutes');
+const bookRoutes = require('./router/bookRoutes');
+const adminRoutes = require('./router/adminRoutes');
+
+const initDb = require('./db/init');
 
 const PORT = 443;
 
@@ -49,7 +51,7 @@ app.use(session({
 
 app.use(express.static('./src/public'));
 app.use(express.urlencoded({ extended: true }));
-app.set('views', './src/views');
+// app.set('views', './src/views');
 app.set('view engine', 'ejs');
 
 const options = {
@@ -60,4 +62,6 @@ const options = {
 https.createServer(options, app).listen(PORT, () => {
     logger.info(`Kashidasuサーバーがポート ${PORT} で起動しました`);
     console.log(`Kashidasuサーバーがポート ${PORT} で起動しました`);
+
+    // initDb.initDb();
 });
