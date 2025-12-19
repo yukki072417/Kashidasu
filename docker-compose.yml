@@ -8,14 +8,14 @@ services:
     restart: "no"
 
   db:
-    # image: mysql:8.0
-    image: arm64v8/mysql:8.0
+    image: mysql:8.0
+    # image: arm64v8/mysql:8.0
     container_name: db
     volumes:
       - ./db/:/docker-entrypoint-initdb.d
       - ./mysql_datas:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       TZ: ${TIME_ZONE}
     ports:
       - "3306:3306"
@@ -32,10 +32,9 @@ services:
     volumes:
       - ./certs:/usr/app/certs
       - ./src:/usr/app/src
-      - ./app.js:/usr/app/app.js
       - ./logs:/usr/app/logs
       - ./.env:/usr/app/.env
-    entrypoint: ["sh", "/usr/app/wait-for-services.sh"]
+    # entrypoint: ["sh", "/usr/app/wait-for-services.sh"]
     command: ["npm", "start"]
 
 volumes:
