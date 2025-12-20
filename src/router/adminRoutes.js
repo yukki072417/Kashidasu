@@ -6,3 +6,5 @@ router.post('/register', adminController.createAdmin);
 router.get('/get', adminController.getAdmin);
 router.put('/update', adminController.updateAdmin);
 router.delete('/delete', adminController.deleteAdmin);
+
+module.exports = router;
