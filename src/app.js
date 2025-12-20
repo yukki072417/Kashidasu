@@ -16,8 +16,13 @@ const bookRoutes = require('./router/bookRoutes');
 const adminRoutes = require('./router/adminRoutes');
 
 const initDb = require('./db/init');
-
 const PORT = 443;
+
+app.use(express.static('./src/public'));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+// app.set('views', './src/views');
+app.set('view engine', 'ejs');
 
 app.use('/user', userRoutes);
 app.use('/book', bookRoutes);
@@ -36,7 +41,7 @@ if(!fs.existsSync(mysqlDatasDir)){
 }
 
 // log4jsの設定ファイルを読み込む
-log4js.configure(`/usr/app/config/config.json`);
+log4js.configure(`/usr/app/config/logs.json`);
 const logger = log4js.getLogger('system');
 
 app.use(session({
@@ -49,11 +54,6 @@ app.use(session({
     }
 }));
 
-app.use(express.static('./src/public'));
-app.use(express.urlencoded({ extended: true }));
-// app.set('views', './src/views');
-app.set('view engine', 'ejs');
-
 const options = {
     key: fs.readFileSync('/usr/app/certs/server.key'),
     cert: fs.readFileSync('/usr/app/certs/server.crt'),
@@ -63,5 +63,5 @@ https.createServer(options, app).listen(PORT, () => {
     logger.info(`Kashidasuサーバーがポート ${PORT} で起動しました`);
     console.log(`Kashidasuサーバーがポート ${PORT} で起動しました`);
 
-    // initDb.initDb();
+    initDb.initDb();
 });
