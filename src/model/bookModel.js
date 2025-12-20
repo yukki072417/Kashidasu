@@ -1,4 +1,4 @@
-const db = require('./connection');
+const { Book } = require('../db/init');
 
 async function createBook() {
 

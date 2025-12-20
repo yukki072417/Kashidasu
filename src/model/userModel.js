@@ -1,4 +1,4 @@
-const db = require('./connection');
+const { User } = require('../db/init');
 
 async function createUser() {
 
