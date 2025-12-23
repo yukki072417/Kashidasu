@@ -41,7 +41,7 @@ if(!fs.existsSync(mysqlDatasDir)){
 }
 
 // log4jsの設定ファイルを読み込む
-log4js.configure(`/usr/app/config/logs.json`);
+log4js.configure(path.join(__dirname, '../config/logs.json'));
 const logger = log4js.getLogger('system');
 
 app.use(session({
@@ -55,8 +55,8 @@ app.use(session({
 }));
 
 const options = {
-    key: fs.readFileSync('/usr/app/certs/server.key'),
-    cert: fs.readFileSync('/usr/app/certs/server.crt'),
+    key: fs.readFileSync(path.join(__dirname, '../certs/server.key')),
+    cert: fs.readFileSync(path.join(__dirname, '../certs/server.crt')),
 };
 
 https.createServer(options, app).listen(PORT, () => {
