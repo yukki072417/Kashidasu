@@ -2,7 +2,7 @@ const sequelize = require('./sequelize');
 const User = require('./models/admin');
 const Book = require('./models/book');
 const Admin = require('./models/admin');
-
+const Loan = require('./models/loan');
 
 async function initDb() {
     await sequelize.sync();
@@ -14,5 +14,6 @@ module.exports = {
     User,
     Book,
     Admin,
+    Loan,
     sequelize
 };
