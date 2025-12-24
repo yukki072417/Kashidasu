@@ -1,6 +1,6 @@
-const adminModel = require('../model/adminModel');
+const adminModel = require('../../model/adminModel');
 
-describe('Admin Model', () => {
+describe('Admin Model testing of valid test case.', () => {
 
     const testCase = {
         admin_id: '1145141919',
@@ -15,7 +15,12 @@ describe('Admin Model', () => {
     test('Get admin with valid data', async () => {
         const admin = await adminModel.getAdmin(testCase.admin_id);
         expect(admin).toStrictEqual(testCase);
-    })
+    });
+
+    test('Update admin password with valid data.', async () => {
+        const admin = await adminModel.updateAdmin(testCase.admin_id, testCase.admin_id, 'new_password');
+        expect(admin).toBe(1);
+    });
 
     test('Delete admin with valid data.', async () => {
         const admin = await adminModel.deleteAdmin(testCase.admin_id);
