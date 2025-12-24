@@ -35,10 +35,11 @@ async function getAdmin(adminId) {
   return result;
 }
 
-async function updateAdmin(adminId, password) {
+async function updateAdmin(adminId, changedAdminId, changedPassword) {
   const [affectedRows] = await sequelize.transaction(async (t) => {
     return Admin.update({
-      password: password
+      admin_id: changedAdminId,
+      password: changedPassword
     }, {
       where: {
         admin_id: adminId
