@@ -3,7 +3,7 @@ const adminModel = require('../../model/adminModel');
 describe('Admin Model testing of valid test case.', () => {
 
     const testCase = {
-        admin_id: '1145141919',
+        admin_id: '0123456789',
         password: 'password'
     }
 
@@ -18,12 +18,12 @@ describe('Admin Model testing of valid test case.', () => {
     });
 
     test('Update admin password with valid data.', async () => {
-        const admin = await adminModel.updateAdmin(testCase.admin_id, testCase.admin_id, 'new_password');
+        const admin = await adminModel.updateAdmin(testCase.admin_id, '9876543210', 'new_password');
         expect(admin).toBe(1);
     });
 
     test('Delete admin with valid data.', async () => {
-        const admin = await adminModel.deleteAdmin(testCase.admin_id);
+        const admin = await adminModel.deleteAdmin('9876543210');
         expect(admin).toBe(1);
     });
 });
