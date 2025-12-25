@@ -17,6 +17,10 @@ Book.init(
             type: DataTypes.STRING,
             allowNull: true
         },
+        publisher: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
     },
     {
         sequelize: sequelize,
