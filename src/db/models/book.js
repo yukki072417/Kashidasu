@@ -9,7 +9,7 @@ Book.init(
             type: DataTypes.STRING,
             primaryKey: true
         },
-        name: {
+        title: {
             type: DataTypes.STRING,
             allowNull: false
         },
