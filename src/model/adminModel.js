@@ -7,10 +7,12 @@ async function createAdmin(adminId, password) {
     throw new Error('Cannot empty adminId and password.');
   }
 
+  const hashedPassword = crypto.hash(password);
+
   const newAdmin = await sequelize.transaction(async (t) => {
     return Admin.create({
       admin_id: adminId,
-      password: password
+      password: hashedPassword
     }, { transaction: t });
   });
 
@@ -43,6 +45,25 @@ async function getAdminById(adminId) {
   return { success: success, admin: admin };
 }
 
+async function authenticateAdmin(adminId, password) {
+  if (!adminId || !password) {
+    throw new Error('Cannot empty adminId and password.');
+  }
+
+  const admin = await Admin.findOne({
+    where: {
+      admin_id: adminId
+    }
+  });
+
+  if (!admin) {
+    crypto.isValid('', '');
+    return false;
+  }
+
+  return crypto.isValid(password, admin.password);
+}
+
 async function updateAdmin(adminId, changedAdminId, changedPassword) {
   let success = false;
 
@@ -53,7 +74,7 @@ async function updateAdmin(adminId, changedAdminId, changedPassword) {
   const affectedRows = await sequelize.transaction(async (t) => {
     return Admin.update({
       admin_id: changedAdminId,
-      password: changedPassword
+      password: hashedPassword
     }, {
       where: {
         admin_id: adminId

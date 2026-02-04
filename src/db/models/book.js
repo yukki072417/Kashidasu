@@ -9,11 +9,15 @@ Book.init(
             type: DataTypes.STRING,
             primaryKey: true
         },
-        name: {
+        title: {
             type: DataTypes.STRING,
             allowNull: false
         },
         author: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        publisher: {
             type: DataTypes.STRING,
             allowNull: true
         },
