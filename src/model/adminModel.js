@@ -1,4 +1,5 @@
 const { Admin, sequelize } = require("../db/init");
+const crypto = require("../services/crypto");
 
 async function createAdmin(adminId, password) {
   let success = false;
