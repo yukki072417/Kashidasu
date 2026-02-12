@@ -14,6 +14,7 @@ const mysqlDatasDir = path.join(__dirname, "../mysql_datas");
 const userRoutes = require("./router/userRoutes");
 const bookRoutes = require("./router/bookRoutes");
 const adminRoutes = require("./router/adminRoutes");
+const pageRoutes = require("./router/pageRoutes");
 
 const initDb = require("./db/init");
 const PORT = 443;
@@ -21,12 +22,14 @@ const PORT = 443;
 app.use(express.static("./src/public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-// app.set('views', './src/views');
+
+app.set("views", "./src/views");
 app.set("view engine", "ejs");
 
-app.use("/user", userRoutes);
-app.use("/book", bookRoutes);
-app.use("/admin", adminRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/book", bookRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/", pageRoutes);
 
 // logsディレクトリが存在しない場合は作成
 if (!fs.existsSync(logDir)) {
@@ -65,5 +68,5 @@ https.createServer(options, app).listen(PORT, () => {
   logger.info(`Kashidasuサーバーがポート ${PORT} で起動しました`);
   console.log(`Kashidasuサーバーがポート ${PORT} で起動しました`);
 
-  initDb.initDb();
+  // initDb.initDb();
 });
