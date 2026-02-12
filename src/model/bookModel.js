@@ -150,18 +150,6 @@ async function deleteBook(isbn) {
   return { success: success, affected_rows: affectedRows.length };
 }
 
-async function deleteBook(isbn) {
-  const deletedRows = await sequelize.transaction(async (t) => {
-    return Book.destroy({
-      where: {
-        isbn: isbn,
-      },
-      transaction: t,
-    });
-  });
-  return deletedRows;
-}
-
 module.exports = {
   createBook,
   getBookByIsbn,
