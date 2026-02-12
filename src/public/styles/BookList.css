@@ -1,47 +1,47 @@
 /* Bellow code writing for bookView page */
 
-#table{
-    margin: auto;
-    margin-top: 25px;
+#table {
+  margin: auto;
+  margin-top: 25px;
 }
 
-#table th{
-    padding: 10px;
-    padding-left:  30px;
-    padding-right: 30px;
+#table th {
+  padding: 10px;
+  padding-left: 30px;
+  padding-right: 30px;
 }
-#table td{
-    text-align: center;
-    height: 35px;
+#table td {
+  text-align: center;
+  height: 35px;
 }
 
-.search{
-    margin: auto;
-    width:  300px;
-    height: 50px;
-    margin-top: 20px;
-    margin-bottom: 70px;
-    
-    text-align: center;
+.search {
+  margin: auto;
+  width: 300px;
+  height: 50px;
+  margin-top: 20px;
+  margin-bottom: 70px;
+
+  text-align: center;
 }
-#book-auther{
-    width: 120px;
+#book-auther {
+  width: 120px;
 }
-#book-title{
-    width: 200px;
+#book-title {
+  width: 200px;
 }
-#book-state{
-    width: 120px;
+#book-state {
+  width: 120px;
 }
-#book-menu{
-    width: 75px;
+#book-menu {
+  width: 75px;
 }
-#book-lend-person{
-    width: 100px;
+#book-lend-person {
+  width: 100px;
 }
-#book-isbn{
-    width: 120px;
+#book-isbn {
+  width: 120px;
 }
-#book-deadline{
-    width: 150px;
+#book-deadline {
+  width: 150px;
 }

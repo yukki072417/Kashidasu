@@ -1,113 +1,114 @@
 /* Bellow code writing for registerBook page */
-.settings-item{
-    width: 600px;
-    border: solid black 2px;
-}
-#submit-btn{
-    margin-top: 10px;
-    width: 100px;
-    height: 30px;
-
-    font-size: 16px;
+.settings-item {
+  width: 600px;
+  border: solid black 2px;
 }
 
-.form-item{
-    width: 200px;
-    height: 25px;
+#submit-btn {
+  margin-top: 10px;
+  width: 100px;
+  height: 30px;
+
+  font-size: 16px;
 }
 
-.guidance-button{
-    width: 150px;
-    height: 150px;
-
-    margin-top:   75px;
-    margin-left:  75px;
-    margin-right: 75px;
-
-    border: solid 3px rgb(188, 188, 188);
+.form-item {
+  width: 200px;
+  height: 25px;
 }
 
-.guidance-button:hover{
-    background-color: rgb(210, 210, 210);
+.guidance-button {
+  width: 150px;
+  height: 150px;
+
+  margin-top: 75px;
+  margin-left: 75px;
+  margin-right: 75px;
+
+  border: solid 3px rgb(188, 188, 188);
 }
 
-#input-form{
-    text-align: center;
+.guidance-button:hover {
+  background-color: rgb(210, 210, 210);
 }
 
-.form-item{
-    width: 175px;
-    height: 25px;
-
-    margin-top: 15px;
+#input-form {
+  text-align: center;
 }
 
-#submit-btn{
-    display: block;
-    
-    margin: auto;
-    margin-top: 15px;
+.form-item {
+  width: 175px;
+  height: 25px;
 
-    text-align: center;
-
-    background-color: rgb(130, 200, 255);
-
-    width: 120px;
-    height: 40px;
-    
-    border-style: none;
-    border-radius: 7.5px;
+  margin-top: 15px;
 }
 
-#submit-btn:hover{
-    background-color: rgb(111, 170, 220);
+#submit-btn {
+  display: block;
+
+  margin: auto;
+  margin-top: 15px;
+
+  text-align: center;
+
+  background-color: rgb(130, 200, 255);
+
+  width: 120px;
+  height: 40px;
+
+  border-style: none;
+  border-radius: 7.5px;
 }
 
-h2{
-    text-align: center;
+#submit-btn:hover {
+  background-color: rgb(111, 170, 220);
 }
 
-#csv-input{
-    display: none;
-}
-#file-selecter{
-    width: 250px;
-    height: 100px;
-
-    font-size: 26px;
-    border-radius: 10px;
-
-    background-color: white;
-
-    box-shadow: 0px 5px gray;
+h2 {
+  text-align: center;
 }
 
-#file-selecter:hover{
-    transform: translateY(5px);
-    box-shadow: 0px 0px gray;
+#csv-input {
+  display: none;
+}
+#file-selecter {
+  width: 250px;
+  height: 100px;
+
+  font-size: 26px;
+  border-radius: 10px;
+
+  background-color: white;
+
+  box-shadow: 0px 5px gray;
 }
 
-#scanning-registration{
-    background: url('/images/scanRegisteraion.png');
-
-    background-repeat: no-repeat;
-    background-size: 150px;
+#file-selecter:hover {
+  transform: translateY(5px);
+  box-shadow: 0px 0px gray;
 }
-#scanning-registration:hover{
-    background: url('/images/scanRegisteration_hover.png');
 
-    background-repeat: no-repeat;
-    background-size: 150px;
+#scanning-registration {
+  background: url("/images/scanRegisteraion.png");
+
+  background-repeat: no-repeat;
+  background-size: 150px;
 }
-#collective-registration{
-    background: url('/images/csvRegisteration.png');
+#scanning-registration:hover {
+  background: url("/images/scanRegisteration_hover.png");
 
-    background-repeat: no-repeat;
-    background-size: 150px;
+  background-repeat: no-repeat;
+  background-size: 150px;
 }
-#collective-registration:hover{
-    background: url('/images/csvRegisteration_hover.png');
+#collective-registration {
+  background: url("/images/csvRegisteration.png");
 
-    background-repeat: no-repeat;
-    background-size: 150px;
+  background-repeat: no-repeat;
+  background-size: 150px;
+}
+#collective-registration:hover {
+  background: url("/images/csvRegisteration_hover.png");
+
+  background-repeat: no-repeat;
+  background-size: 150px;
 }

@@ -1,19 +1,19 @@
-const sequelize = require('./sequelize');
-const User = require('./models/admin');
-const Book = require('./models/book');
-const Admin = require('./models/admin');
-const Loan = require('./models/loan');
+const sequelize = require("./sequelize");
+const User = require("./models/admin");
+const Book = require("./models/book");
+const Admin = require("./models/admin");
+const Loan = require("./models/loan");
 
 async function initDb() {
-    await sequelize.sync();
-    console.log("Database & tables created!");
+  await sequelize.sync();
+  console.log("Database & tables created!");
 }
 
 module.exports = {
-    initDb,
-    User,
-    Book,
-    Admin,
-    Loan,
-    sequelize
+  initDb,
+  User,
+  Book,
+  Admin,
+  Loan,
+  sequelize,
 };

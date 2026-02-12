@@ -1,137 +1,177 @@
-const adminModel = require('../../model/adminModel');
-const bookModel = require('../../model/bookModel');
-const userModel = require('../../model/userModel');
+const adminModel = require("../../model/adminModel");
+const bookModel = require("../../model/bookModel");
+const userModel = require("../../model/userModel");
 
-describe('Admin Model testing of valid test case.', () => {
+describe("Admin Model testing of valid test case.", () => {
+  const testCase = {
+    admin_id: "0123456789",
+    password: "password",
+  };
 
-    const testCase = {
-        admin_id: '0123456789',
-        password: 'password'
-    }
+  test("Create admin with valid data.", async () => {
+    const admin = await adminModel.createAdmin(
+      testCase.admin_id,
+      testCase.password,
+    );
+    expect(admin.admin_id).toBe(testCase.admin_id);
+  });
 
-    test('Create admin with valid data.', async () => {
-        const admin = await adminModel.createAdmin(testCase.admin_id, testCase.password);
-        expect(admin.admin_id).toBe(testCase.admin_id);
-    });
+  test("Get admin with valid data", async () => {
+    const admin = await adminModel.getAdmin(testCase.admin_id);
+    expect(admin.admin_id).toStrictEqual(testCase.admin_id);
+  });
 
-    test('Get admin with valid data', async () => {
-        const admin = await adminModel.getAdmin(testCase.admin_id);
-        expect(admin.admin_id).toStrictEqual(testCase.admin_id);
-    });
+  test("Authenticate admin with valid data should return true.", async () => {
+    const result = await adminModel.authenticateAdmin(
+      testCase.admin_id,
+      testCase.password,
+    );
+    expect(result).toBe(true);
+  });
 
-    test('Authenticate admin with valid data should return true.', async () => {
-        const result = await adminModel.authenticateAdmin(testCase.admin_id, testCase.password);
-        expect(result).toBe(true);
-    });
+  test("Update admin password with valid data.", async () => {
+    const affectedRows = await adminModel.updateAdmin(
+      testCase.admin_id,
+      "9876543210",
+      "new_password",
+    );
+    expect(affectedRows).toBe(1);
+  });
 
-    test('Update admin password with valid data.', async () => {
-        const affectedRows = await adminModel.updateAdmin(testCase.admin_id, '9876543210', 'new_password');
-        expect(affectedRows).toBe(1);
-    });
-
-    test('Delete admin with valid data.', async () => {
-        const affectedRows = await adminModel.deleteAdmin('9876543210');
-        expect(affectedRows).toBe(1);
-    });
+  test("Delete admin with valid data.", async () => {
+    const affectedRows = await adminModel.deleteAdmin("9876543210");
+    expect(affectedRows).toBe(1);
+  });
 });
 
-describe('Admin Model testing of invalid test case.', () => {
+describe("Admin Model testing of invalid test case.", () => {
+  const testCase = {
+    admin_id: "0123456789",
+    password: "password",
+  };
 
-    const testCase = {
-        admin_id: '0123456789',
-        password: 'password'
-    }
-    
-    const emptyIdOrPasswordError = 'Cannot empty adminId and password.';
-    const emptyIdError = 'Cannot empty adminId.';
-    const notFoundError = 'Admin not found.';
+  const emptyIdOrPasswordError = "Cannot empty adminId and password.";
+  const emptyIdError = "Cannot empty adminId.";
+  const notFoundError = "Admin not found.";
 
-    beforeAll(async () => {
-        // Ensure a known state for authentication tests
-        await adminModel.createAdmin(testCase.admin_id, testCase.password);
-    });
+  beforeAll(async () => {
+    // Ensure a known state for authentication tests
+    await adminModel.createAdmin(testCase.admin_id, testCase.password);
+  });
 
-    afterAll(async () => {
-        // Clean up the created admin
-        await adminModel.deleteAdmin(testCase.admin_id);
-    });
+  afterAll(async () => {
+    // Clean up the created admin
+    await adminModel.deleteAdmin(testCase.admin_id);
+  });
 
-    // createAdmin
-    test('Create admin with null adminId should throw error.', async () => {
-        await expect(adminModel.createAdmin(null, testCase.password)).rejects.toThrow(emptyIdOrPasswordError);
-    });
-    test('Create admin with empty password should throw error.', async () => {
-        await expect(adminModel.createAdmin(testCase.admin_id, '')).rejects.toThrow(emptyIdOrPasswordError);
-    });
+  // createAdmin
+  test("Create admin with null adminId should throw error.", async () => {
+    await expect(
+      adminModel.createAdmin(null, testCase.password),
+    ).rejects.toThrow(emptyIdOrPasswordError);
+  });
+  test("Create admin with empty password should throw error.", async () => {
+    await expect(adminModel.createAdmin(testCase.admin_id, "")).rejects.toThrow(
+      emptyIdOrPasswordError,
+    );
+  });
 
-    // getAdmin
-    test('Get admin with null adminId should throw error.', async () => {
-        await expect(adminModel.getAdmin(null)).rejects.toThrow(emptyIdError);
-    });
-    test('Get admin with non-existent adminId should throw error.', async () => {
-        await expect(adminModel.getAdmin('non-existent-id')).rejects.toThrow(notFoundError);
-    });
+  // getAdmin
+  test("Get admin with null adminId should throw error.", async () => {
+    await expect(adminModel.getAdmin(null)).rejects.toThrow(emptyIdError);
+  });
+  test("Get admin with non-existent adminId should throw error.", async () => {
+    await expect(adminModel.getAdmin("non-existent-id")).rejects.toThrow(
+      notFoundError,
+    );
+  });
 
-    // authenticateAdmin
-    test('Authenticate admin with null adminId should throw error.', async () => {
-        await expect(adminModel.authenticateAdmin(null, testCase.password)).rejects.toThrow(emptyIdOrPasswordError);
-    });
-    test('Authenticate admin with empty password should throw error.', async () => {
-        await expect(adminModel.authenticateAdmin(testCase.admin_id, '')).rejects.toThrow(emptyIdOrPasswordError);
-    });
-    test('Authenticate with non-existent adminId should return false.', async () => {
-        const result = await adminModel.authenticateAdmin('non-existent-id', testCase.password);
-        expect(result).toBe(false);
-    });
-    test('Authenticate with wrong password should return false.', async () => {
-        const result = await adminModel.authenticateAdmin(testCase.admin_id, 'wrong-password');
-        expect(result).toBe(false);
-    });
+  // authenticateAdmin
+  test("Authenticate admin with null adminId should throw error.", async () => {
+    await expect(
+      adminModel.authenticateAdmin(null, testCase.password),
+    ).rejects.toThrow(emptyIdOrPasswordError);
+  });
+  test("Authenticate admin with empty password should throw error.", async () => {
+    await expect(
+      adminModel.authenticateAdmin(testCase.admin_id, ""),
+    ).rejects.toThrow(emptyIdOrPasswordError);
+  });
+  test("Authenticate with non-existent adminId should return false.", async () => {
+    const result = await adminModel.authenticateAdmin(
+      "non-existent-id",
+      testCase.password,
+    );
+    expect(result).toBe(false);
+  });
+  test("Authenticate with wrong password should return false.", async () => {
+    const result = await adminModel.authenticateAdmin(
+      testCase.admin_id,
+      "wrong-password",
+    );
+    expect(result).toBe(false);
+  });
 
-    // updateAdmin
-    test('Update admin with null adminId should throw error.', async () => {
-        await expect(adminModel.updateAdmin(null, 'id', 'pw')).rejects.toThrow(emptyIdOrPasswordError);
-    });
-    test('Update admin with empty changedAdminId should throw error.', async () => {
-        await expect(adminModel.updateAdmin('id', '', 'pw')).rejects.toThrow(emptyIdOrPasswordError);
-    });
-    test('Update admin with null changedPassword should throw error.', async () => {
-        await expect(adminModel.updateAdmin('id', 'newId', null)).rejects.toThrow(emptyIdOrPasswordError);
-    });
+  // updateAdmin
+  test("Update admin with null adminId should throw error.", async () => {
+    await expect(adminModel.updateAdmin(null, "id", "pw")).rejects.toThrow(
+      emptyIdOrPasswordError,
+    );
+  });
+  test("Update admin with empty changedAdminId should throw error.", async () => {
+    await expect(adminModel.updateAdmin("id", "", "pw")).rejects.toThrow(
+      emptyIdOrPasswordError,
+    );
+  });
+  test("Update admin with null changedPassword should throw error.", async () => {
+    await expect(adminModel.updateAdmin("id", "newId", null)).rejects.toThrow(
+      emptyIdOrPasswordError,
+    );
+  });
 
-    // deleteAdmin
-    test('Delete admin with null adminId should throw error.', async () => {
-        await expect(adminModel.deleteAdmin(null)).rejects.toThrow(emptyIdError);
-    });
+  // deleteAdmin
+  test("Delete admin with null adminId should throw error.", async () => {
+    await expect(adminModel.deleteAdmin(null)).rejects.toThrow(emptyIdError);
+  });
 
-    test('Delete admin with non-existent adminId should return 0.', async () => {
-        const affectedRows = await adminModel.deleteAdmin('non-existent-id');
-        expect(affectedRows).toBe(0);
-    });
+  test("Delete admin with non-existent adminId should return 0.", async () => {
+    const affectedRows = await adminModel.deleteAdmin("non-existent-id");
+    expect(affectedRows).toBe(0);
+  });
 });
 
-describe('Book Model testing of valid test case.', () => {
-
-    const testCase = {
-        isbn: "0123456789012",
-        title: "サンプル",
-        author: "サンプル",
-        publisher: "サンプル"
-    }
-    test('Create book with valid data.', async () => {
-        const book = await bookModel.createBook(testCase.isbn, testCase.title, testCase.author, testCase.publisher);
-        expect(book).toStrictEqual(testCase);
-    });
-    test('Get book with valid data.', async () => {
-        const book = await bookModel.getBookByIsbn(testCase.isbn);
-        expect(book).toStrictEqual(testCase);
-    });
-    test('Update book with valid data.', async () => {
-        const affectedRows = await bookModel.updateBook(testCase.isbn, "9876543210987", "変更後タイトル", "変更後著者", "変更後出版社");
-        expect(affectedRows).toBe(1);
-    });
-    test('Delete book with valid data.', async () => {
-        const affectedRows = await bookModel.deleteBook("9876543210987");
-        expect(affectedRows).toBe(1);
-    });
+describe("Book Model testing of valid test case.", () => {
+  const testCase = {
+    isbn: "0123456789012",
+    title: "サンプル",
+    author: "サンプル",
+    publisher: "サンプル",
+  };
+  test("Create book with valid data.", async () => {
+    const book = await bookModel.createBook(
+      testCase.isbn,
+      testCase.title,
+      testCase.author,
+      testCase.publisher,
+    );
+    expect(book).toStrictEqual(testCase);
+  });
+  test("Get book with valid data.", async () => {
+    const book = await bookModel.getBookByIsbn(testCase.isbn);
+    expect(book).toStrictEqual(testCase);
+  });
+  test("Update book with valid data.", async () => {
+    const affectedRows = await bookModel.updateBook(
+      testCase.isbn,
+      "9876543210987",
+      "変更後タイトル",
+      "変更後著者",
+      "変更後出版社",
+    );
+    expect(affectedRows).toBe(1);
+  });
+  test("Delete book with valid data.", async () => {
+    const affectedRows = await bookModel.deleteBook("9876543210987");
+    expect(affectedRows).toBe(1);
+  });
 });

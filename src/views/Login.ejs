@@ -1,35 +1,55 @@
 <!DOCTYPE html>
-<html lang='ja'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ログインページ</title>
-    
-    <link rel='stylesheet' href='/styles/Login.css'>
 
-    <script src='/js/jquery-3.7.1.min.js'></script>
-    <script src='/js/Login.js'></script>
-    <link rel='stylesheet' href='/fonts/fonts.css'>
-    <meta name='robots' content='noindex' />
-</head>
-<body>
+    <link rel="stylesheet" href="/styles/Login.css" />
 
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/Login.js"></script>
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
     <%- include('Header') %>
-    
-    <form method='post'>
-        <h1 id='form-title'>ログインページ</h1>
-        <div class='form-container'>
-            <ul class='form-lists'>
-                <li class='form-list-item'><input type='text' name='admin_id' id='admin-id' placeholder='管理者ID' required> </li>
-                <li class='form-list-item'><input type='password' name='admin_password' id='admin-password' placeholder='管理者パスワード' required> </li>
-            </ul>
-        </div>
-        <div class='form-container' id='login'>
-            <input id='login-btn' type='submit' value='ログイン'>
-        </div>
+
+    <form method="post">
+      <h1 id="form-title">ログインページ</h1>
+      <div class="form-container">
+        <ul class="form-lists">
+          <li class="form-list-item">
+            <input
+              type="text"
+              name="admin_id"
+              id="admin-id"
+              placeholder="管理者ID"
+              required
+            />
+          </li>
+          <li class="form-list-item">
+            <input
+              type="password"
+              name="admin_password"
+              id="admin-password"
+              placeholder="管理者パスワード"
+              required
+            />
+          </li>
+        </ul>
+      </div>
+      <div class="form-container" id="login">
+        <input id="login-btn" type="submit" value="ログイン" />
+      </div>
     </form>
-    <input id='open-reading-code' type='button' onclick='location.href = "/read-code"' value='読み取り画面を開く'>
+    <input
+      id="open-reading-code"
+      type="button"
+      onclick="location.href = '/read-code'"
+      value="読み取り画面を開く"
+    />
 
     <%- include('Footer') %>
-</body>
+  </body>
 </html>
