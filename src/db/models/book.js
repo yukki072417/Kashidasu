@@ -1,7 +1,7 @@
 const path = require("path");
 const { writeJsonFile, readJsonFile } = require("../operation");
 
-const repositoryPath = path.join(__dirname, "../../repository");
+const repositoryPath = path.join(__dirname, "../../../repository");
 
 class BookModel {
   async create(title, author, isbn) {
