@@ -1,130 +1,114 @@
-const { Admin, sequelize } = require("../db/init");
-const crypto = require("../services/crypto");
+// const { Admin } = require("../db/init");
+// const crypto = require("../services/crypto");
 
-async function createAdmin(adminId, password) {
-  let success = false;
-  if (adminId == null || password == null) {
-    throw new Error("Cannot empty adminId and password.");
-  }
+// async function createAdmin(adminId, password) {
+//   let success = false;
+//   if (adminId == null || password == null) {
+//     throw new Error("Cannot empty adminId and password.");
+//   }
 
-  const hashedPassword = crypto.hash(password);
+//   const hashedPassword = crypto.hash(password);
 
-  const newAdmin = await sequelize.transaction(async (t) => {
-    return Admin.create(
-      {
-        admin_id: adminId,
-        password: hashedPassword,
-      },
-      { transaction: t },
-    );
-  });
+//   const newAdmin = await Admin.create({
+//     admin_id: adminId,
+//     password: hashedPassword,
+//   });
 
-  if (newAdmin && newAdmin.admin_id) {
-    success = true;
-  }
+//   if (newAdmin && newAdmin.admin_id) {
+//     success = true;
+//   }
 
-  return { success: success };
-}
+//   return { success: success };
+// }
 
-async function getAdminById(adminId) {
-  let success = false;
+// async function getAdminById(adminId) {
+//   let success = false;
 
-  if (adminId == null) {
-    throw new Error("Cannot empty userId.");
-  }
+//   if (adminId == null) {
+//     throw new Error("Cannot empty userId.");
+//   }
 
-  const admin = await sequelize.transaction(async (t) => {
-    return Admin.findOne(
-      {
-        where: {
-          user_id: adminId,
-        },
-      },
-      { transaction: t },
-    );
-  });
+//   const admin = await Admin.findOne({
+//     where: {
+//       admin_id: adminId,
+//     },
+//   });
 
-  if (admin && admin.admin_id) {
-    success = true;
-  }
+//   if (admin && admin.admin_id) {
+//     success = true;
+//   }
 
-  return { success: success, admin: admin };
-}
+//   return { success: success, admin: admin };
+// }
 
-async function authenticateAdmin(adminId, password) {
-  if (!adminId || !password) {
-    throw new Error("Cannot empty adminId and password.");
-  }
+// async function authenticateAdmin(adminId, password) {
+//   if (!adminId || !password) {
+//     throw new Error("Cannot empty adminId and password.");
+//   }
 
-  const admin = await Admin.findOne({
-    where: {
-      admin_id: adminId,
-    },
-  });
+//   const admin = await Admin.findOne({
+//     where: {
+//       admin_id: adminId,
+//     },
+//   });
 
-  if (!admin) {
-    crypto.isValid("", "");
-    return false;
-  }
+//   if (!admin) {
+//     crypto.isValid("", "");
+//     return false;
+//   }
 
-  return crypto.isValid(password, admin.password);
-}
+//   return crypto.isValid(password, admin.password);
+// }
 
-async function updateAdmin(adminId, changedAdminId, changedPassword) {
-  let success = false;
+// async function updateAdmin(adminId, changedAdminId, changedPassword) {
+//   let success = false;
 
-  if (adminId == null || changedAdminId == null || changedPassword == null) {
-    throw new Error(
-      "Cannot empty adminId, changedAdminId, and changedPassword.",
-    );
-  }
+//   if (adminId == null || changedAdminId == null || changedPassword == null) {
+//     throw new Error(
+//       "Cannot empty adminId, changedAdminId, and changedPassword.",
+//     );
+//   }
+//   const hashedPassword = crypto.hash(changedPassword);
 
-  const affectedRows = await sequelize.transaction(async (t) => {
-    return Admin.update(
-      {
-        admin_id: changedAdminId,
-        password: hashedPassword,
-      },
-      {
-        where: {
-          admin_id: adminId,
-        },
-        transaction: t,
-      },
-    );
-  });
+//   const affectedRows = await Admin.update(
+//     {
+//       admin_id: changedAdminId,
+//       password: hashedPassword,
+//     },
+//     {
+//       where: {
+//         admin_id: adminId,
+//       },
+//     },
+//   );
 
-  if (affectedRows.length > 0) {
-    success = true;
-  }
+//   if (affectedRows.length > 0) {
+//     success = true;
+//   }
 
-  return { success: success, affected_rows: affectedRows.length };
-}
+//   return { success: success, affected_rows: affectedRows.length };
+// }
 
-async function deleteAdmin(adminId) {
-  let success = false;
+// async function deleteAdmin(adminId) {
+//   let success = false;
 
-  const affectedRows = await sequelize.transaction(async (t) => {
-    return Admin.destroy(
-      {
-        where: {
-          admin_id: adminId,
-        },
-      },
-      { transaction: t },
-    );
-  });
+//   const affectedRows = await Admin.destroy({
+//     where: {
+//       admin_id: adminId,
+//     },
+//   });
 
-  if (affectedRows.length > 0) {
-    success = true;
-  }
+//   if (affectedRows > 0) {
+//     // Repository.destroy returns the count directly
+//     success = true;
+//   }
 
-  return { success: success, affected_rows: affectedRows.length };
-}
+//   return { success: success, affected_rows: affectedRows };
+// }
 
-module.exports = {
-  createAdmin,
-  getAdminById,
-  updateAdmin,
-  deleteAdmin,
-};
+// module.exports = {
+//   createAdmin,
+//   getAdminById,
+//   updateAdmin,
+//   deleteAdmin,
+// };

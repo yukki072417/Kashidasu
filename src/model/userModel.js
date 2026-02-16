@@ -1,126 +1,113 @@
-const { User, sequelize } = require("../db/init");
+// const { User } = require("../db/init");
 
-async function createUser(userId, password, grade) {
-  let success = false;
+// async function createUser(userId, password, grade) {
+//   let success = false;
 
-  if (userId == null || password == null || grade == null) {
-    throw new Error("Cannot empty userId, password, and grade.");
-  }
+//   if (userId == null || password == null || grade == null) {
+//     throw new Error("Cannot empty userId, password, and grade.");
+//   }
 
-  const newBook = await sequelize.transaction(async (t) => {
-    return User.create({
-      userId: userId,
-      password: password,
-      grade: grade,
-    });
-  });
+//   const newUser = await User.create({
+//     user_id: userId,
+//     password: password,
+//     grade: grade,
+//   });
 
-  if (newBook && newBook.userId) {
-    success = true;
-  }
+//   if (newUser && newUser.user_id) {
+//     success = true;
+//   }
 
-  return { success: success, user: newBook };
-}
+//   return { success: success, user: newUser };
+// }
 
-async function getUserByID(userId) {
-  let success = false;
+// async function getUserByID(userId) {
+//   let success = false;
 
-  if (userId == null) {
-    throw new Error("Cannot empty userId.");
-  }
+//   if (userId == null) {
+//     throw new Error("Cannot empty userId.");
+//   }
 
-  const user = await sequelize.transaction(async (t) => {
-    return User.findOne(
-      {
-        where: {
-          user_id: userId,
-        },
-      },
-      { transaction: t },
-    );
-  });
+//   const user = await User.findOne({
+//     where: {
+//       user_id: userId,
+//     },
+//   });
 
-  if (user && user.user_id) {
-    success = true;
-  }
+//   if (user && user.user_id) {
+//     success = true;
+//   }
 
-  return { success: success, user: user };
-}
+//   return { success: success, user: user };
+// }
 
-async function getUserByName(name) {
-  let success = false;
-  if (name == null) {
-    throw new Error("Cannot empty name.");
-  }
+// async function getUserByName(userId) {
+//   let success = false;
+//   if (userId == null) {
+//     throw new Error("Cannot empty user_id.");
+//   }
 
-  const user = await sequelize.transaction(async (t) => {
-    return User.findOne(
-      {
-        where: {
-          name: name,
-        },
-      },
-      { transaction: t },
-    );
-  });
+//   const user = await User.findOne({
+//     where: {
+//       user_id: userId,
+//     },
+//   });
 
-  if (user && user.user_id) {
-    success = true;
-  }
+//   if (user && user.user_id) {
+//     success = true;
+//   }
 
-  return { success: success, user: user };
-}
+//   return { success: success, user: user };
+// }
 
-async function updateUser(userId, password, grade) {
-  let success = false;
+// async function updateUser(userId, password, grade) {
+//   let success = false;
 
-  if (userId == null || password == null || grade == null) {
-    throw new Error("Cannot empty userId, password, and grade.");
-  }
+//   if (userId == null || password == null || grade == null) {
+//     throw new Error("Cannot empty userId, password, and grade.");
+//   }
 
-  const affectedRows = await sequelize.transaction(async (t) => {
-    return User.update({
-      user_id: userId,
-      password: password,
-      grade: grade,
-    });
-  });
+//   const affectedRows = await User.update(
+//     {
+//       password: password,
+//       grade: grade,
+//     },
+//     {
+//       where: {
+//         user_id: userId,
+//       },
+//     },
+//   );
 
-  if (affectedRows.length > 0) {
-    success = true;
-  }
+//   if (affectedRows > 0) {
+//     success = true;
+//   }
 
-  return { success: success, affected_rows: affectedRows.length };
-}
+//   return { success: success, affected_rows: affectedRows };
+// }
 
-async function deleteUser(user_id) {
-  let success = false;
-  if (user_id == null) {
-    throw new Error("Cannot empty user_id.");
-  }
+// async function deleteUser(user_id) {
+//   let success = false;
+//   if (user_id == null) {
+//     throw new Error("Cannot empty user_id.");
+//   }
 
-  const affectedRows = await sequelize.transaction(async (t) => {
-    return User.destroy(
-      {
-        where: {
-          user_id: user_id,
-        },
-      },
-      { transaction: t },
-    );
-  });
+//   const affectedRows = await User.destroy({
+//     where: {
+//       user_id: user_id,
+//     },
+//   });
 
-  if (affectedRows.length > 0) {
-    success = true;
-  }
+//   if (affectedRows > 0) {
+//     success = true;
+//   }
 
-  return { success: success, affected_rows: affectedRows.length };
-}
+//   return { success: success, affected_rows: affectedRows };
+// }
 
-exports.modules = {
-  createUser,
-  getUserByID,
-  getUserByName,
-  updateUser,
-  deleteUser,
-};
+// module.exports = {
+//   createUser,
+//   getUserByID,
+//   getUserByName,
+//   updateUser,
+//   deleteUser,
+// };

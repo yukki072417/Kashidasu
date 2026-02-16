@@ -68,5 +68,5 @@ https.createServer(options, app).listen(PORT, () => {
   logger.info(`Kashidasuサーバーがポート ${PORT} で起動しました`);
   console.log(`Kashidasuサーバーがポート ${PORT} で起動しました`);
 
-  // initDb.initDb();
+  initDb.initDb();
 });

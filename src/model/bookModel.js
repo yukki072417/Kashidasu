@@ -1,160 +1,138 @@
-const { Book, sequelize } = require("../db/init");
+// const { Book } = require("../db/init");
 
-async function createBook(isbn, name, author) {
-  let success = false;
+// async function createBook(isbn, title, author, publisher) {
+//   let success = false;
 
-  if (isbn == null || name == null || author == null) {
-    throw new Error("Cannot empty isbn, name, and author.");
-  }
+//   if (isbn == null || title == null || author == null) {
+//     throw new Error("Cannot empty isbn, title, and author.");
+//   }
 
-  const newBook = await sequelize.transaction(async (t) => {
-    return Book.create(
-      {
-        isbn: isbn,
-        name: name,
-        author: author,
-      },
-      { transaction: t },
-    );
-  });
+//   const newBook = await Book.create({
+//     isbn: isbn,
+//     title: title,
+//     author: author,
+//     publisher: publisher,
+//   });
 
-  if (newBook && newBook.isbn) {
-    success = true;
-  }
+//   if (newBook && newBook.isbn) {
+//     success = true;
+//   }
 
-  return { success: success };
-}
+//   return { success: success };
+// }
 
-async function getBookByIsbn(isbn) {
-  let success = false;
+// async function getBookByIsbn(isbn) {
+//   let success = false;
 
-  if (isbn == null) {
-    throw new Error("Cannot empty isbn, name, and author.");
-  }
+//   if (isbn == null) {
+//     throw new Error("Cannot empty isbn.");
+//   }
 
-  const book = await sequelize.transaction(async (t) => {
-    return Book.findOne(
-      {
-        where: {
-          isbn: isbn,
-        },
-      },
-      { transaction: t },
-    );
-  });
+//   const book = await Book.findOne({
+//     where: {
+//       isbn: isbn,
+//     },
+//   });
 
-  if (book && book.isbn) {
-    success = true;
-  }
+//   if (book && book.isbn) {
+//     success = true;
+//   }
 
-  return { success: success, book: book };
-}
+//   return { success: success, book: book };
+// }
 
-async function getBookByName(name) {
-  let success = false;
+// async function getBookByName(title) {
+//   let success = false;
 
-  if (name == null) {
-    throw new Error("Cannot empty name.");
-  }
+//   if (title == null) {
+//     throw new Error("Cannot empty title.");
+//   }
 
-  const book = await sequelize.transaction(async (t) => {
-    return Book.findOne(
-      {
-        where: {
-          name: name,
-        },
-      },
-      { transaction: t },
-    );
-  });
+//   const book = await Book.findOne({
+//     where: {
+//       title: title,
+//     },
+//   });
 
-  if (book && book.name) {
-    success = true;
-  }
+//   if (book && book.isbn) {
+//     success = true;
+//   }
 
-  return { success: success, book: book };
-}
+//   return { success: success, book: book };
+// }
 
-async function getBookByAuthor(author) {
-  let success = false;
+// async function getBookByAuthor(author) {
+//   let success = false;
 
-  if (author == null) {
-    throw new Error("Cannot empty author.");
-  }
+//   if (author == null) {
+//     throw new Error("Cannot empty author.");
+//   }
 
-  const book = await sequelize.transaction(async (t) => {
-    return Book.findOne(
-      {
-        where: {
-          author: author,
-        },
-      },
-      { transaction: t },
-    );
-  });
+//   const book = await Book.findOne({
+//     where: {
+//       author: author,
+//     },
+//   });
 
-  if (book && book.author) {
-    success = true;
-  }
+//   if (book && book.isbn) {
+//     success = true;
+//   }
 
-  return { success: success, book: book };
-}
+//   return { success: success, book: book };
+// }
 
-async function updateBook(isbn, name, author) {
-  let success = false;
+// async function updateBook(isbn, title, author, publisher) {
+//   let success = false;
 
-  if (isbn == null || name == null || author == null) {
-    throw new Error("Cannot empty isbn, name, and author.");
-  }
+//   if (isbn == null || title == null || author == null || publisher == null) {
+//     throw new Error("Cannot empty isbn, title, author, and publisher.");
+//   }
 
-  const affectedRows = await sequelize.transaction(async (t) => {
-    return Book.update(
-      {
-        name: name,
-        author: author,
-      },
-      {
-        where: {
-          isbn: isbn,
-        },
-      },
-      { transaction: t },
-    );
-  });
+//   const affectedRows = await Book.update(
+//     {
+//       title: title,
+//       author: author,
+//       publisher: publisher,
+//     },
+//     {
+//       where: {
+//         isbn: isbn,
+//       },
+//     },
+//   );
 
-  if (affectedRows.length > 0) {
-    success = true;
-  }
+//   if (affectedRows > 0) {
+//     success = true;
+//   }
 
-  return { success: success, affected_rows: affectedRows.length };
-}
+//   return { success: success, affected_rows: affectedRows };
+// }
 
-async function deleteBook(isbn) {
-  let success = false;
+// async function deleteBook(isbn) {
+//   let success = false;
 
-  if (isbn == null) {
-    throw new Error("Cannot empty isbn.");
-  }
+//   if (isbn == null) {
+//     throw new Error("Cannot empty isbn.");
+//   }
 
-  const affectedRows = await sequelize.transaction(async (t) => {
-    return Book.destroy(
-      {
-        where: {
-          isbn: isbn,
-        },
-      },
-      { transaction: t },
-    );
-  });
+//   const affectedRows = await Book.destroy({
+//     where: {
+//       isbn: isbn,
+//     },
+//   });
 
-  return { success: success, affected_rows: affectedRows.length };
-}
+//   if (affectedRows > 0) {
+//     success = true;
+//   }
 
-module.exports = {
-  createBook,
-  getBookByIsbn,
-  getBookByName,
-  getBookByAuthor,
-  updateBook,
-  deleteBook,
-};
+//   return { success: success, affected_rows: affectedRows };
+// }
+
+// module.exports = {
+//   createBook,
+//   getBookByIsbn,
+//   getBookByName,
+//   getBookByAuthor,
+//   updateBook,
+//   deleteBook,
+// };
