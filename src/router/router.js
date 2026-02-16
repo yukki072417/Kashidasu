@@ -39,7 +39,6 @@ router.post('/lend', lendBook.LendBook);
 router.post('/return', returnBook.ReturnBook);
 
 // ユーザーのログイン処理
-router.post('/main', auth.Login);
 
 // 書籍情報を更新する
 router.post('/upload-book', updateBook.UploadBook);

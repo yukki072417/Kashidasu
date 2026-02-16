@@ -23,6 +23,18 @@ app.use(express.static("./src/public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(
+  session({
+    secret: "seacret-key",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true,
+      maxAge: 1000 * 60 * 60 * 24,
+    },
+  }),
+);
+
 app.set("views", "./src/views");
 app.set("view engine", "ejs");
 
@@ -46,18 +58,6 @@ if (!fs.existsSync(mysqlDatasDir)) {
 // log4jsの設定ファイルを読み込む
 log4js.configure(path.join(__dirname, "../config/logs.json"));
 const logger = log4js.getLogger("system");
-
-app.use(
-  session({
-    secret: "seacret-key",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: true,
-      maxAge: 1000 * 60 * 60 * 24,
-    },
-  }),
-);
 
 const options = {
   key: fs.readFileSync(path.join(__dirname, "../certs/server.key")),
