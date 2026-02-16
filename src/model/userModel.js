@@ -1,113 +1,74 @@
-// const { User } = require("../db/init");
+const UserModel = require("../db/models/user");
+const crypto = require("../services/crypto");
 
-// async function createUser(userId, password, grade) {
-//   let success = false;
+const userModel = new UserModel();
 
-//   if (userId == null || password == null || grade == null) {
-//     throw new Error("Cannot empty userId, password, and grade.");
-//   }
+async function createUser(userId, password) {
+  if (userId == null || password == null) {
+    throw new Error("Cannot empty userId and password.");
+  }
 
-//   const newUser = await User.create({
-//     user_id: userId,
-//     password: password,
-//     grade: grade,
-//   });
+  const hashedPassword = crypto.hash(password);
 
-//   if (newUser && newUser.user_id) {
-//     success = true;
-//   }
+  await userModel.create(userId, hashedPassword);
 
-//   return { success: success, user: newUser };
-// }
+  return { success: true };
+}
 
-// async function getUserByID(userId) {
-//   let success = false;
+async function getUserByID(userId) {
+  if (userId == null) {
+    throw new Error("Cannot empty userId.");
+  }
 
-//   if (userId == null) {
-//     throw new Error("Cannot empty userId.");
-//   }
+  const user = await userModel.findOne(userId);
 
-//   const user = await User.findOne({
-//     where: {
-//       user_id: userId,
-//     },
-//   });
+  if (user && user.userId) {
+    return { success: true, user: user };
+  }
 
-//   if (user && user.user_id) {
-//     success = true;
-//   }
+  return { success: false, user: null };
+}
 
-//   return { success: success, user: user };
-// }
+async function getUserByName(userId) {
+  if (userId == null) {
+    throw new Error("Cannot empty user_id.");
+  }
 
-// async function getUserByName(userId) {
-//   let success = false;
-//   if (userId == null) {
-//     throw new Error("Cannot empty user_id.");
-//   }
+  const user = await userModel.findOne(userId);
 
-//   const user = await User.findOne({
-//     where: {
-//       user_id: userId,
-//     },
-//   });
+  if (user && user.userId) {
+    return { success: true, user: user };
+  }
 
-//   if (user && user.user_id) {
-//     success = true;
-//   }
+  return { success: false, user: null };
+}
 
-//   return { success: success, user: user };
-// }
+async function updateUser(userId, password) {
+  if (userId == null || password == null) {
+    throw new Error("Cannot empty userId and password.");
+  }
 
-// async function updateUser(userId, password, grade) {
-//   let success = false;
+  const hashedPassword = crypto.hash(password);
 
-//   if (userId == null || password == null || grade == null) {
-//     throw new Error("Cannot empty userId, password, and grade.");
-//   }
+  await userModel.update(userId, { password: hashedPassword });
 
-//   const affectedRows = await User.update(
-//     {
-//       password: password,
-//       grade: grade,
-//     },
-//     {
-//       where: {
-//         user_id: userId,
-//       },
-//     },
-//   );
+  return { success: true };
+}
 
-//   if (affectedRows > 0) {
-//     success = true;
-//   }
+async function deleteUser(user_id) {
+  if (user_id == null) {
+    throw new Error("Cannot empty user_id.");
+  }
 
-//   return { success: success, affected_rows: affectedRows };
-// }
+  await userModel.delete(user_id);
 
-// async function deleteUser(user_id) {
-//   let success = false;
-//   if (user_id == null) {
-//     throw new Error("Cannot empty user_id.");
-//   }
+  return { success: true };
+}
 
-//   const affectedRows = await User.destroy({
-//     where: {
-//       user_id: user_id,
-//     },
-//   });
-
-//   if (affectedRows > 0) {
-//     success = true;
-//   }
-
-//   return { success: success, affected_rows: affectedRows };
-// }
-
-// module.exports = {
-//   createUser,
-//   getUserByID,
-//   getUserByName,
-//   updateUser,
-//   deleteUser,
-// };
+module.exports = {
+  createUser,
+  getUserByID,
+  getUserByName,
+  updateUser,
+  deleteUser,
+};

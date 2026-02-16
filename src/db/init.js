@@ -1,11 +1,13 @@
-const fs = require("fs");
 const path = require("path");
+const { createAdmin } = require("../model/adminModel");
+const fs = require("fs").promises;
+const fsSync = require("fs");
 
 async function createFile(filePath, fileName) {
   const target = path.join(filePath, fileName);
 
   try {
-    fs.writeFileSync(target, JSON.stringify([], null, 2), "utf8");
+    await fs.writeFile(target, JSON.stringify([], null, 2), "utf8");
   } catch (error) {
     console.error(`Error creating ${fileName}:`, error);
     throw error;
@@ -14,21 +16,33 @@ async function createFile(filePath, fileName) {
 
 async function initializeDatabase() {
   const repositoryPath = path.join(__dirname, "../../repository");
-  if (fs.existsSync(repositoryPath) != true) {
-    fs.mkdirSync(repositoryPath);
+
+  if (!fsSync.existsSync(repositoryPath)) {
+    fsSync.mkdirSync(repositoryPath);
   }
 
-  if (
-    fs.existsSync(path.join(repositoryPath, "admin.json")) != true ||
-    fs.existsSync(path.join(repositoryPath, "book.json")) != true ||
-    fs.existsSync(path.join(repositoryPath, "loan.json")) != true ||
-    fs.existsSync(path.join(repositoryPath, "user.json")) != true
-  ) {
-    await createFile(repositoryPath, "admin.json");
-    await createFile(repositoryPath, "book.json");
-    await createFile(repositoryPath, "loan.json");
-    await createFile(repositoryPath, "user.json");
-    console.log("Store initializing successed");
+  const adminPath = path.join(repositoryPath, "admin.json");
+  const bookPath = path.join(repositoryPath, "book.json");
+  const loanPath = path.join(repositoryPath, "loan.json");
+  const userPath = path.join(repositoryPath, "user.json");
+
+  const needsInit =
+    !fsSync.existsSync(adminPath) ||
+    !fsSync.existsSync(bookPath) ||
+    !fsSync.existsSync(loanPath) ||
+    !fsSync.existsSync(userPath);
+
+  if (needsInit) {
+    await Promise.all([
+      createFile(repositoryPath, "admin.json"),
+      createFile(repositoryPath, "book.json"),
+      createFile(repositoryPath, "loan.json"),
+      createFile(repositoryPath, "user.json"),
+    ]);
+
+    await createAdmin("0123456789", "password");
+
+    console.log("Store initializing succeeded");
   }
 }
 

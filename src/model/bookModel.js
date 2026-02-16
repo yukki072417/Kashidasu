@@ -1,138 +1,88 @@
-// const { Book } = require("../db/init");
+const BookModel = require("../db/models/book");
 
-// async function createBook(isbn, title, author, publisher) {
-//   let success = false;
+const bookModel = new BookModel();
 
-//   if (isbn == null || title == null || author == null) {
-//     throw new Error("Cannot empty isbn, title, and author.");
-//   }
+async function createBook(isbn, title, author) {
+  if (isbn == null || title == null || author == null) {
+    throw new Error("Cannot empty isbn, title, and author.");
+  }
 
-//   const newBook = await Book.create({
-//     isbn: isbn,
-//     title: title,
-//     author: author,
-//     publisher: publisher,
-//   });
+  await bookModel.create(title, author, isbn);
 
-//   if (newBook && newBook.isbn) {
-//     success = true;
-//   }
+  return { success: true };
+}
 
-//   return { success: success };
-// }
+async function getBookByIsbn(isbn) {
+  if (isbn == null) {
+    throw new Error("Cannot empty isbn.");
+  }
 
-// async function getBookByIsbn(isbn) {
-//   let success = false;
+  const book = await bookModel.findOne(isbn);
 
-//   if (isbn == null) {
-//     throw new Error("Cannot empty isbn.");
-//   }
+  if (book && book.isbn) {
+    return { success: true, book: book };
+  }
 
-//   const book = await Book.findOne({
-//     where: {
-//       isbn: isbn,
-//     },
-//   });
+  return { success: false, book: null };
+}
 
-//   if (book && book.isbn) {
-//     success = true;
-//   }
+async function getBookByName(title) {
+  if (title == null) {
+    throw new Error("Cannot empty title.");
+  }
 
-//   return { success: success, book: book };
-// }
+  const books = await bookModel.findAll();
+  const book = books.find((b) => b.title === title);
 
-// async function getBookByName(title) {
-//   let success = false;
+  if (book && book.isbn) {
+    return { success: true, book: book };
+  }
 
-//   if (title == null) {
-//     throw new Error("Cannot empty title.");
-//   }
+  return { success: false, book: null };
+}
 
-//   const book = await Book.findOne({
-//     where: {
-//       title: title,
-//     },
-//   });
+async function getBookByAuthor(author) {
+  if (author == null) {
+    throw new Error("Cannot empty author.");
+  }
 
-//   if (book && book.isbn) {
-//     success = true;
-//   }
+  const books = await bookModel.findAll();
+  // Find all books by the author, not just one.
+  const foundBooks = books.filter((b) => b.author === author);
 
-//   return { success: success, book: book };
-// }
+  if (foundBooks.length > 0) {
+    return { success: true, book: foundBooks };
+  }
 
-// async function getBookByAuthor(author) {
-//   let success = false;
+  return { success: false, book: null };
+}
 
-//   if (author == null) {
-//     throw new Error("Cannot empty author.");
-//   }
+async function updateBook(isbn, title, author) {
+  if (isbn == null || title == null || author == null) {
+    throw new Error("Cannot empty isbn, title, and author.");
+  }
 
-//   const book = await Book.findOne({
-//     where: {
-//       author: author,
-//     },
-//   });
+  const newData = { title, author };
+  await bookModel.update(isbn, newData);
 
-//   if (book && book.isbn) {
-//     success = true;
-//   }
+  return { success: true };
+}
 
-//   return { success: success, book: book };
-// }
+async function deleteBook(isbn) {
+  if (isbn == null) {
+    throw new Error("Cannot empty isbn.");
+  }
 
-// async function updateBook(isbn, title, author, publisher) {
-//   let success = false;
+  await bookModel.delete(isbn);
 
-//   if (isbn == null || title == null || author == null || publisher == null) {
-//     throw new Error("Cannot empty isbn, title, author, and publisher.");
-//   }
+  return { success: true };
+}
 
-//   const affectedRows = await Book.update(
-//     {
-//       title: title,
-//       author: author,
-//       publisher: publisher,
-//     },
-//     {
-//       where: {
-//         isbn: isbn,
-//       },
-//     },
-//   );
-
-//   if (affectedRows > 0) {
-//     success = true;
-//   }
-
-//   return { success: success, affected_rows: affectedRows };
-// }
-
-// async function deleteBook(isbn) {
-//   let success = false;
-
-//   if (isbn == null) {
-//     throw new Error("Cannot empty isbn.");
-//   }
-
-//   const affectedRows = await Book.destroy({
-//     where: {
-//       isbn: isbn,
-//     },
-//   });
-
-//   if (affectedRows > 0) {
-//     success = true;
-//   }
-
-//   return { success: success, affected_rows: affectedRows };
-// }
-
-// module.exports = {
-//   createBook,
-//   getBookByIsbn,
-//   getBookByName,
-//   getBookByAuthor,
-//   updateBook,
-//   deleteBook,
-// };
+module.exports = {
+  createBook,
+  getBookByIsbn,
+  getBookByName,
+  getBookByAuthor,
+  updateBook,
+  deleteBook,
+};
