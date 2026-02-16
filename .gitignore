@@ -2,6 +2,7 @@
 *.csv
 certs
 repository
+.DS_Store
 
 # Logs
 logs
