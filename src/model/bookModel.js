@@ -78,6 +78,16 @@ async function deleteBook(isbn) {
   return { success: true };
 }
 
+async function deleteAllBooks() {
+  await bookModel.deleteAll();
+  return { success: true };
+}
+
+async function getAllBooks() {
+  const books = await bookModel.findAll();
+  return books;
+}
+
 module.exports = {
   createBook,
   getBookByIsbn,
@@ -85,4 +95,6 @@ module.exports = {
   getBookByAuthor,
   updateBook,
   deleteBook,
+  deleteAllBooks,
+  getAllBooks,
 };
