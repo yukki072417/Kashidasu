@@ -31,8 +31,8 @@ $(document).ready(() => {
 
 function LoadBooks(pageNum) {
   $.ajax({
-    url: "/search-book",
-    type: "POST",
+    url: "/api/book/get",
+    type: "GET",
     contentType: "application/json",
     data: JSON.stringify({
       book_num: pageNum,
@@ -40,7 +40,7 @@ function LoadBooks(pageNum) {
     }),
     success: function (data) {
       if (data && data.length > 0) {
-        totalRecords = data[0]["COUNT(ID)"];
+        totalRecords = data[0]["COUNT(isbn)"]; // COUNT(ID) -> COUNT(isbn)
         // SetTable は async なので完了を待ってから UpdatePageInfo を呼ぶ
         SetTable(data.slice(1))
           .then(() => {
@@ -76,12 +76,12 @@ async function SetTable(data) {
   if (!Array.isArray(data)) data = [data];
 
   for (const book of data) {
-    if (!book || !book.book_name) continue;
+    if (!book || !book.title) continue; // book.book_name -> book.title
 
     const today = new Date();
 
     // --- 各本ごとの貸出日・返却期限を個別に扱う ---
-    const lendDateRaw = book.lend_date || null;
+    const lendDateRaw = book.loanDate || null; // book.lend_date -> book.loanDate
     const lendDate = lendDateRaw ? new Date(lendDateRaw) : null;
 
     // ここで期限切れフィルタを適用するため、期限（lendDate + 延長日数）を先に計算する
@@ -90,7 +90,7 @@ async function SetTable(data) {
 
     if (lendDate && !isNaN(lendDate.getTime())) {
       // 学籍番号は本来 book.lending_user_id などを使うべき
-      const studentIdForCheck = book.lending_user_id || "1234567890";
+      const studentIdForCheck = book.userId || "1234567890"; // book.lending_user_id -> book.userId
 
       try {
         const result = await authAdmin(studentIdForCheck);
@@ -143,17 +143,17 @@ async function SetTable(data) {
 
     // --- 行生成 ---
     const $row = $("<tr>");
-    const bookID = book.book_id;
-    const bookName = book.book_name;
-    const writter = book.book_auther || "";
+    const isbn = book.isbn; // bookID -> isbn
+    const bookName = book.title; // book_name -> title
+    const writter = book.author || ""; // book_auther -> author
 
     // ステータス
     const $statusCell = $("<td>").text(
-      book.book_is_lending ? "貸出中" : "空き",
+      book.isBorrowed ? "貸出中" : "空き", // book.book_is_lending -> book.isBorrowed
     );
 
     // 貸出ユーザー
-    const $lendingUserCell = $("<td>").text(book.lending_user_id || "");
+    const $lendingUserCell = $("<td>").text(book.userId || ""); // book.lending_user_id -> book.userId
     console.log(book);
 
     // lendDate 表示フォーマット
@@ -168,13 +168,13 @@ async function SetTable(data) {
     const $editButton = $("<button>")
       .text("編集")
       .on("click", () => {
-        const params = $.param({ ID: bookID });
+        const params = $.param({ isbn: isbn }); // ID: bookID -> isbn: isbn
         window.location.href = `/edit?${params}`;
       });
 
     $row.append($("<td>").text(bookName));
     $row.append($("<td>").text(writter));
-    $row.append($("<td>").text(bookID));
+    $row.append($("<td>").text(isbn)); // bookID -> isbn
     $row.append($statusCell);
     $row.append($lendingUserCell);
     $row.append($("<td>").append($editButton));

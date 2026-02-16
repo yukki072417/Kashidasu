@@ -121,17 +121,13 @@ function ManualInput(isbn) {
 // 本の登録処理
 function RegisterBook(isbn, title, author) {
   const data = {
-    books: [
-      {
-        isbn: isbn,
-        title: title,
-        author: author,
-      },
-    ],
+    isbn: isbn,
+    title: title,
+    author: author,
   };
 
   // 本の登録のリクエストを送信
-  fetch("/register-book", {
+  fetch("/api/book/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
