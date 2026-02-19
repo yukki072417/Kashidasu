@@ -1,43 +1,47 @@
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../sequelize');
+const path = require("path");
+const { writeJsonFile, readJsonFile } = require("../operation");
 
-const User = require('../models/user');
+const repositoryPath = path.join(__dirname, "../../../repository");
 
-class Loan extends Model {}
-
-Loan.init(
-    {
-        loan_id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true
-        },
-        isbn: {
-            type: DataTypes.STRING(13),
-            allowNull: false,
-        },
-        user_id: {
-            type: DataTypes.STRING(10),
-            allowNull: false,
-        },
-        lend_date: {
-            type: DataTypes.DATE,
-            allowNull: false,
-        },
-        return_date: {
-            type: DataTypes.DATE,
-            allowNull: false,
-        }
-    },
-    {
-        sequelize: sequelize,
-        modelName: 'loan',
-        timestamps: false
+class LoanModel {
+  async create(loanId, bookId, userId, loanDate, returnDate = null) {
+    const loans = await readJsonFile(repositoryPath, "loans.json");
+    if (loans.find(loan => loan.loanId === loanId)) {
+      throw new Error("Loan with this ID already exists.");
     }
-);
+    loans.push({ loanId, bookId, userId, loanDate, returnDate });
+    await writeJsonFile(repositoryPath, "loans.json", loans);
+  }
 
+  async findOne(loanId) {
+    const loans = await readJsonFile(repositoryPath, "loans.json");
+    return loans.find((loan) => loan.loanId === loanId);
+  }
 
-// 「一つの貸出は、一人のユーザーに属する」という関係を定義するため、`belongsTo` を使用します。
-Loan.belongsTo(User, { foreignKey: 'user_id' });
+  async findByBookId(bookId) {
+    const loans = await readJsonFile(repositoryPath, "loans.json");
+    return loans.filter((loan) => loan.bookId === bookId);
+  }
 
-module.exports = Loan;
+  async findByUserId(userId) {
+    const loans = await readJsonFile(repositoryPath, "loans.json");
+    return loans.filter((loan) => loan.userId === userId);
+  }
+
+  async findAll() {
+    const loans = await readJsonFile(repositoryPath, "loans.json");
+    return loans;
+  }
+
+  async update(loanId, newData) {
+    const loans = await readJsonFile(repositoryPath, "loans.json");
+    const index = loans.findIndex(loan => loan.loanId === loanId);
+    if (index === -1) {
+      throw new Error("Loan not found.");
+    }
+    loans[index] = { ...loans[index], ...newData };
+    await writeJsonFile(repositoryPath, "loans.json", loans);
+  }
+}
+
+module.exports = LoanModel;

@@ -1,87 +1,100 @@
-const sequelize = require('../db/sequelize');
-const { Book } = require('../db/init');
-const { Op } = require('sequelize');
+const BookModel = require("../db/models/book");
 
-async function createBook(isbn, title, author, publisher) {
-  try {
-    const newBook = await sequelize.transaction(async (t) => {
-      return Book.create({
-        isbn: isbn,
-        title: title,
-        author: author,
-        publisher: publisher
-      }, { transaction: t });
-    });
-    const obj = newBook.toJSON();
-    return obj;
-  } catch (err) {
-    console.log(err);
-    throw err;
+const bookModel = new BookModel();
+
+async function createBook(isbn, title, author) {
+  if (isbn == null || title == null || author == null) {
+    throw new Error("Cannot empty isbn, title, and author.");
   }
+
+  await bookModel.create(title, author, isbn);
+
+  return { success: true };
 }
 
 async function getBookByIsbn(isbn) {
-  const book = await Book.findOne({
-    where: {
-      isbn: isbn
-    }
-  });
-  if (!book) {
-    throw new Error('Book not found.');
+  if (isbn == null) {
+    throw new Error("Cannot empty isbn.");
   }
-  const obj = book.toJSON();
-  return obj;
+
+  const book = await bookModel.findOne(isbn);
+
+  if (book && book.isbn) {
+    return { success: true, book: book };
+  }
+
+  return { success: false, book: null };
 }
 
-async function getBookByName(name) {
-  const [book] = await Book.findAll({
-    where: {
-      name: { 
-        [Op.like]: `%${name}%` 
-      }
-    }
-  });
-  if(!book){
-    throw new Error('Book not found.');
+async function getBookByName(title) {
+  if (title == null) {
+    throw new Error("Cannot empty title.");
   }
-  const obj = book.toJSON();
-  return obj;
+
+  const books = await bookModel.findAll();
+  const book = books.find((b) => b.title === title);
+
+  if (book && book.isbn) {
+    return { success: true, book: book };
+  }
+
+  return { success: false, book: null };
 }
 
-async function updateBook(isbn, changedIsbn, changedName, changedAuthor, changedPublisher) {
-  const [affectedRows] = await sequelize.transaction(async (t) => {
-    return Book.update({
-      isbn: changedIsbn,
-      name: changedName,
-      author: changedAuthor,
-      publisher: changedPublisher
-    }, {
-      where: {
-        isbn: isbn
-      },
-      transaction: t
-    });
-  });
+async function getBookByAuthor(author) {
+  if (author == null) {
+    throw new Error("Cannot empty author.");
+  }
 
-  return affectedRows;
+  const books = await bookModel.findAll();
+  // Find all books by the author, not just one.
+  const foundBooks = books.filter((b) => b.author === author);
+
+  if (foundBooks.length > 0) {
+    return { success: true, book: foundBooks };
+  }
+
+  return { success: false, book: null };
+}
+
+async function updateBook(isbn, title, author) {
+  if (isbn == null || title == null || author == null) {
+    throw new Error("Cannot empty isbn, title, and author.");
+  }
+
+  const newData = { title, author };
+  await bookModel.update(isbn, newData);
+
+  return { success: true };
 }
 
 async function deleteBook(isbn) {
-  const deletedRows = await sequelize.transaction(async (t) => {
-    return Book.destroy({
-      where: {
-        isbn: isbn
-      },
-      transaction: t
-    });
-  });
-  return deletedRows;
+  if (isbn == null) {
+    throw new Error("Cannot empty isbn.");
+  }
+
+  await bookModel.delete(isbn);
+
+  return { success: true };
+}
+
+async function deleteAllBooks() {
+  await bookModel.deleteAll();
+  return { success: true };
+}
+
+async function getAllBooks() {
+  const books = await bookModel.findAll();
+  return books;
 }
 
 module.exports = {
   createBook,
   getBookByIsbn,
   getBookByName,
+  getBookByAuthor,
   updateBook,
-  deleteBook
-}
+  deleteBook,
+  deleteAllBooks,
+  getAllBooks,
+};

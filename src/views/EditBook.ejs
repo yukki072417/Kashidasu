@@ -1,30 +1,43 @@
 <!DOCTYPE html>
-<html lang='ja'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>蔵書情報編集ページ</title>
-    <link rel='stylesheet' href='/styles/EditBook.css'>
-    <link rel='stylesheet' href='/fonts/fonts.css'>
-    <meta name='robots' content='noindex' />
-    
-</head>
-<body>
-    <script src='/js/jquery-3.7.1.min.js'></script>
-    <script src='/js/EditBook.js'></script>
-    
+    <link rel="stylesheet" href="/styles/EditBook.css" />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/EditBook.js"></script>
+
     <%- include('Header') %>
-    <button class='animation-btn' onclick='location.href = "/book-list" '>←戻る</button>
-    <div id='main'>
-        <form id='edit-form'>
-            <label>本のID　</label> <input type='text' id='book-id' name='book-id' ><br>
-            <label>本の名前</label> <input type='text' id='book-name' name='book-name' ><br>
-            <label>本の著者</label> <input type='text' id='writter' name='writter' ><br>
-           <input type='button' value='変更' id='edit-button' class='edit-submit'>
-           <input type='button' value='削除' id='delete-button' class='edit-submit'>
-        </form>
+    <button class="animation-btn" onclick="location.href = '/book-list'">
+      ←戻る
+    </button>
+    <div id="main">
+      <form id="edit-form">
+        <label>本のID　</label>
+        <input type="text" id="book-id" name="book-id" /><br />
+        <label>本の名前</label>
+        <input type="text" id="book-name" name="book-name" /><br />
+        <label>本の著者</label>
+        <input type="text" id="writter" name="writter" /><br />
+        <input
+          type="button"
+          value="変更"
+          id="edit-button"
+          class="edit-submit"
+        />
+        <input
+          type="button"
+          value="削除"
+          id="delete-button"
+          class="edit-submit"
+        />
+      </form>
     </div>
     <%- include('Footer') %>
-
-</body>
+  </body>
 </html>

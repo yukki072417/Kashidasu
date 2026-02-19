@@ -1,39 +1,41 @@
 <!DOCTYPE html>
-<html lang='ja'>
-
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>読み取りページ</title>
 
-    <script src='/js/jquery-3.7.1.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js'></script>
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
     <script src="/js/ReadCode.css"></script>
-    
-    <link rel='stylesheet' href='/styles/ReadCode.css'>
-    <link rel='stylesheet' href='/fonts/fonts.css'>
-    <meta name='robots' content='noindex' />
-</head>
 
-<body>
+    <link rel="stylesheet" href="/styles/ReadCode.css" />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <meta name="robots" content="noindex" />
+  </head>
+
+  <body>
     <%- include('Header') %>
 
-        <section id='read-qr'>
-            <div class='buttons'>
-                <button class='animation-btn' onclick='location.href = "/main" '>←戻る</button>
-                <button class='animation-btn' onclick='location.reload()'>最初から</button>
-                <!-- <img src='/images/LendButtonImage.png' id='SetReadMode' class='lend' onclick='SetReadMode()'> -->
-                <button id="toggle-mode-btn" class="animation-btn">貸出モード</button>
-            </div>
+    <section id="read-qr">
+      <div class="buttons">
+        <button class="animation-btn" onclick="location.href = '/main'">
+          ←戻る
+        </button>
+        <button class="animation-btn" onclick="location.reload()">
+          最初から
+        </button>
+        <!-- <img src='/images/LendButtonImage.png' id='SetReadMode' class='lend' onclick='SetReadMode()'> -->
+        <button id="toggle-mode-btn" class="animation-btn">貸出モード</button>
+      </div>
 
-            <div id='read-view'>
-                <div id='interactive'></div>
-                <canvas class='drawRect'></canvas>
-            </div>
-
-        </section>
-        <input type="text" id="hidden-barcode-input" maxlength="13" >
+      <div id="read-view">
+        <div id="interactive"></div>
+        <canvas class="drawRect"></canvas>
+      </div>
+    </section>
+    <input type="text" id="hidden-barcode-input" maxlength="13" />
     <%- include('Footer') %>
-    <script src='/js/ReadCode.js'></script>
-</body>
+    <script src="/js/ReadCode.js"></script>
+  </body>
 </html>

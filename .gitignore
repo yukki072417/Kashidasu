@@ -1,7 +1,8 @@
 # Kashidasu
 *.csv
 certs
-repository/
+repository
+.DS_Store
 
 # Logs
 logs

@@ -1,48 +1,46 @@
 <!DOCTYPE html>
-<html lang='ja'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>蔵書一覧ページ</title>
-    <link rel='stylesheet' href='/styles/BookList.css'>
-    <link rel='stylesheet' href='/fonts/fonts.css'>
-    <meta name='robots' content='noindex' />
-</head>
-<body>
-    <script src='/js/jquery-3.7.1.min.js'></script>
-    <script src='/js/BookList.js'></script>
-    
-    <%- include('Header') %>
-    <div id='main'>
-        <button class='animation-btn' onclick='location.href = "/main" '>←戻る</button>
+    <link rel="stylesheet" href="/styles/BookList.css" />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
+    <script src="/js/jquery-3.7.1.min.js"></script>
+    <script src="/js/BookList.js"></script>
 
-        <!-- 一旦放置。後は後輩に託す -->
-        <!-- <div class='search'>
+    <%- include('Header') %>
+    <div id="main">
+      <button class="animation-btn" onclick="location.href = '/main'">
+        ←戻る
+      </button>
+
+      <!-- 一旦放置。後は後輩に託す -->
+      <!-- <div class='search'>
             <label>検索欄</label> <input placeholder='本の名前' id='searchBook' type='text'> <input value='検索' type='submit' onclick=''>
         </div> -->
-        
-        <div class='search'>
-            <button id ="toggle-overdue">期限切れの本だけを表示</button>
-            <p>1/30</p>
-            <button class='change-view-button' id='back'>前へ</button>
-            <button class='change-view-button' id='next'>次へ</button>
-        </div>
-        <table id='table' border='1'>
 
-            <tr>
-              <th id='book-title'>本の名前</th>
-              <th id="book-auther">本の著者</th>
-              <th id="book-isbn">本のISBN</th>
-              <th id="book-state">状態</th>
-              <th id="book-lend-person">借りている人</th>
-              <th id="book-menu">メニュー</th>
-              <th id="book-deadline">返却日</th>
-
-            </tr>
-        </table>
-
+      <div class="search">
+        <button id="toggle-overdue">期限切れの本だけを表示</button>
+        <p>1/30</p>
+        <button class="change-view-button" id="back">前へ</button>
+        <button class="change-view-button" id="next">次へ</button>
+      </div>
+      <table id="table" border="1">
+        <tr>
+          <th id="book-title">本の名前</th>
+          <th id="book-auther">本の著者</th>
+          <th id="book-isbn">本のISBN</th>
+          <th id="book-state">状態</th>
+          <th id="book-lend-person">借りている人</th>
+          <th id="book-menu">メニュー</th>
+          <th id="book-deadline">返却日</th>
+        </tr>
+      </table>
     </div>
     <%- include('Footer') %>
-
-</body>
+  </body>
 </html>

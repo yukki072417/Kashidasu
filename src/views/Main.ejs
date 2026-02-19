@@ -1,31 +1,44 @@
 <!DOCTYPE html>
-<html lang='ja'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>メインページ</title>
-    <link rel='stylesheet' href='/styles/Main.css'>
-    <link rel='stylesheet' href='/fonts/fonts.css'>
-    <meta name='robots' content='noindex' />
-
-</head>
-<body>
-
+    <link rel="stylesheet" href="/styles/Main.css" />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
     <%- include('Header') %>
 
-    <div id='top'>
-        <h2 id='top-title'> <%- resData.lastName + ' ' + resData.firstName %> の管理画面</h2>
+    <div id="top">
+      <h2 id="top-title"><%= adminId %> の管理画面</h2>
     </div>
-        
-    <div class='container'>
-        <div id="read-code" class='site-item' onclick="location.href = '/read-code'"></div>
-        <div id="generate-card" class='site-item' onclick="location.href = '/generate-card'"></div>
-        <div id="register-book" class='site-item' onclick="location.href = '/register'"></div>
-        <div id="book-list" class='site-item' onclick="location.href = '/book-list'"></div>
-        <!-- <div id="settings" class='site-item' onclick="location.href = '/settings'"><h2>管理者設定</h2></div> -->
+
+    <div class="container">
+      <div
+        id="read-code"
+        class="site-item"
+        onclick="location.href = '/read-code'"
+      ></div>
+      <div
+        id="generate-card"
+        class="site-item"
+        onclick="location.href = '/generate-card'"
+      ></div>
+      <div
+        id="register-book"
+        class="site-item"
+        onclick="location.href = '/register'"
+      ></div>
+      <div
+        id="book-list"
+        class="site-item"
+        onclick="location.href = '/book-list'"
+      ></div>
+      <!-- <div id="settings" class='site-item' onclick="location.href = '/settings'"><h2>管理者設定</h2></div> -->
     </div>
 
     <%- include('Footer') %>
-    </html>
-
-</body>
+  </body>
+</html>

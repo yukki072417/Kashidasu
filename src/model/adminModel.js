@@ -1,58 +1,43 @@
-const sequelize = require('../db/sequelize');
-const Admin = require('../db/models/admin');
-const crypto = require('../services/crypto');
+const AdminModel = require("../db/models/admin");
+const crypto = require("../services/crypto");
+
+const adminModel = new AdminModel();
 
 async function createAdmin(adminId, password) {
-  if (!adminId || !password) {
-    throw new Error('Cannot empty adminId and password.');
+  if (adminId == null || password == null) {
+    throw new Error("Cannot empty adminId and password.");
   }
 
   const hashedPassword = crypto.hash(password);
 
-  const newAdmin = await sequelize.transaction(async (t) => {
-    return Admin.create({
-      admin_id: adminId,
-      password: hashedPassword
-    }, { transaction: t });
-  });
+  await adminModel.create(adminId, hashedPassword);
 
-  return newAdmin;
+  return { success: true };
 }
 
-async function getAdmin(adminId) {
-  if (!adminId) {
-    throw new Error('Cannot empty adminId.');
-  }
-  const admin = await Admin.findOne({
-    where: {
-      admin_id: adminId
-    }
-  });
-
-  if (!admin) {
-    throw new Error('Admin not found.');
+async function getAdminById(adminId) {
+  if (adminId == null) {
+    throw new Error("Cannot empty userId.");
   }
 
-  const result = {
-    admin_id: admin.admin_id,
+  const admin = await adminModel.findOne(adminId);
+
+  if (admin && admin.adminId) {
+    return { success: true, admin: admin };
   }
 
-  return result;
+  return { success: false, admin: null };
 }
 
 async function authenticateAdmin(adminId, password) {
   if (!adminId || !password) {
-    throw new Error('Cannot empty adminId and password.');
+    throw new Error("Cannot empty adminId and password.");
   }
 
-  const admin = await Admin.findOne({
-    where: {
-      admin_id: adminId
-    }
-  });
+  const admin = await adminModel.findOne(adminId);
 
   if (!admin) {
-    crypto.isValid('', '');
+    crypto.isValid("dummy_password_for_timing_attack_prevention", "dummy_hash");
     return false;
   }
 
@@ -60,42 +45,30 @@ async function authenticateAdmin(adminId, password) {
 }
 
 async function updateAdmin(adminId, changedAdminId, changedPassword) {
-  if (!adminId || !changedAdminId || !changedPassword) {
-    throw new Error('Cannot empty adminId and password.');
+  if (adminId == null || changedAdminId == null || changedPassword == null) {
+    throw new Error(
+      "Cannot empty adminId, changedAdminId, and changedPassword.",
+    );
   }
-
   const hashedPassword = crypto.hash(changedPassword);
 
-  const [affectedRows] = await sequelize.transaction(async (t) => {
-    return Admin.update({
-      admin_id: changedAdminId,
-      password: hashedPassword
-    }, {
-      where: {
-        admin_id: adminId
-      },
-      transaction: t
-    });
+  await adminModel.update(adminId, {
+    adminId: changedAdminId,
+    password: hashedPassword,
   });
 
-  return affectedRows;
+  return { success: true };
 }
 
 async function deleteAdmin(adminId) {
-  if (!adminId) {
-    throw new Error('Cannot empty adminId.');
-  }
-  return Admin.destroy({
-    where: {
-      admin_id: adminId
-    }
-  });
+  await adminModel.delete(adminId);
+  return { success: true };
 }
 
 module.exports = {
   createAdmin,
-  getAdmin,
+  getAdminById,
   authenticateAdmin,
   updateAdmin,
-  deleteAdmin
-}
+  deleteAdmin,
+};
