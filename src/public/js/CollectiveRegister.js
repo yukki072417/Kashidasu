@@ -61,8 +61,8 @@ function convertToArray(csvFile) {
 
 // サーバーに本データを登録する関数
 function RegisterBook(csvArray) {
-  const Register_URL = "/register-book";
-  const AllDeleteDB_URL = "/delete-book";
+  const Register_URL = "/api/book/register";
+  const AllDeleteDB_URL = "/api/book/delete";
 
   // ISBNコードが空でない本だけを送信データにする
   const datas = JSON.stringify({
@@ -71,7 +71,7 @@ function RegisterBook(csvArray) {
 
   // まず全ての本を削除してから新しい本を登録
   fetch(AllDeleteDB_URL, {
-    method: "POST",
+    method: "DELETE", // POSTからDELETEに変更
     headers: {
       "Content-Type": "application/json",
     },

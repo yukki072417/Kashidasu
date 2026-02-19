@@ -27,7 +27,7 @@ function SendContent() {
   });
 
   // fetchでPOSTリクエストを送信
-  fetch("/generating", {
+  fetch("/api/generating", {
     method: "POST",
     headers: {
       "Content-Type": "application/json;charset=UTF-8",

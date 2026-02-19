@@ -6,7 +6,7 @@ window.onload = () => {
 
   // 本の情報をサーバーから取得してフォームに反映
   $.ajax({
-    url: "/search-book",
+    url: "/api/book/search", // /search-book -> /api/book/search に変更
     type: "POST",
     data: {
       isbn: isbn, // book_id -> isbn に変更
@@ -51,8 +51,8 @@ window.onload = () => {
 // 本の情報を編集する関数
 function EditBook(beforeIsbn, isbn, title, author) { // beforeBookID -> beforeIsbn, bookID -> isbn, bookName -> title, bookWritter -> author に変更
   $.ajax({
-    url: "/upload-book",
-    type: "POST",
+    url: "/api/book/update", // /upload-book -> /api/book/update に変更
+    type: "PUT", // POST -> PUT に変更
     data: {
       before_isbn: beforeIsbn, // before_book_id -> before_isbn に変更
       isbn: isbn, // book_id -> isbn に変更
@@ -74,8 +74,8 @@ function DeleteBook(isbn) { // bookID -> isbn に変更
   if (!confirm("本当に削除しますか？")) return;
 
   $.ajax({
-    url: "/delete-book",
-    type: "POST",
+    url: "/api/book/delete", // /delete-book -> /api/book/delete に変更
+    type: "DELETE", // POST -> DELETE に変更
     contentType: "application/json",
     data: JSON.stringify({
       isbn: isbn, // book_id -> isbn に変更

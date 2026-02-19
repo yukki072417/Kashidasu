@@ -187,7 +187,7 @@ async function SetTable(data) {
 // リクエストを送信して、返却されるレスポンスを確認する
 async function authAdmin(student_id) {
   const response = await fetch(
-    `https://localhost/admin-auth?student_id=${encodeURIComponent(student_id)}`,
+    `/api/admin/auth-check?student_id=${encodeURIComponent(student_id)}`,
     {
       method: "GET",
       headers: {

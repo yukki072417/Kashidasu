@@ -15,6 +15,7 @@ const userRoutes = require("./router/userRoutes");
 const bookRoutes = require("./router/bookRoutes");
 const adminRoutes = require("./router/adminRoutes");
 const pageRoutes = require("./router/pageRoutes");
+const apiRoutes = require("./router/apiRoutes"); // 新しいapiRoutesをインポート
 
 const initDb = require("./db/init");
 const PORT = 443;
@@ -41,6 +42,7 @@ app.set("view engine", "ejs");
 app.use("/api/user", userRoutes);
 app.use("/api/book", bookRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api", apiRoutes); // apiRoutesをマウント
 app.use("/", pageRoutes);
 
 // logsディレクトリが存在しない場合は作成

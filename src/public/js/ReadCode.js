@@ -108,7 +108,7 @@ function processingBook(userBarcode, isbnBarcode) {
     isbn: isbnBarcode, // book_id -> isbn
   };
 
-  fetch(`/${currentMode}`, {
+  fetch(`/api/book/${currentMode}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

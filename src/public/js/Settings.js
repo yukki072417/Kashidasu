@@ -3,7 +3,7 @@ async function ApplySettings() {
     user_id: $("#user-id").val(),
     user_password: $("#user-password").val(),
   };
-  const response = await fetch("/settings-apply", {
+  const response = await fetch("/api/user/settings", {
     headers: {
       "Content-Type": "application/json",
     },

@@ -9,7 +9,6 @@ router.get("/edit", (req, res) => {
 router.get("/register", auth.adminAuth, (req, res) => {
   res.render("Register");
 });
-router.post("/main", auth.Login);
 router.get("/main", auth.adminAuth, auth.renderMainPage);
 router.get("/read-code", (req, res) => {
   res.render("ReadCode");

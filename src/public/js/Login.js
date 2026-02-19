@@ -28,7 +28,7 @@ $(document).ready(function () {
 
     if (id !== "" && password !== "") {
       $.ajax({
-        url: "/main",
+        url: "/api/admin/login",
         type: "POST",
         data: {
           admin_id: id,
