@@ -81,8 +81,17 @@ function Detected(resultCode) {
 
 // Google Books APIから本の情報を取得
 function FetchBookInfo(isbn) {
-  fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`)
-    .then((response) => response.json())
+  const apiKey = process.env.BOOKS_API_KEY;
+
+  fetch(
+    `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${apiKey}`,
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("API Error");
+      }
+      return response.json();
+    })
     .then((data) => {
       if (data.items && data.items.length > 0) {
         const book = data.items[0].volumeInfo;
@@ -100,7 +109,6 @@ function FetchBookInfo(isbn) {
           }
         }
       }
-      // APIで情報が取得できない場合は手動入力
       ManualInput(isbn);
     })
     .catch(() => ManualInput(isbn));
