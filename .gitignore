@@ -3,6 +3,7 @@
 certs
 repository
 .DS_Store
+.srl
 
 # Logs
 logs
