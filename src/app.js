@@ -9,7 +9,6 @@ const https = require("https");
 const app = express();
 
 const logDir = path.join(__dirname, "../logs");
-const mysqlDatasDir = path.join(__dirname, "../mysql_datas");
 
 const userRoutes = require("./router/userRoutes");
 const bookRoutes = require("./router/bookRoutes");
@@ -49,12 +48,6 @@ app.use("/", pageRoutes);
 if (!fs.existsSync(logDir)) {
   console.log("logsディレクトリを生成");
   fs.mkdirSync(logDir);
-}
-
-// MySQLデータが存在しない場合は生成
-if (!fs.existsSync(mysqlDatasDir)) {
-  console.log("mysqlディレクトリを生成");
-  fs.mkdirSync(mysqlDatasDir);
 }
 
 // log4jsの設定ファイルを読み込む
