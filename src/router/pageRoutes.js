@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../services/auth");
+const apiKey = process.env.BOOKS_API_KEY;
 
 router.get("/", (req, res) => res.render("Login"));
 router.get("/login", (req, res) => res.render("Login"));
@@ -21,7 +22,7 @@ router.get("/book-list", (req, res) => {
   res.render("BookList");
 });
 router.get("/scanning-registration", auth.adminAuth, (req, res) => {
-  res.render("Registers/ScanningRegister");
+  res.render("Registers/ScanningRegister", { apiKey: apiKey });
 });
 router.get("/collective-registration", auth.adminAuth, (req, res) => {
   res.render("Registers/CollectiveRegister");

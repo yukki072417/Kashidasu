@@ -11,11 +11,13 @@
     <link rel="stylesheet" href="/styles/ReadCode.css" />
     <link rel="stylesheet" href="/fonts/fonts.css" />
     <meta name="robots" content="noindex" />
+    <script>
+      const BOOKS_API_KEY = "<%- apiKey %>";
+    </script>
   </head>
 
   <body>
     <%- include('../Header') %>
-
     <section id="read-qr">
       <div class="buttons">
         <button class="animation-btn" onclick="location.href = '/register'">

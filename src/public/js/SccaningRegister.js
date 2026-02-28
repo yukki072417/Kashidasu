@@ -1,5 +1,4 @@
 alert("本の裏にあるISBNコード(上部)をスキャンしてください");
-
 // バーコードリーダ初期化
 function InitQuagga() {
   Quagga.init(
@@ -81,10 +80,8 @@ function Detected(resultCode) {
 
 // Google Books APIから本の情報を取得
 function FetchBookInfo(isbn) {
-  const apiKey = process.env.BOOKS_API_KEY;
-
   fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${apiKey}`,
+    `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${BOOKS_API_KEY}`,
   )
     .then((response) => {
       if (!response.ok) {
