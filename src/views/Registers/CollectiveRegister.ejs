@@ -1,29 +1,101 @@
 <!DOCTYPE html>
-<html lang='ja'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>一括登録ページ</title>
-    <link rel='stylesheet' href='/styles/Register.css'>
-    <link rel='stylesheet' href='/fonts/fonts.css'>
-    <meta name='robots' content='noindex' />
-    
-</head>
-<body>
-    <script src='/js/jquery-3.7.1.min.js'></script>
+    <link rel="stylesheet" href="/styles/Register.css" />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <meta name="robots" content="noindex" />
+  </head>
+  <body>
+    <script src="/js/jquery-3.7.1.min.js"></script>
     <script src="/js/CollectiveRegister.js"></script>
     <%- include('../Header') %>
-    <button class='animation-btn' onclick='location.href = "/register" '>←戻る</button>
-        <h2>CSVファイル読み込み登録方式</h2>
-        <form method='post'>
-            <div id='input-form'>
-                <!-- ここに一括登録用のcsvファイルを読み込みボタンを置く -->
-                 <input type="file" id="csv-input" accept="text/csv">
-                 <input type="button" onclick="SelectFile()" id="file-selecter" value="ファイルを選択">
-            </div>
-            <input type="button" id="submit-btn" onclick="RegisterBooksByFile()" value="上書き登録">
+    <button class="animation-btn" onclick="location.href = '/register'">
+      ←戻る
+    </button>
+
+    <div class="tab-container">
+      <h2>一括登録</h2>
+
+      <div class="tab-buttons">
+        <button class="tab-button active" onclick="switchTab('csv')">
+          CSVファイル登録
+        </button>
+        <button class="tab-button" onclick="switchTab('text')">
+          テキスト入力登録
+        </button>
+      </div>
+
+      <!-- CSVファイル登録タブ -->
+      <div id="csv-tab" class="tab-content active">
+        <h3>CSVファイル読み込み登録方式</h3>
+        <div class="input-format">
+          <h4>CSVファイル形式：</h4>
+          <p>1行目：ヘッダー（ISBN,タイトル,著者）</p>
+          <p>2行目以降：<code>ISBNコード,本のタイトル,著者名</code></p>
+          <p>例：<code>9784167159005,吾輩は猫である,夏目漱石</code></p>
+        </div>
+        <form method="post">
+          <div id="input-form">
+            <input type="file" id="csv-input" accept="text/csv" />
+            <input
+              type="button"
+              onclick="SelectFile()"
+              id="file-selecter"
+              value="ファイルを選択"
+            />
+          </div>
+          <input
+            type="button"
+            id="submit-btn"
+            onclick="RegisterBooksByFile()"
+            value="上書き登録"
+          />
         </form>
         <h3 id="selected-file-name"></h3>
+      </div>
+
+      <!-- テキスト入力登録タブ -->
+      <div id="text-tab" class="tab-content">
+        <h3>テキスト入力登録方式</h3>
+        <div class="input-format">
+          <h4>入力形式：</h4>
+          <p>1行に1冊の情報を入力してください</p>
+          <p>形式：<code>ISBNコード,本のタイトル,著者名</code></p>
+          <p>例：<code>9784167159005,吾輩は猫である,夏目漱石</code></p>
+        </div>
+        <textarea
+          id="text-input"
+          class="text-input-area"
+          placeholder="ISBNコード,本のタイトル,著者名&#10;9784167159005,吾輩は猫である,夏目漱石&#10;9784101010014,坊っちゃん,夏目漱石"
+        ></textarea>
+        <input
+          type="button"
+          id="text-submit-btn"
+          onclick="RegisterBooksByText()"
+          value="上書き登録"
+        />
+      </div>
+    </div>
+
     <%- include('../Footer') %>
-</body>
+
+    <script>
+      function switchTab(tabName) {
+        // タブボタンのアクティブ状態を切り替え
+        document.querySelectorAll(".tab-button").forEach((btn) => {
+          btn.classList.remove("active");
+        });
+        event.target.classList.add("active");
+
+        // タブコンテンツの表示を切り替え
+        document.querySelectorAll(".tab-content").forEach((content) => {
+          content.classList.remove("active");
+        });
+        document.getElementById(tabName + "-tab").classList.add("active");
+      }
+    </script>
+  </body>
 </html>

@@ -1,7 +1,9 @@
 # Kashidasu
 *.csv
 certs
-mysql_datas
+repository
+.DS_Store
+.srl
 
 # Logs
 logs

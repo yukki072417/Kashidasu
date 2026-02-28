@@ -1,56 +1,54 @@
 /* Bellow code were writted for genalateCard.ejs　*/
 
-.top{
-    text-align: left;
-    margin-left: 55px;
+.top {
+  text-align: left;
+  margin-left: 55px;
 }
-#genelate-card-form{
-    margin: auto;
-    width: 250px;
-    height: 350px;
+#genelate-card-form {
+  margin: auto;
+  width: 250px;
+  height: 350px;
 
-    display: flex;
-    flex-flow: column;
+  display: flex;
+  flex-flow: column;
 
-    text-align: left;
-
+  text-align: left;
 }
-.form-txtbox{
-    width: 250px;
-    height: 25px;
-    margin-top: 15px;
+.form-txtbox {
+  width: 250px;
+  height: 25px;
+  margin-top: 15px;
 }
-.form-label{
-    font-size: 16px;
+.form-label {
+  font-size: 16px;
 }
-#form-submit{
-    
-    padding-top:    20px;
-    padding-bottom: 20px;
-    padding-left:  30px;
-    padding-right: 30px;
-    
-    background-color: gainsboro;
+#form-submit {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 30px;
+  padding-right: 30px;
 
-    margin: auto;
-    margin-top: 25px;
+  background-color: gainsboro;
 
-    border-radius: 10px;
-    border-style: none;
+  margin: auto;
+  margin-top: 25px;
 
-    font-size: 18px;
+  border-radius: 10px;
+  border-style: none;
+
+  font-size: 18px;
 }
 
-#image{
-    margin-top: 15px;
+#image {
+  margin-top: 15px;
 }
 
-#card{
-    display: block;
-    margin: auto;
+#card {
+  display: block;
+  margin: auto;
 
-    margin-top: 25px;
+  margin-top: 25px;
 
-    border-style: solid;
-    border-width: 0.5px;
+  border-style: solid;
+  border-width: 0.5px;
 }
