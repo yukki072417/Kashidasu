@@ -10,11 +10,20 @@
 
 Githubからリポジトリをクローン
 
-    git clone https://github.com/yukki072417/Kashidasu.git
+`git clone https://github.com/yukki072417/Kashidasu.git`
 
 Kashidasuのディレクトリに移動
 
-    cd Kashidasu
+`cd Kashidasu`
+
+サーバー証明書の発行
+`sh ./ca/init.sh`
+
+### 環境変数の設定
+
+```.env
+BOOKS_API_KEY=<Google Books APIのAPIキー(設定は任意)>
+```
 
 ### サーバーの立ち上げ方
 
