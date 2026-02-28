@@ -27,5 +27,6 @@ router.get("/collective-registration", auth.adminAuth, (req, res) => {
   res.render("Registers/CollectiveRegister");
 });
 router.get("/settings", (req, res) => res.render("Settings"));
+router.get("/logout", auth.logout);
 
 module.exports = router;

@@ -20,7 +20,7 @@ function renderMainPage(req, res) {
   res.render("Main", { adminId: req.session.admin }); // Main.ejs に adminId を渡す
 }
 
-async function Login(req, res) {
+async function login(req, res) {
   const { admin_id, admin_password } = req.body;
 
   try {
@@ -40,8 +40,14 @@ async function Login(req, res) {
   }
 }
 
+async function logout(req, res) {
+  req.session = null;
+  res.redirect("/login");
+}
+
 module.exports = {
   adminAuth,
   renderMainPage,
-  Login, // Login 関数をエクスポートに追加
+  login,
+  logout,
 };
