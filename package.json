@@ -1,6 +1,6 @@
 {
   "name": "kashidasu",
-  "version": "1.2-beta",
+  "version": "1.3.0",
   "description": "",
   "directories": {
     "doc": "docs"
@@ -10,7 +10,7 @@
     "start": "nodemon src/app.js",
     "test": "jest --detectOpenHandles"
   },
-  "author": "ゆっきー",
+  "author": "yukki072417",
   "license": "MIT",
   "dependencies": {
     "@pdf-lib/fontkit": "^1.1.1",
