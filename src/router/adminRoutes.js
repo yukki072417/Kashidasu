@@ -7,7 +7,7 @@ router.post("/signin", adminController.createAdmin);
 router.get("/get", adminController.getAdmin);
 router.put("/update", adminController.updateAdmin);
 router.delete("/delete", adminController.deleteAdmin);
-router.post("/login", auth.login); // ログインルートを追加
-router.post("/logout", auth.logout);
+router.post("/login", auth.login);
+router.get("/logout", auth.logout);
 
 module.exports = router;
