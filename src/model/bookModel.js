@@ -57,12 +57,15 @@ async function getBookByAuthor(author) {
   return { success: false, book: null };
 }
 
-async function updateBook(isbn, title, author) {
+async function updateBook(isbn, title, author, isBorrowed = null) {
   if (isbn == null || title == null || author == null) {
     throw new Error("Cannot empty isbn, title, and author.");
   }
 
   const newData = { title, author };
+  if (isBorrowed !== null) {
+    newData.isBorrowed = isBorrowed;
+  }
   await bookModel.update(isbn, newData);
 
   return { success: true };

@@ -64,9 +64,114 @@ async function deleteBook(req, res, next) {
   }
 }
 
+// 貸出機能（ReadCode.jsから呼び出される）
+async function lend(req, res, next) {
+  const { user_id, isbn } = req.body;
+  try {
+    // 書籍が存在し、利用可能か確認
+    const { success, book } = await bookModel.getBookByIsbn(isbn);
+    if (!success) {
+      return res.json({ message: "BOOK_NOT_EXIST" });
+    }
+
+    if (book.isBorrowed) {
+      return res.json({ message: "BOOK_ALRADY_LENDING" });
+    }
+
+    // 書籍を貸出中に更新
+    await bookModel.updateBook(isbn, book.title, book.author, true);
+
+    // 貸出記録を作成（LoanModelを使用）
+    const LoanModel = require("../db/models/loan");
+    const loanModel = new LoanModel();
+    const loanId = `loan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const loanDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD形式
+
+    await loanModel.create(loanId, isbn, user_id, loanDate);
+
+    res.json({ message: "SUCCESS" });
+  } catch (error) {
+    console.error("Error lending book:", error);
+    res.status(500).json({ result: "FAILED", message: error.message });
+  }
+}
+
+// 返却機能（ReadCode.jsから呼び出される）
+async function returnBook(req, res, next) {
+  const { user_id, isbn } = req.body;
+  try {
+    // 書籍が存在し、貸出中か確認
+    const { success, book } = await bookModel.getBookByIsbn(isbn);
+    if (!success) {
+      return res.json({ message: "BOOK_NOT_EXIST" });
+    }
+
+    if (!book.isBorrowed) {
+      return res.json({ message: "BOOK_NOT_LENDING" });
+    }
+
+    // 書籍を利用可能に更新
+    await bookModel.updateBook(isbn, book.title, book.author, false);
+
+    // 貸出記録を更新（返却日を設定）
+    const LoanModel = require("../db/models/loan");
+    const loanModel = new LoanModel();
+    const userLoans = await loanModel.findByUserId(user_id);
+    const activeLoan = userLoans.find(
+      (loan) => loan.bookId === isbn && !loan.returnDate,
+    );
+
+    if (activeLoan) {
+      const returnDate = new Date().toISOString().split("T")[0];
+      await loanModel.update(activeLoan.loanId, { returnDate });
+    }
+
+    res.json({ message: "SUCCESS" });
+  } catch (error) {
+    console.error("Error returning book:", error);
+    res.status(500).json({ result: "FAILED", message: error.message });
+  }
+}
+
+// 検索機能
+async function search(req, res, next) {
+  const { query, searchType } = req.body; // searchType: 'title', 'author', 'isbn'
+  try {
+    let result;
+
+    switch (searchType) {
+      case "isbn":
+        result = await bookModel.getBookByIsbn(query);
+        break;
+      case "title":
+        result = await bookModel.getBookByName(query);
+        break;
+      case "author":
+        result = await bookModel.getBookByAuthor(query);
+        break;
+      default:
+        return res
+          .status(400)
+          .json({ result: "FAILED", message: "Invalid search type." });
+    }
+
+    if (result.success) {
+      res.json({ result: "SUCCESS", data: result.book });
+    } else {
+      res.json({ result: "SUCCESS", data: [] }); // 検索結果がない場合は空配列
+    }
+  } catch (error) {
+    console.error("Error searching book:", error);
+    res.status(500).json({ result: "FAILED", message: error.message });
+  }
+}
+
 module.exports = {
   createBook,
   getBook,
   updateBook,
   deleteBook,
+  lend,
+  returnBook,
+  search,
 };
