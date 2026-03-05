@@ -79,36 +79,33 @@ function Detected(resultCode) {
 }
 
 // Google Books APIから本の情報を取得
-function FetchBookInfo(isbn) {
-  fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${BOOKS_API_KEY}`,
-  )
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("API Error");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      if (data.items && data.items.length > 0) {
-        const book = data.items[0].volumeInfo;
-        const title = book.title || "";
-        const author = book.authors ? book.authors.join(", ") : "";
+async function FetchBookInfo(isbn) {
+  const URL = BOOKS_API_KEY
+    ? `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${apiKey}`
+    : `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`;
 
-        if (title && author) {
-          if (
-            confirm(
-              `タイトル: ${title}\n著者: ${author}\n\nこの情報で登録しますか？`,
-            )
-          ) {
-            RegisterBook(isbn, title, author);
-            return;
-          }
-        }
+  const response = await fetch(URL);
+  if (!response.ok) {
+    throw new Error("API Error");
+  }
+  const data = await response.json();
+  if (data.items && data.items.length > 0) {
+    const book = data.items[0].volumeInfo;
+    const title = book.title || "";
+    const author = book.authors ? book.authors.join(", ") : "";
+
+    if (title && author) {
+      if (
+        confirm(
+          `タイトル: ${title}\n著者: ${author}\n\nこの情報で登録しますか？`,
+        )
+      ) {
+        RegisterBook(isbn, title, author);
+        return;
       }
-      ManualInput(isbn);
-    })
-    .catch(() => ManualInput(isbn));
+    }
+  }
+  ManualInput(isbn);
 }
 
 // 手動入力処理
