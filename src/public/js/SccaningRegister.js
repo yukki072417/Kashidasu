@@ -81,7 +81,7 @@ function Detected(resultCode) {
 // Google Books APIから本の情報を取得
 async function FetchBookInfo(isbn) {
   const URL = BOOKS_API_KEY
-    ? `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${apiKey}`
+    ? `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}&key=${BOOKS_API_KEY}`
     : `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`;
 
   const response = await fetch(URL);
