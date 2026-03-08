@@ -28,6 +28,15 @@ class LoanModel {
     return loans.filter((loan) => loan.userId === userId);
   }
 
+  async isBookCurrentlyLoaned(isbn) {
+    const loans = await readJsonFile(repositoryPath, "loan.json");
+    // 返却日がnull（未返却）のレコードが存在するかチェック
+    const activeLoans = loans.filter(
+      (loan) => loan.bookId === isbn && !loan.returnDate,
+    );
+    return activeLoans.length > 0;
+  }
+
   async findAll() {
     const loans = await readJsonFile(repositoryPath, "loan.json");
     return loans;

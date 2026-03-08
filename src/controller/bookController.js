@@ -1,4 +1,5 @@
 const bookModel = require("../model/bookModel");
+const loanModel = require("../model/loanModel");
 
 async function createBook(req, res, next) {
   const { isbn, title, author } = req.body;
@@ -67,69 +68,84 @@ async function deleteBook(req, res, next) {
 // 貸出機能（ReadCode.jsから呼び出される）
 async function lend(req, res, next) {
   const { user_id, isbn } = req.body;
+  console.log("Lend request:", { user_id, isbn });
+
   try {
-    // 書籍が存在し、利用可能か確認
+    // 書籍が存在するか確認
     const { success, book } = await bookModel.getBookByIsbn(isbn);
+    console.log("Book lookup result:", { success, book });
+
     if (!success) {
-      return res.json({ message: "BOOK_NOT_EXIST" });
+      return res.json({ success: false, message: "BOOK_NOT_EXIST" });
     }
 
-    if (book.isBorrowed) {
-      return res.json({ message: "BOOK_ALRADY_LENDING" });
+    // loanデータベースで貸出状態を確認
+    const isCurrentlyLoaned = await loanModel.isBookCurrentlyLoaned(isbn);
+    console.log("Book loan status from loan DB:", isCurrentlyLoaned);
+
+    if (isCurrentlyLoaned) {
+      return res.json({ success: false, message: "BOOK_ALREADY_LENDING" });
     }
 
     // 書籍を貸出中に更新
+    console.log("Updating book status...");
     await bookModel.updateBook(isbn, book.title, book.author, true);
 
-    // 貸出記録を作成（LoanModelを使用）
-    const LoanModel = require("../db/models/loan");
-    const loanModel = new LoanModel();
+    // 貸出記録を作成
     const loanId = `loan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const loanDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD形式
+    console.log("Creating loan record:", { loanId, isbn, user_id, loanDate });
 
-    await loanModel.create(loanId, isbn, user_id, loanDate);
+    await loanModel.createLoan(isbn, user_id, loanDate);
 
-    res.json({ message: "SUCCESS" });
+    res.json({ success: true, message: "本が正常に貸出されました" });
   } catch (error) {
     console.error("Error lending book:", error);
-    res.status(500).json({ result: "FAILED", message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 
 // 返却機能（ReadCode.jsから呼び出される）
 async function returnBook(req, res, next) {
   const { user_id, isbn } = req.body;
+  console.log("Return request:", { user_id, isbn });
+
   try {
-    // 書籍が存在し、貸出中か確認
+    // 書籍が存在するか確認
     const { success, book } = await bookModel.getBookByIsbn(isbn);
+    console.log("Book lookup result:", { success, book });
+
     if (!success) {
-      return res.json({ message: "BOOK_NOT_EXIST" });
+      return res.json({ success: false, message: "BOOK_NOT_EXIST" });
     }
 
-    if (!book.isBorrowed) {
-      return res.json({ message: "BOOK_NOT_LENDING" });
+    // loanデータベースで貸出状態を確認
+    const isCurrentlyLoaned = await loanModel.isBookCurrentlyLoaned(isbn);
+    console.log("Book loan status from loan DB:", isCurrentlyLoaned);
+
+    if (!isCurrentlyLoaned) {
+      return res.json({ success: false, message: "BOOK_NOT_LENDING" });
     }
 
     // 書籍を利用可能に更新
+    console.log("Updating book status to available...");
     await bookModel.updateBook(isbn, book.title, book.author, false);
 
     // 貸出記録を更新（返却日を設定）
-    const LoanModel = require("../db/models/loan");
-    const loanModel = new LoanModel();
-    const userLoans = await loanModel.findByUserId(user_id);
-    const activeLoan = userLoans.find(
-      (loan) => loan.bookId === isbn && !loan.returnDate,
-    );
+    console.log("Finding active loan...");
+    const activeLoan = await loanModel.findActiveLoan(isbn, user_id);
+    console.log("Active loan found:", activeLoan);
 
     if (activeLoan) {
       const returnDate = new Date().toISOString().split("T")[0];
-      await loanModel.update(activeLoan.loanId, { returnDate });
+      console.log("Updating loan with return date:", returnDate);
+      await loanModel.updateLoan(activeLoan.loanId, { returnDate });
     }
 
-    res.json({ message: "SUCCESS" });
+    res.json({ success: true, message: "本が正常に返却されました" });
   } catch (error) {
     console.error("Error returning book:", error);
-    res.status(500).json({ result: "FAILED", message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 

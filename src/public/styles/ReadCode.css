@@ -1,4 +1,4 @@
-/* ReadCodeページ用スタイル - 元の構成を改善 */
+/* ReadCodeページ用スタイル */
 * {
   box-sizing: border-box;
 }
@@ -11,25 +11,48 @@ body {
   min-height: 100vh;
 }
 
+/* ========================================
+   メインレイアウト
+======================================== */
 #read-code {
   display: flex;
-  height: 100vh;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
   padding: 20px;
-  gap: 30px;
 }
 
-/* 左側ボタンエリア */
+.left-column {
+  width: 350px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* カメラビュー: aspect-ratio で比率を維持したまま伸縮 */
+#read-view {
+  flex: 1;
+  min-width: 0; /* flex アイテムの縮小を許可 */
+  aspect-ratio: 4 / 3; /* 比率固定（4:3） */
+  max-height: 520px; /* 大画面での上限 */
+  position: relative;
+  align-self: flex-start;
+}
+
+/* ========================================
+   ボタンエリア
+======================================== */
 .buttons {
   display: flex;
   flex-direction: column;
   text-align: center;
-  gap: 15px;
-  min-width: 200px;
+  gap: 10px;
   padding: 20px;
   background: white;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  height: fit-content;
 }
 
 .animation-btn {
@@ -37,20 +60,16 @@ body {
   color: rgb(95, 95, 95);
   border-radius: 8px;
   border: 2px solid #ddd;
-  padding: 15px 20px;
+  padding: 12px 20px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
-  position: relative;
-  z-index: 1;
 }
 
 .animation-btn:hover {
-  background: white;
   transform: translateY(-2px);
-  border: solid 2px #ddd;
   box-shadow: 0 4px 8px rgba(140, 147, 155, 0.2);
 }
 
@@ -58,20 +77,15 @@ body {
   transform: translateY(0);
 }
 
-#toggle-mode-btn {
-  background: white;
-  color: rgb(95, 95, 95);
-}
-
-/* 中央ステータスパネル */
+/* ========================================
+   ステータスパネル
+======================================== */
 .status-panel {
   background: white;
   border-radius: 10px;
   padding: 25px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
-  min-width: 350px;
-  height: fit-content;
 }
 
 .status-title {
@@ -89,6 +103,7 @@ body {
   height: 20px;
   border-radius: 50%;
   display: inline-block;
+  flex-shrink: 0;
   margin-right: 10px;
   background: #e9ecef;
 }
@@ -118,7 +133,7 @@ body {
 }
 
 .status-message {
-  font-size: 16px;
+  font-size: 15px;
   color: #666;
   margin-bottom: 20px;
   line-height: 1.5;
@@ -130,7 +145,7 @@ body {
   background: #e9ecef;
   border-radius: 4px;
   overflow: hidden;
-  margin: 20px 0;
+  margin: 15px 0;
 }
 
 .progress-fill {
@@ -145,8 +160,8 @@ body {
   background: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 8px;
-  padding: 15px;
-  margin: 15px 0;
+  padding: 12px;
+  margin: 10px 0;
   font-family: "Courier New", monospace;
   font-size: 14px;
   color: #495057;
@@ -156,8 +171,8 @@ body {
 .error-message,
 .success-message {
   border-radius: 8px;
-  padding: 15px;
-  margin: 15px 0;
+  padding: 12px;
+  margin: 10px 0;
   font-size: 14px;
   font-weight: 500;
   display: none;
@@ -191,44 +206,37 @@ body {
   }
 }
 
-/* 右側カメラビューエリア */
-#read-view {
-  flex: 1;
-  position: relative;
+/* ========================================
+   手入力エリア
+======================================== */
+.manual-input {
   background: white;
   border-radius: 10px;
+  padding: 15px 20px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  min-height: 500px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
 }
 
-#interactive {
+.manual-input label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+#manual-barcode-input {
   width: 100%;
-  height: 100%;
-  position: relative;
+  padding: 8px 12px;
+  font-size: 15px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  transition: border-color 0.2s;
 }
 
-#interactive video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.drawRect {
-  position: absolute;
-  width: 400px;
-  height: 200px;
-  border: 3px solid #28a745;
-  border-radius: 8px;
-  background: rgba(40, 167, 69, 0.1);
-  pointer-events: none;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 10px rgba(40, 167, 69, 0.2);
+#manual-barcode-input:focus {
+  outline: none;
+  border-color: #007bff;
 }
 
 /* 隠し入力フィールド */
@@ -237,218 +245,124 @@ body {
   opacity: 0;
   pointer-events: none;
   z-index: -1;
+  width: 1px;
+  height: 1px;
 }
 
-/* レスポンシブデザイン */
-/* 大画面デスクトップ (1400px以上) */
-@media (min-width: 1400px) {
-  .buttons {
-    min-width: 250px;
-  }
-
-  .status-panel {
-    min-width: 400px;
-  }
-
-  .drawRect {
-    width: 450px;
-    height: 225px;
-  }
+/* ========================================
+   カメラ表示
+======================================== */
+#interactive {
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 
-/* デスクトップ (1200px - 1399px) */
-@media (max-width: 1399px) {
-  #read-code {
-    gap: 20px;
-  }
-
-  .buttons {
-    min-width: 180px;
-    padding: 15px;
-  }
-
-  .status-panel {
-    min-width: 320px;
-    padding: 20px;
-  }
-
-  .drawRect {
-    width: 380px;
-    height: 190px;
-  }
+#interactive video,
+#interactive canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
-/* 小さいデスクトップ/大きいタブレット (1024px - 1199px) */
-@media (max-width: 1199px) {
+.drawRect {
+  position: absolute;
+  width: 70%; /* 親要素に対する割合で指定 */
+  height: 40%;
+  border: 3px solid #28a745;
+  border-radius: 8px;
+  background: rgba(40, 167, 69, 0.1);
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 10px rgba(40, 167, 69, 0.15);
+}
+
+.drawingBuffer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ========================================
+   レスポンシブ: 縦積みレイアウト (≤1024px)
+======================================== */
+@media (max-width: 1024px) {
   #read-code {
     flex-direction: column;
     align-items: center;
-    height: auto;
-    gap: 20px;
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .left-column {
+    width: 100%;
+    max-width: 560px;
   }
 
   .buttons {
     flex-direction: row;
-    width: 100%;
-    max-width: 600px;
-    justify-content: center;
-    min-width: auto;
-    padding: 15px;
-  }
-
-  .animation-btn {
-    max-width: 180px;
-  }
-
-  .status-panel {
-    width: 100%;
-    max-width: 500px;
-    min-width: auto;
-  }
-
-  #read-view {
-    width: 100%;
-    max-width: 600px;
-    height: 400px;
-  }
-
-  .drawRect {
-    width: 320px;
-    height: 160px;
-  }
-}
-
-/* タブレット (768px - 1023px) */
-@media (max-width: 1023px) {
-  #read-code {
-    padding: 15px;
-  }
-
-  .buttons {
     flex-wrap: wrap;
+    justify-content: center;
     gap: 10px;
   }
 
   .animation-btn {
-    flex: 1;
-    min-width: 140px;
+    flex: 1 1 140px;
     max-width: 200px;
   }
 
-  .status-panel {
-    padding: 20px;
-  }
-
-  .status-title {
-    font-size: 16px;
-  }
-
-  .status-message {
-    font-size: 14px;
-  }
-
+  /* カメラビューは幅100%に合わせて aspect-ratio が自動で高さを決める */
   #read-view {
-    height: 350px;
-  }
-
-  .drawRect {
-    width: 280px;
-    height: 140px;
+    width: 100%;
+    max-width: 560px;
+    max-height: none; /* 縦積み時は高さ制限を解除 */
+    align-self: center;
   }
 }
 
-/* 大きいスマートフォン (600px - 767px) */
-@media (max-width: 767px) {
+/* ========================================
+   スマートフォン (≤600px)
+======================================== */
+@media (max-width: 600px) {
   #read-code {
     padding: 10px;
-    gap: 15px;
+    gap: 10px;
+  }
+
+  .left-column {
+    max-width: 100%;
   }
 
   .buttons {
     flex-direction: column;
-    gap: 8px;
-    padding: 10px;
+    padding: 12px;
   }
 
   .animation-btn {
-    width: 100%;
-    max-width: 300px;
-    padding: 12px 16px;
+    max-width: 100%;
     font-size: 13px;
+    padding: 10px 16px;
   }
 
   .status-panel {
     padding: 15px;
-    min-width: auto;
   }
 
   .status-title {
     font-size: 15px;
-    margin-bottom: 10px;
   }
 
   .status-message {
     font-size: 13px;
-    margin-bottom: 15px;
-  }
-
-  .progress-bar {
-    height: 6px;
-    margin: 15px 0;
   }
 
   .barcode-info {
     font-size: 12px;
-    padding: 10px;
-  }
-
-  #read-view {
-    height: 280px;
-  }
-
-  .drawRect {
-    width: 240px;
-    height: 120px;
-    border-width: 2px;
-  }
-}
-
-/* スマートフォン (480px - 599px) */
-@media (max-width: 599px) {
-  #read-code {
-    padding: 8px;
-    gap: 10px;
-  }
-
-  .buttons {
-    padding: 8px;
-  }
-
-  .animation-btn {
-    padding: 10px 14px;
-    font-size: 12px;
-  }
-
-  .status-panel {
-    padding: 12px;
-  }
-
-  .status-title {
-    font-size: 14px;
-  }
-
-  .status-message {
-    font-size: 12px;
-  }
-
-  .progress-bar {
-    height: 5px;
-    margin: 10px 0;
-  }
-
-  .barcode-info {
-    font-size: 11px;
-    padding: 8px;
   }
 
   .error-message,
@@ -458,183 +372,34 @@ body {
   }
 
   #read-view {
-    height: 220px;
+    max-width: 100%;
   }
 
   .drawRect {
-    width: 200px;
-    height: 100px;
     border-width: 2px;
   }
 }
 
-/* 小さいスマートフォン (320px - 479px) */
-@media (max-width: 479px) {
-  #read-code {
-    padding: 5px;
-    gap: 8px;
-  }
-
-  .buttons {
-    padding: 5px;
-  }
-
-  .animation-btn {
-    padding: 8px 12px;
-    font-size: 11px;
-  }
-
-  .status-panel {
-    padding: 10px;
-  }
-
-  .status-title {
-    font-size: 13px;
-  }
-
-  .status-message {
-    font-size: 11px;
-  }
-
-  .progress-bar {
-    height: 4px;
-    margin: 8px 0;
-  }
-
-  .barcode-info {
-    font-size: 10px;
-    padding: 6px;
-  }
-
-  .error-message,
-  .success-message {
-    font-size: 11px;
-    padding: 8px;
-  }
-
-  #read-view {
-    height: 180px;
-  }
-
-  .drawRect {
-    width: 160px;
-    height: 80px;
-    border-width: 1px;
-  }
-}
-
-/* 超小さいデバイス (320px未満) */
-@media (max-width: 319px) {
-  .animation-btn {
-    font-size: 10px;
-    padding: 6px 10px;
-  }
-
-  .status-panel {
-    padding: 8px;
-  }
-
-  .status-title {
-    font-size: 12px;
-  }
-
-  .status-message {
-    font-size: 10px;
-  }
-
-  #read-view {
-    height: 150px;
-  }
-
-  .drawRect {
-    width: 140px;
-    height: 70px;
-  }
-}
-
-/* ランドスケープモード対応 */
+/* ========================================
+   ランドスケープ (高さ ≤500px)
+======================================== */
 @media (max-height: 500px) and (orientation: landscape) {
   #read-code {
     flex-direction: row;
-    height: 100vh;
+    align-items: flex-start;
+    height: 100svh;
+    overflow: hidden;
   }
 
-  .buttons {
-    flex-direction: column;
-    min-width: 150px;
-  }
-
-  .status-panel {
-    min-width: 280px;
+  .left-column {
+    width: 300px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    height: 100%;
   }
 
   #read-view {
-    height: auto;
-    min-height: 300px;
+    flex: 1;
+    max-height: 100%;
   }
-
-  .drawRect {
-    width: 300px;
-    height: 150px;
-  }
-}
-
-/* タブレットランドスケープ */
-@media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
-  #read-code {
-    flex-direction: row;
-  }
-
-  .buttons {
-    flex-direction: column;
-    min-width: 180px;
-  }
-
-  .status-panel {
-    min-width: 350px;
-  }
-
-  .drawRect {
-    width: 350px;
-    height: 175px;
-  }
-}
-
-/* 既存のスタイルを維持 */
-.site-image {
-  width: 150px;
-  height: 150px;
-  padding: 5px;
-  margin-top: 50px;
-  transition: background-color 500ms;
-}
-
-.site-image:hover,
-.site-image:active {
-  background-color: rgb(200, 200, 200);
-}
-
-.drawingBuffer {
-  margin: auto;
-}
-
-#SetReadMode {
-  width: 100px;
-  height: 100px;
-  margin: 15px;
-}
-
-.mode-button {
-  width: 150px;
-  height: 75px;
-  margin-left: 10px;
-  margin-right: 10px;
-  border-radius: 20px;
-  border-style: none;
-  font-size: 22px;
-  color: white;
-}
-
-#under {
-  margin-top: 550px;
 }

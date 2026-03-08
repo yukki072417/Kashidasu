@@ -131,23 +131,63 @@ function initializeQuagga(readerType) {
  * 手入力バーコード処理の初期化
  */
 function initializeManualBarcodeReader() {
-  const $input = $("#hidden-barcode-input");
+  const $hiddenInput = $("#hidden-barcode-input");
+  const $manualInput = $("#manual-barcode-input");
 
-  $(document).on("keydown", () => {
-    $input.focus();
+  // USBバーコードリーダー → hidden input にフォーカス
+  // ただし手入力テキストボックスがアクティブな場合はフォーカスを奪わない
+  $(document).on("keydown", (e) => {
+    if (document.activeElement === $manualInput[0]) {
+      // 手入力中はそのまま
+      return;
+    }
+    // Enter / Tab / 特殊キー以外のみ hidden input にフォーカス移動
+    if (e.key.length === 1 || e.key === "Enter") {
+      $hiddenInput.focus();
+    }
   });
 
-  $input.on("input", () => {
-    const cleanedValue = cleanInputValue($input.val());
-    $input.val(cleanedValue);
+  // USBバーコードリーダー（隠し入力）
+  $hiddenInput.on("input", () => {
+    const cleanedValue = cleanInputValue($hiddenInput.val());
+    $hiddenInput.val(cleanedValue);
 
     if (!isUserBarcodeRead && cleanedValue.length === 10) {
       handleBarcodeDetected(cleanedValue);
-      $input.val("");
+      $hiddenInput.val("");
     } else if (isUserBarcodeRead && cleanedValue.length === 13) {
       handleBarcodeDetected(cleanedValue);
-      $input.val("");
+      $hiddenInput.val("");
     }
+  });
+
+  // 手入力テキストボックス
+  // input イベントで長さチェック、確定はEnterキーも対応
+  $manualInput.on("input", () => {
+    const cleanedValue = cleanInputValue($manualInput.val());
+    $manualInput.val(cleanedValue);
+
+    if (!isUserBarcodeRead && cleanedValue.length === 10) {
+      handleBarcodeDetected(cleanedValue);
+      $manualInput.val("");
+    } else if (isUserBarcodeRead && cleanedValue.length === 13) {
+      handleBarcodeDetected(cleanedValue);
+      $manualInput.val("");
+    }
+  });
+
+  // Enterキーで手動確定（桁数に関わらず送信できる補助機能）
+  $manualInput.on("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const cleanedValue = cleanInputValue($manualInput.val());
+      if (cleanedValue.length > 0) {
+        handleBarcodeDetected(cleanedValue);
+        $manualInput.val("");
+      }
+    }
+    // Enterキーのバブルを止めて hidden input にフォーカスが移らないようにする
+    e.stopPropagation();
   });
 }
 
@@ -236,16 +276,20 @@ function processingBook(userBarcode, isbnBarcode) {
         case "BOOK_NOT_EXIST":
           showError("エラー: 本が存在しません");
           break;
-        case "BOOK_ALRADY_LENDING":
+        case "BOOK_ALREADY_LENDING":
           showError("エラー: この本はすでに借りられています");
           break;
         case "BOOK_NOT_LENDING":
           showError("エラー: この本は貸出されていません");
           break;
         default:
-          showSuccess(
-            `本が正常に${currentMode === "lend" ? "貸出" : "返却"}されました。`,
-          );
+          if (json.success) {
+            showSuccess(
+              `本が正常に${currentMode === "lend" ? "貸出" : "返却"}されました。`,
+            );
+          } else {
+            showError(`エラー: ${json.message}`);
+          }
       }
 
       // 2秒後にリロード
