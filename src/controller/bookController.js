@@ -23,7 +23,6 @@ async function getBook(req, res, next) {
         res.status(404).json({ result: "FAILED", message: "Book not found." });
       }
     } else {
-      // ページング処理を考慮した findAll の呼び出し (簡易実装)
       const allBooks = await bookModel.getAllBooks(); // getAllBooks は後で定義する
       const count = allBooks.length;
       // 実際には book_num を使ってスライスする
@@ -33,6 +32,209 @@ async function getBook(req, res, next) {
   } catch (error) {
     console.error("Error getting book:", error);
     res.status(500).json({ result: "FAILED", message: error.message });
+  }
+}
+
+async function getAllBooks(req, res, next) {
+  try {
+    const allBooks = await bookModel.getAllBooks();
+    const count = allBooks.length;
+
+    // ページングパラメータ
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 30;
+    const offset = (page - 1) * limit;
+
+    // ページング処理
+    const paginatedBooks = allBooks.slice(offset, offset + limit);
+
+    // レスポンス形式
+    res.json([{ "COUNT(isbn)": count }, ...paginatedBooks]);
+  } catch (error) {
+    console.error("Error getting all books:", error);
+    res.status(500).json({ result: "FAILED", message: error.message });
+  }
+}
+
+async function getBooksWithLoanInfo(req, res, next) {
+  try {
+    const allBooks = await bookModel.getAllBooks();
+    const allLoans = await loanModel.getUserLoans(); // すべての貸出情報を取得
+
+    // 各書籍に貸出情報を付加
+    const booksWithLoanInfo = allBooks.map((book) => {
+      const activeLoan = allLoans.find(
+        (loan) => loan.bookId === book.isbn && !loan.returnDate,
+      );
+
+      return {
+        ...book,
+        isBorrowed: activeLoan ? true : false,
+        userId: activeLoan ? activeLoan.userId : null,
+        loanDate: activeLoan ? activeLoan.loanDate : null,
+        returnDate: activeLoan ? activeLoan.returnDate : null,
+      };
+    });
+
+    const count = booksWithLoanInfo.length;
+
+    // ページング処理
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 30;
+    const offset = (page - 1) * limit;
+    const paginatedBooks = booksWithLoanInfo.slice(offset, offset + limit);
+
+    res.json([{ "COUNT(isbn)": count }, ...paginatedBooks]);
+  } catch (error) {
+    console.error("Error getting books with loan info:", error);
+    res.status(500).json({ result: "FAILED", message: error.message });
+  }
+}
+
+async function getOverdueBooks(req, res, next) {
+  try {
+    const overdueBooks = await loanModel.getOverdueBooks();
+
+    // 期限切れ本の書籍情報を取得
+    const booksWithOverdueInfo = await Promise.all(
+      overdueBooks.map(async (loan) => {
+        const book = await bookModel.getBookByIsbn(loan.bookId);
+        const loanDate = new Date(loan.loanDate);
+        const dueDate = new Date(loan.loanDate);
+        dueDate.setDate(dueDate.getDate() + 14);
+        const daysOverdue = Math.floor(
+          (new Date() - dueDate) / (1000 * 60 * 60 * 24),
+        );
+
+        return {
+          ...book,
+          loanId: loan.loanId,
+          userId: loan.userId,
+          loanDate: loan.loanDate,
+          returnDate: loan.returnDate,
+          daysOverdue: daysOverdue,
+        };
+      }),
+    );
+
+    const count = booksWithOverdueInfo.length;
+
+    // ページング処理
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 30;
+    const offset = (page - 1) * limit;
+    const paginatedBooks = booksWithOverdueInfo.slice(offset, offset + limit);
+
+    res.json([{ "COUNT(isbn)": count }, ...paginatedBooks]);
+  } catch (error) {
+    console.error("Error getting overdue books:", error);
+    res.status(500).json({ result: "FAILED", message: error.message });
+  }
+}
+
+async function getLoanByIsbn(req, res, next) {
+  try {
+    const { isbn } = req.params;
+
+    if (!isbn) {
+      return res.status(400).json({
+        success: false,
+        message: "isbn is required",
+      });
+    }
+
+    const activeLoans = await loanModel.getActiveLoans(isbn);
+
+    if (activeLoans.length === 0) {
+      return res.json({
+        success: true,
+        data: null,
+        message: "No active loans found for this ISBN",
+      });
+    }
+
+    // 書籍情報を取得して貸出情報を付加
+    const loanWithBookInfo = await Promise.all(
+      activeLoans.map(async (loan) => {
+        const book = await bookModel.getBookByIsbn(loan.bookId);
+        const loanDate = new Date(loan.loanDate);
+        const daysBorrowed = loan.loanDate
+          ? Math.floor(
+              (new Date() - new Date(loan.loanDate)) / (1000 * 60 * 60 * 24),
+            )
+          : 0;
+
+        return {
+          loanId: loan.loanId,
+          bookId: loan.bookId,
+          userId: loan.userId,
+          loanDate: loan.loanDate,
+          returnDate: loan.returnDate,
+          daysBorrowed: daysBorrowed,
+          bookInfo: book.success ? book.book : null,
+        };
+      }),
+    );
+
+    res.json({
+      success: true,
+      data: loanWithBookInfo,
+    });
+  } catch (error) {
+    console.error("Error getting loan by ISBN:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
+
+async function getAllLoans(req, res, next) {
+  try {
+    const limit = parseInt(req.query.limit) || 100;
+    const allLoans = await loanModel.getUserLoans();
+
+    // アクティブな貸出のみをフィルタ
+    const activeLoans = allLoans.filter((loan) => !loan.returnDate);
+
+    // 書籍情報を取得して貸出情報を付加
+    const loansWithBookInfo = await Promise.all(
+      activeLoans.map(async (loan) => {
+        const book = await bookModel.getBookByIsbn(loan.bookId);
+        const loanDate = new Date(loan.loanDate);
+        const daysBorrowed = loan.loanDate
+          ? Math.floor(
+              (new Date() - new Date(loan.loanDate)) / (1000 * 60 * 60 * 24),
+            )
+          : 0;
+
+        return {
+          loanId: loan.loanId,
+          bookId: loan.bookId,
+          userId: loan.userId,
+          loanDate: loan.loanDate,
+          returnDate: loan.returnDate,
+          daysBorrowed: daysBorrowed,
+          bookInfo: book.success ? book.book : null,
+        };
+      }),
+    );
+
+    // 指定された件数に制限
+    const limitedLoans = loansWithBookInfo.slice(0, limit);
+
+    res.json({
+      success: true,
+      data: limitedLoans,
+      count: limitedLoans.length,
+      totalActive: activeLoans.length,
+    });
+  } catch (error) {
+    console.error("Error getting all loans:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 }
 
@@ -65,7 +267,6 @@ async function deleteBook(req, res, next) {
   }
 }
 
-// 貸出機能（ReadCode.jsから呼び出される）
 async function lend(req, res, next) {
   const { user_id, isbn } = req.body;
   console.log("Lend request:", { user_id, isbn });
@@ -185,6 +386,10 @@ async function search(req, res, next) {
 module.exports = {
   createBook,
   getBook,
+  getAllBooks,
+  getOverdueBooks,
+  getLoanByIsbn,
+  getAllLoans,
   updateBook,
   deleteBook,
   lend,

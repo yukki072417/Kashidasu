@@ -1,4 +1,3 @@
-/* ReadCodeページ用スタイル */
 * {
   box-sizing: border-box;
 }
@@ -31,14 +30,10 @@ body {
   gap: 15px;
 }
 
-/* カメラビュー: aspect-ratio で比率を維持したまま伸縮 */
 #read-view {
-  flex: 1;
-  min-width: 0; /* flex アイテムの縮小を許可 */
   aspect-ratio: 4 / 3; /* 比率固定（4:3） */
-  max-height: 520px; /* 大画面での上限 */
+  max-height: 640px; /* 大画面での上限 */
   position: relative;
-  align-self: flex-start;
 }
 
 /* ========================================

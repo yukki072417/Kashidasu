@@ -146,23 +146,62 @@ async function getUserLoans(userId) {
 
 /**
  * 指定ISBNの本が現在貸出中かどうかを確認する。
- *
- * 修正: 元のコードは findByUserId() を引数なしで呼び出していた（全件取得と思われる）。
- * 意図を尊重しつつ findAll が存在する場合はそちらを使うように修正。
  */
 async function isBookCurrentlyLoaned(isbn) {
-  const allLoans = await (loanModelInstance.findAll
-    ? loanModelInstance.findAll()
-    : loanModelInstance.findByUserId()); // fallback
-  return allLoans.some((loan) => loan.bookId === isbn && !loan.returnDate);
+  const loans = await loanModelInstance.findByUserId();
+  const activeLoans = loans.filter(
+    (loan) => loan.bookId === isbn && !loan.returnDate,
+  );
+  return activeLoans.length > 0;
+}
+
+async function getActiveLoans(isbn) {
+  const loans = await loanModelInstance.findByUserId();
+  return loans.filter((loan) => loan.bookId === isbn && !loan.returnDate);
+}
+
+async function getOverdueBooks() {
+  const loans = await loanModelInstance.findByUserId();
+  const today = new Date();
+
+  return loans.filter((loan) => {
+    if (!loan.returnDate && loan.loanDate) {
+      const loanDate = new Date(loan.loanDate);
+      const dueDate = new Date(loan.loanDate);
+      dueDate.setDate(dueDate.getDate() + 14); // 14日後が期限
+
+      return dueDate < today; // 期限切れの場合
+    }
+    return false;
+  });
+}
+
+async function getLoanHistory(userId) {
+  const loans = await loanModelInstance.findByUserId(userId);
+  return loans.map((loan) => ({
+    loanId: loan.loanId,
+    bookId: loan.bookId,
+    userId: loan.userId,
+    loanDate: loan.loanDate,
+    returnDate: loan.returnDate,
+    isOverdue: loan.returnDate
+      ? false
+      : (() => {
+          if (!loan.loanDate) return false;
+          const dueDate = new Date(loan.loanDate);
+          dueDate.setDate(dueDate.getDate() + 14);
+          return dueDate < new Date();
+        })(),
+  }));
 }
 
 module.exports = {
-  lendBook,
-  returnBook,
   createLoan,
   findActiveLoan,
   updateLoan,
   getUserLoans,
   isBookCurrentlyLoaned,
+  getActiveLoans,
+  getOverdueBooks,
+  getLoanHistory,
 };

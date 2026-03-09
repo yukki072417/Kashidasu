@@ -18,20 +18,58 @@
 
   <body>
     <%- include('../Header') %>
+
     <section id="read-code">
-      <div class="buttons">
-        <button class="animation-btn" onclick="location.href = '/register'">
-          ←戻る
-        </button>
+      <!-- 左カラム -->
+      <div class="left-column">
+        <div class="buttons">
+          <button class="animation-btn" onclick="location.href = '/register'">
+            ←戻る
+          </button>
+          <button class="animation-btn" onclick="location.reload()">
+            最初から
+          </button>
+        </div>
+
+        <div class="status-panel">
+          <div class="status-title">
+            <span class="status-indicator" id="status-indicator"></span>
+            <span id="status-text">準備中...</span>
+          </div>
+          <div class="status-message" id="status-message">
+            バーコードリーダーを準備中...
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div id="barcode-info-container"></div>
+          <div class="error-message" id="error-message"></div>
+          <div class="success-message" id="success-message"></div>
+        </div>
+
+        <div class="manual-input">
+          <label>手動入力ISBN:</label>
+          <input
+            type="text"
+            id="manual-barcode-input"
+            placeholder="ISBNコードを手動入力"
+            maxlength="13"
+          />
+          <p class="help-text">
+            USBバーコードリーダーまたはカメラでスキャンできない場合に使用
+          </p>
+        </div>
       </div>
+
+      <!-- 右カラム（カメラ） -->
       <div id="read-view">
         <div id="interactive"></div>
         <canvas class="drawRect"></canvas>
       </div>
     </section>
-    <%- include('../Footer') %>
-    <input type="text" id="hidden-barcode-input" maxlength="13" />
 
+    <input type="text" id="hidden-barcode-input" maxlength="13" />
+    <%- include('../Footer') %>
     <script src="/js/SccaningRegister.js"></script>
   </body>
 </html>
