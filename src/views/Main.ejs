@@ -9,7 +9,7 @@
     <meta name="robots" content="noindex" />
   </head>
   <body>
-    <%- include('Header') %>
+    <%- include('header') %>
 
     <div id="top">
       <h2 id="top-title"><%= adminId %> の管理画面</h2>
@@ -19,12 +19,12 @@
       <div
         id="read-code"
         class="site-item"
-        onclick="location.href = '/Read-code'"
+        onclick="location.href = '/read-code'"
       ></div>
       <div
         id="generate-card"
         class="site-item"
-        onclick="location.href = '/Generate-card'"
+        onclick="location.href = '/generate-card'"
       ></div>
       <div
         id="register-book"
@@ -34,11 +34,11 @@
       <div
         id="book-list"
         class="site-item"
-        onclick="location.href = '/Book-list'"
+        onclick="location.href = '/book-list'"
       ></div>
       <!-- <div id="settings" class='site-item' onclick="location.href = '/settings'"><h2>管理者設定</h2></div> -->
     </div>
 
-    <%- include('Footer') %>
+    <%- include('footer') %>
   </body>
 </html>

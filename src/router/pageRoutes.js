@@ -10,14 +10,14 @@ const apiKey = process.env.BOOKS_API_KEY;
 /**
  * ログインページ
  */
-router.get("/", (req, res) => res.render("Login"));
-router.get("/login", (req, res) => res.render("Login"));
+router.get("/", (req, res) => res.render("login"));
+router.get("/login", (req, res) => res.render("login"));
 
 /**
  * 書籍編集ページ
  */
 router.get("/edit", (req, res) => {
-  res.render("EditBook");
+  res.render("editbook");
 });
 
 /**
@@ -36,35 +36,35 @@ router.get("/main", auth.adminAuth, auth.renderMainPage);
  * バーコード読み取りページ
  */
 router.get("/read-code", (req, res) => {
-  res.render("ReadCode");
+  res.render("readcode");
 });
 
 /**
  * カード生成ページ（認証必須）
  */
 router.get("/generate-card", auth.adminAuth, (req, res) => {
-  res.render("GenerateCard");
+  res.render("generatecard");
 });
 
 /**
  * 書籍一覧ページ
  */
 router.get("/book-list", (req, res) => {
-  res.render("BookList");
+  res.render("booklist");
 });
 
 /**
  * スキャン登録ページ（認証必須）
  */
 router.get("/scanning-registration", auth.adminAuth, (req, res) => {
-  res.render("Registers/ScanningRegister", { apiKey: apiKey });
+  res.render("Registers/scanningregister", { apiKey: apiKey });
 });
 
 /**
  * 一括登録ページ（認証必須）
  */
 router.get("/collective-registration", auth.adminAuth, (req, res) => {
-  res.render("Registers/CollectiveRegister");
+  res.render("Registers/collectiveregister");
 });
 
 /**
