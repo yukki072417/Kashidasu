@@ -22,14 +22,22 @@ class LoanModel {
    * @param {string} userId - ユーザーID
    * @param {string} loanDate - 貸出日
    * @param {string|null} returnDate - 返却日
+   * @param {string|null} dueDate - 貸出期限
    * @returns {object} - 貸出データ
    */
-  async create(loanId, bookId, userId, loanDate, returnDate = null) {
+  async create(
+    loanId,
+    bookId,
+    userId,
+    loanDate,
+    returnDate = null,
+    dueDate = null,
+  ) {
     const loans = await readJsonFile(repositoryPath, "loan.json");
     if (loans.find((loan) => loan.loanId === loanId)) {
       throw new Error("Loan with this ID already exists.");
     }
-    const newLoan = { loanId, bookId, userId, loanDate, returnDate };
+    const newLoan = { loanId, bookId, userId, loanDate, returnDate, dueDate };
     loans.push(newLoan);
     await writeJsonFile(repositoryPath, "loan.json", loans);
     return newLoan;

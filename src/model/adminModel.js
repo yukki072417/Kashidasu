@@ -120,6 +120,24 @@ async function updateAdmin(adminId, changedAdminId, changedPassword) {
 }
 
 /**
+ * 管理者かどうかを判定する関数
+ * @param {string} userId - ユーザーID
+ * @returns {Promise<boolean>} - 管理者の場合はtrue
+ */
+async function isAdmin(userId) {
+  try {
+    if (!userId) {
+      return false;
+    }
+
+    const admin = await adminModel.findOne(userId);
+    return admin && admin.adminId ? true : false;
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
  * 管理者を削除する関数
  * @param {string} adminId - 管理者ID
  * @returns {Promise<object>} - 削除結果
@@ -143,4 +161,5 @@ module.exports = {
   authenticateAdmin,
   updateAdmin,
   deleteAdmin,
+  isAdmin,
 };

@@ -50,12 +50,14 @@ async function lendBook(isbn, userId, loanDate) {
         }
 
         const loanId = Date.now().toString();
+        const dueDate = await calculateDueDate(userId, loanDate);
         const loan = await loanModelInstance.create(
           loanId,
           isbn,
           userId,
           loanDate,
-          null,
+          null, // returnDateは貸出時はnull
+          dueDate, // dueDateを保存
         );
 
         if (!loan) {
@@ -64,11 +66,36 @@ async function lendBook(isbn, userId, loanDate) {
 
         return {
           success: true,
-          data: { loanId },
+          data: {
+            loanId,
+            dueDate: await calculateDueDate(userId, loanDate),
+          },
           message: "書籍が正常に貸出されました",
         };
       },
     );
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * 貸出期限を計算する関数
+ * @param {string} userId - ユーザーID
+ * @param {string} loanDate - 貸出日
+ * @returns {Promise<string>} - 貸出期限日
+ */
+async function calculateDueDate(userId, loanDate) {
+  try {
+    const { isAdmin } = require("./adminModel");
+    const isAdminUser = await isAdmin(userId);
+
+    const dueDate = new Date(loanDate);
+    // 管理者は2週間後、一般ユーザーは1週間後
+    const daysToAdd = isAdminUser ? 14 : 7;
+    dueDate.setDate(dueDate.getDate() + daysToAdd);
+
+    return dueDate.toISOString().split("T")[0]; // YYYY-MM-DD形式
   } catch (error) {
     throw error;
   }
@@ -280,10 +307,19 @@ async function getOverdueBooks() {
 
     const overdueLoans = loans.filter((loan) => {
       if (!loan.returnDate && loan.loanDate) {
-        const loanDate = new Date(loan.loanDate);
-        const dueDate = new Date(loan.loanDate);
-        dueDate.setDate(dueDate.getDate() + 14); // 14日後が期限
-        return today > dueDate;
+        // 保存されているdueDateがあれば使用し、なければ計算
+        const targetDueDate =
+          loan.dueDate ||
+          (() => {
+            // 旧データの場合は計算（互換性のため）
+            const loanDate = new Date(loan.loanDate);
+            const dueDate = new Date(loan.loanDate);
+            dueDate.setDate(dueDate.getDate() + 14); // デフォルト14日
+            return dueDate.toISOString().split("T")[0];
+          })();
+
+        const dueDateObj = new Date(targetDueDate);
+        return today > dueDateObj;
       }
       return false;
     });
@@ -311,27 +347,55 @@ async function getLoanHistory(userId) {
     }
 
     const loans = loansResult.data;
-    const loanHistory = loans.map((loan) => ({
-      loanId: loan.loanId,
-      bookId: loan.bookId,
-      userId: loan.userId,
-      loanDate: loan.loanDate,
-      returnDate: loan.returnDate,
-      isOverdue: loan.returnDate
+    const loanHistory = loans.map((loan) => {
+      const isOverdue = loan.returnDate
         ? false
-        : (() => {
-            if (!loan.loanDate) return false;
-            const dueDate = new Date(loan.loanDate);
-            dueDate.setDate(dueDate.getDate() + 14);
-            return dueDate < new Date();
-          })(),
-    }));
+        : loan.loanDate && loan.dueDate
+          ? new Date() > new Date(loan.dueDate)
+          : loan.loanDate
+            ? (() => {
+                // 旧データの場合は計算（互換性のため）
+                const loanDate = new Date(loan.loanDate);
+                const dueDate = new Date(loan.loanDate);
+                dueDate.setDate(dueDate.getDate() + 14);
+                return new Date() > dueDate;
+              })()
+            : false;
+
+      return {
+        loanId: loan.loanId,
+        bookId: loan.bookId,
+        userId: loan.userId,
+        loanDate: loan.loanDate,
+        returnDate: loan.returnDate,
+        dueDate: loan.dueDate, // dueDateを含める
+        isOverdue: isOverdue,
+      };
+    });
 
     return {
       success: true,
       data: loanHistory,
       message: "貸出履歴が正常に取得されました",
     };
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * 期限切れかどうかをチェックする関数
+ * @param {string} userId - ユーザーID
+ * @param {string} loanDate - 貸出日
+ * @param {string|null} dueDate - 貸出期限（保存されている場合）
+ * @returns {Promise<boolean>} - 期限切れの場合はtrue
+ */
+async function checkIfOverdue(userId, loanDate, dueDate = null) {
+  try {
+    // 保存されているdueDateがあれば使用し、なければ計算
+    const targetDueDate = dueDate || (await calculateDueDate(userId, loanDate));
+    const dueDateObj = new Date(targetDueDate);
+    return new Date() > dueDateObj;
   } catch (error) {
     throw error;
   }

@@ -76,6 +76,7 @@ async function LoadBooks(pageNum) {
           userId: activeLoan ? activeLoan.userId : null,
           loanDate: activeLoan ? activeLoan.loanDate : null,
           returnDate: activeLoan ? activeLoan.returnDate : null,
+          dueDate: activeLoan ? activeLoan.dueDate : null,
         };
       });
 
@@ -117,6 +118,18 @@ async function SetTable(data) {
 
     // 期限切れフィルタ適用
     let deadlineStr = "";
+
+    // 貸出期限日付表示フォーマット
+    const dueDateRaw = book.dueDate || null;
+    if (dueDateRaw) {
+      const dueDate = new Date(dueDateRaw);
+      if (!isNaN(dueDate.getTime())) {
+        const yy = String(dueDate.getFullYear()).slice(-2);
+        const mm = String(dueDate.getMonth() + 1).padStart(2, "0");
+        const dd = String(dueDate.getDate()).padStart(2, "0");
+        deadlineStr = `${yy}/${mm}/${dd}`;
+      }
+    }
 
     if (showOnlyOverdue && !book.isBorrowed) {
       continue; // 期限切れフィルタが有効で、貸出されていない場合はスキップ
@@ -170,7 +183,7 @@ async function SetTable(data) {
 
     const $editButton = $("<button>")
       .text("編集")
-      .on("click", () => {
+      .on("click", function () {
         const params = $.param({ isbn: isbn });
         window.location.href = `/edit?${params}`;
       });
@@ -181,7 +194,7 @@ async function SetTable(data) {
     $row.append($statusCell);
     $row.append($lendingUserCell);
     $row.append($("<td>").append($editButton));
-    $row.append($("<td>").text(lendDateStr + "->" + deadlineStr));
+    $row.append($("<td>").text(lendDateStr + " -> " + deadlineStr));
     $row.append($("<td>").text(returnDateStr));
 
     $("#table").append($row);

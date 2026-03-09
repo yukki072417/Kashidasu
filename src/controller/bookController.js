@@ -149,8 +149,9 @@ async function getLoanByIsbn(req, res, next) {
           userId: loan.userId,
           loanDate: loan.loanDate,
           returnDate: loan.returnDate,
+          dueDate: loan.dueDate, // dueDateを含める
           daysBorrowed: daysBorrowed,
-          bookInfo: book.success ? book.book : null,
+          bookInfo: book.success ? book.data : null,
         };
       }),
     );
@@ -204,6 +205,7 @@ async function getAllLoans(req, res, next) {
             userId: loan.userId,
             loanDate: loan.loanDate,
             returnDate: loan.returnDate,
+            dueDate: loan.dueDate, // dueDateを含める
             daysBorrowed: daysBorrowed,
             bookInfo: book.success ? book.data : null,
           };
@@ -215,6 +217,7 @@ async function getAllLoans(req, res, next) {
             userId: loan.userId,
             loanDate: loan.loanDate,
             returnDate: loan.returnDate,
+            dueDate: loan.dueDate, // dueDateを含める
             daysBorrowed: 0,
             bookInfo: null,
             error: error.message,
@@ -279,7 +282,14 @@ async function lend(req, res, next) {
     const loanDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD形式
     const result = await loanModel.lendBook(isbn, user_id, loanDate);
 
-    res.json({ success: true, message: "本が正常に貸出されました" });
+    res.json({
+      success: true,
+      message: "本が正常に貸出されました",
+      data: {
+        loanId: result.data.loanId,
+        dueDate: result.data.dueDate,
+      },
+    });
   } catch (error) {
     console.error("Error lending book:", error);
 
