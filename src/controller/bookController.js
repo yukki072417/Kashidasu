@@ -33,11 +33,11 @@ async function getBook(req, res, next) {
   try {
     if (manual_search_mode) {
       // 特定の書籍を取得
-      const { success, book } = await bookModel.getBookByIsbn(isbn);
-      if (success) {
+      const bookResult = await bookModel.getBookByIsbn(isbn);
+      if (bookResult.success) {
         res.json({
           success: true,
-          data: book,
+          data: bookResult.data,
           message: "書籍が正常に取得されました",
         });
       } else {
