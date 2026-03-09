@@ -1,5 +1,11 @@
 {
-  "watch": ["src"],
-  "ext": "js,json",
-  "ignore": ["node_modules", "logs", "certs"]
+  "watch": [
+    "src"
+  ],
+  "ext": "js,json,ejs,css",
+  "ignore": [
+    "node_modules",
+    "logs",
+    "certs"
+  ]
 }

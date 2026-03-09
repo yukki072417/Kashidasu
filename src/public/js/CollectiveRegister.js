@@ -9,7 +9,7 @@ $(document).ready(function () {
   });
 });
 
-// 「ファイルから本を登録」ボタンが押されたときの処理
+// 「ファイルから本を登録（上書き）」ボタンが押されたときの処理
 function RegisterBooksByFile() {
   const csvInput = $("#csv-input");
   const csvFile = csvInput[0].files[0];
@@ -19,7 +19,7 @@ function RegisterBooksByFile() {
     // 確認ダイアログを表示
     if (
       confirm(
-        "本を登録しますか？ \nまた、すでに登録されてる本は削除されます。 \n\nよろしいですか？",
+        "CSVファイルの内容で既存の書籍データを上書きしますか？\n既存のデータはすべて削除されます。\n\nよろしいですか？",
       )
     ) {
       convertToArray(csvFile);
@@ -27,7 +27,7 @@ function RegisterBooksByFile() {
   }
 }
 
-// 「テキスト入力で本を登録」ボタンが押されたときの処理
+// 「テキスト入力で本を登録（追加）」ボタンが押されたときの処理
 function RegisterBooksByText() {
   const textInput = $("#text-input");
   const textContent = textInput.val().trim();
@@ -40,7 +40,7 @@ function RegisterBooksByText() {
   // 確認ダイアログを表示
   if (
     confirm(
-      "本を登録しますか？ \nまた、すでに登録されてる本は削除されます。 \n\nよろしいですか？",
+      "入力された書籍データを既存のデータに追加しますか？\n既存の書籍データは保持されます。\n\nよろしいですか？",
     )
   ) {
     convertTextToArray(textContent);
@@ -74,8 +74,7 @@ function convertToArray(csvFile) {
         });
       }
     }
-    console.log(csvArray); // デバッグ用：配列の中身を表示
-    RegisterBook(csvArray); // サーバーに登録
+    RegisterBook(csvArray, true); // 上書きモードで登録
   };
 }
 
@@ -107,48 +106,78 @@ function convertTextToArray(textContent) {
     return;
   }
 
-  console.log(textArray); // デバッグ用：配列の中身を表示
-  RegisterBook(textArray); // サーバーに登録
+  RegisterBook(textArray, false); // 追加モードで登録
 }
 
 // サーバーに本データを登録する関数
-function RegisterBook(bookArray) {
-  const Register_URL = "/api/book/register";
-  const AllDeleteDB_URL = "/api/book/delete";
+function RegisterBook(bookArray, isOverwrite) {
+  const Register_URL = "/api/book";
 
   // ISBNコードが空でない本だけを送信データにする
   const datas = JSON.stringify({
     books: bookArray.filter((item) => item.isbn !== ""),
   });
 
-  // まず全ての本を削除してから新しい本を登録
-  fetch(AllDeleteDB_URL, {
-    method: "DELETE", // POSTからDELETEに変更
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ all_delete: true }),
-  })
-    .then((response) => {
-      // 削除が終わったら本の登録リクエストを送信
-      fetch(Register_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: datas,
-      })
-        .then(async (response) => {
-          const json = await response.json();
-          alert(`${bookArray.length}冊の本が正常に登録されました`);
-        })
-        .catch((error) => {
-          console.error("Fetch error:", error);
-          alert("登録中にエラーが発生しました");
-        });
+  if (isOverwrite) {
+    // 上書きモード：まず全ての本を削除してから新しい本を登録
+    fetch("/api/book", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ all_delete: true }),
     })
-    .catch((error) => {
-      console.error("Delete error:", error);
-      alert("既存データの削除中にエラーが発生しました");
-    });
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("削除処理に失敗しました");
+        }
+        // 削除が終わったら本の登録リクエストを送信
+        return fetch(Register_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: datas,
+        });
+      })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("登録処理に失敗しました");
+        }
+        const json = await response.json();
+        if (json.success) {
+          alert(`${bookArray.length}冊の本が正常に上書き登録されました`);
+        } else {
+          alert(`登録エラー: ${json.message || "不明なエラー"}`);
+        }
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+        alert("登録中にエラーが発生しました: " + error.message);
+      });
+  } else {
+    // 追加モード：新しい本を直接登録
+    fetch(Register_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: datas,
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("登録処理に失敗しました");
+        }
+        const json = await response.json();
+        if (json.success) {
+          alert(`${bookArray.length}冊の本が正常に追加登録されました`);
+        } else {
+          alert(`登録エラー: ${json.message || "不明なエラー"}`);
+        }
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+        alert("登録中にエラーが発生しました: " + error.message);
+      });
+  }
 }

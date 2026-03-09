@@ -1,91 +1,400 @@
-/* Bellow code is using to read-qr.js */
-#read-qr {
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* ========================================
+   メインレイアウト
+======================================== */
+#read-code {
   display: flex;
-
-  height: 100%;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+  padding: 20px;
 }
 
-.site-image {
-  width: 150px;
-  height: 150px;
-  padding: 5px;
-  margin-top: 50px;
-
-  transition: background-color 500ms;
-}
-.site-image:hover,
-.site-image:active {
-  background-color: rgb(200, 200, 200);
-}
-.drawingBuffer {
-  margin: auto;
-}
-
-.buttons {
+.left-column {
+  width: 350px;
+  flex-shrink: 0;
   display: flex;
-  text-align: center;
-  margin-top: 20px;
-
-  flex-flow: column;
-
-  margin-left: 50px;
-}
-
-#SetReadMode {
-  width: 100px;
-  height: 100px;
-
-  margin: 15px;
-}
-
-#interactive {
-  margin-left: 20%;
-}
-
-.drawRect,
-#interactive {
-  position: absolute;
-}
-
-.drawRect {
-  width: 400px;
-  height: 200px;
-
-  top: 275px;
-  left: 625px;
-
-  border-style: solid;
-  border-width: 3px;
-
-  background-color: none;
-  border-color: chartreuse;
-
-  /* margin-left: 31%; */
+  flex-direction: column;
+  gap: 15px;
 }
 
 #read-view {
-  margin-top: 20px;
+  aspect-ratio: 4 / 3; /* 比率固定（4:3） */
+  max-height: 640px; /* 大画面での上限 */
+  position: relative;
 }
 
-.mode-button {
-  width: 150px;
-  height: 75px;
+/* ========================================
+   ボタンエリア
+======================================== */
+.buttons {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: 10px;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
 
-  margin-left: 10px;
+.animation-btn {
+  background: white;
+  color: rgb(95, 95, 95);
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.animation-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(140, 147, 155, 0.2);
+}
+
+.animation-btn:active {
+  transform: translateY(0);
+}
+
+/* ========================================
+   ステータスパネル
+======================================== */
+.status-panel {
+  background: white;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.status-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.status-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
   margin-right: 10px;
-
-  border-radius: 20px;
-  border-style: none;
-
-  font-size: 22px;
-  color: white;
+  background: #e9ecef;
 }
+
+.status-indicator.active {
+  background: #28a745;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.waiting {
+  background: #ffc107;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.error {
+  background: #dc3545;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.status-message {
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 15px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #007bff, #28a745);
+  width: 0%;
+  transition: width 0.5s ease;
+  border-radius: 4px;
+}
+
+.barcode-info {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 10px 0;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  color: #495057;
+  text-align: left;
+}
+
+.error-message,
+.success-message {
+  border-radius: 8px;
+  padding: 12px;
+  margin: 10px 0;
+  font-size: 14px;
+  font-weight: 500;
+  display: none;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.success-message {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.success-animation {
+  animation: successPulse 0.6s ease;
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ========================================
+   手入力エリア
+======================================== */
+.manual-input {
+  background: white;
+  border-radius: 10px;
+  padding: 15px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.manual-input label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+#manual-barcode-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 15px;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  transition: border-color 0.2s;
+}
+
+#manual-barcode-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* 隠し入力フィールド */
 #hidden-barcode-input {
   position: absolute;
   opacity: 0;
   pointer-events: none;
+  z-index: -1;
+  width: 1px;
+  height: 1px;
 }
 
-#under {
-  margin-top: 550px;
+/* ========================================
+   カメラ表示
+======================================== */
+#interactive {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#interactive video,
+#interactive canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.drawRect {
+  position: absolute;
+  width: 70%; /* 親要素に対する割合で指定 */
+  height: 40%;
+  border: 3px solid #28a745;
+  border-radius: 8px;
+  background: rgba(40, 167, 69, 0.1);
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 10px rgba(40, 167, 69, 0.15);
+}
+
+.drawingBuffer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ========================================
+   レスポンシブ: 縦積みレイアウト (≤1024px)
+======================================== */
+@media (max-width: 1024px) {
+  #read-code {
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .left-column {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .animation-btn {
+    flex: 1 1 140px;
+    max-width: 200px;
+  }
+
+  /* カメラビューは幅100%に合わせて aspect-ratio が自動で高さを決める */
+  #read-view {
+    width: 100%;
+    max-width: 560px;
+    max-height: none; /* 縦積み時は高さ制限を解除 */
+    align-self: center;
+  }
+}
+
+/* ========================================
+   スマートフォン (≤600px)
+======================================== */
+@media (max-width: 600px) {
+  #read-code {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .left-column {
+    max-width: 100%;
+  }
+
+  .buttons {
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .animation-btn {
+    max-width: 100%;
+    font-size: 13px;
+    padding: 10px 16px;
+  }
+
+  .status-panel {
+    padding: 15px;
+  }
+
+  .status-title {
+    font-size: 15px;
+  }
+
+  .status-message {
+    font-size: 13px;
+  }
+
+  .barcode-info {
+    font-size: 12px;
+  }
+
+  .error-message,
+  .success-message {
+    font-size: 12px;
+    padding: 10px;
+  }
+
+  #read-view {
+    max-width: 100%;
+  }
+
+  .drawRect {
+    border-width: 2px;
+  }
+}
+
+/* ========================================
+   ランドスケープ (高さ ≤500px)
+======================================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  #read-code {
+    flex-direction: row;
+    align-items: flex-start;
+    height: 100svh;
+    overflow: hidden;
+  }
+
+  .left-column {
+    width: 300px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    height: 100%;
+  }
+
+  #read-view {
+    flex: 1;
+    max-height: 100%;
+  }
 }

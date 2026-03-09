@@ -10,9 +10,27 @@
   padding-left: 30px;
   padding-right: 30px;
 }
+
 #table td {
   text-align: center;
   height: 35px;
+}
+
+/* 貸出状態のスタイル */
+#table td.available {
+  background-color: #e8f5e8;
+  color: #333;
+}
+
+#table td.borrowed {
+  background-color: #fff3cd;
+  color: #856404;
+  font-weight: bold;
+}
+
+#table td.returned {
+  background-color: #d4edda;
+  color: #155724;
 }
 
 .search {
@@ -21,27 +39,33 @@
   height: 50px;
   margin-top: 20px;
   margin-bottom: 70px;
-
   text-align: center;
 }
+
 #book-auther {
   width: 120px;
 }
+
 #book-title {
   width: 200px;
 }
+
 #book-state {
   width: 120px;
 }
+
 #book-menu {
   width: 75px;
 }
+
 #book-lend-person {
   width: 100px;
 }
+
 #book-isbn {
   width: 120px;
 }
+
 #book-deadline {
   width: 150px;
 }

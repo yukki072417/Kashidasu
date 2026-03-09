@@ -1,22 +1,33 @@
+/**
+ * カード出力サービス
+ * 学生証カードのPDF生成を管理する
+ */
 const { PDFDocument } = require("pdf-lib");
 const bwipjs = require("bwip-js");
-const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const fontkit = require("@pdf-lib/fontkit");
 
-const app = express();
-const width = 400;
-const height = 200;
-const OUTPUT_DIR = "/usr/app/src/public/pdf";
+const width = 400; // カードの幅（ピクセル）
+const height = 200; // カードの高さ（ピクセル）
+const OUTPUT_DIR = path.join(__dirname, "../public/pdf"); // 出力ディレクトリ（相対パス）
 
+/**
+ * ディレクトリが存在することを確認する関数
+ * @param {string} dirPath - ディレクトリパス
+ */
 function ensureDirectoryExists(dirPath) {
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
 }
 
-async function Generating(studentID) {
+/**
+ * バーコードを生成する関数
+ * @param {string} studentID - 学生ID
+ * @returns {Promise<string>} - バーコードファイルパス
+ */
+async function generateBarcode(studentID) {
   ensureDirectoryExists(OUTPUT_DIR);
   const barcodePath = path.join(OUTPUT_DIR, `card_barcode_${studentID}.png`);
 
@@ -39,6 +50,16 @@ async function Generating(studentID) {
   }
 }
 
+/**
+ * PDFを作成する関数
+ * @param {string} outputPath - 出力ファイルパス
+ * @param {object} studentData - 学生データ
+ * @param {string} studentData.id - 学生ID
+ * @param {string} studentData.gread - 学年
+ * @param {string} studentData.class - クラス
+ * @param {string} studentData.number - 番号
+ * @returns {Promise<boolean>} - 作成成功フラグ
+ */
 async function createPdf(outputPath, studentData) {
   try {
     ensureDirectoryExists(path.dirname(outputPath));
@@ -64,7 +85,7 @@ async function createPdf(outputPath, studentData) {
     const lightFontBytes = await fs.promises.readFile(lightFontPath);
     const lightFontFamily = await pdfDoc.embedFont(lightFontBytes);
 
-    const barcodePath = await Generating(studentData.id);
+    const barcodePath = await generateBarcode(studentData.id);
     const barcodeBytes = await fs.promises.readFile(barcodePath);
     const barcodeImage = await pdfDoc.embedPng(barcodeBytes);
     const barcodeDims = barcodeImage.scale(1);
@@ -106,7 +127,12 @@ async function createPdf(outputPath, studentData) {
   }
 }
 
-app.GenerateCard = async (req, res) => {
+/**
+ * カード生成リクエストを処理する関数
+ * @param {object} req - リクエストオブジェクト
+ * @param {object} res - レスポンスオブジェクト
+ */
+async function generateCard(req, res) {
   try {
     const studentData = req.body;
     const pdfFilename = `kashidasu_card.pdf`;
@@ -117,11 +143,21 @@ app.GenerateCard = async (req, res) => {
       throw new Error("PDF生成に失敗しました");
     }
 
-    res.status(200).send({ id: "Complete" });
+    res.status(200).json({
+      success: true,
+      data: { id: "Complete" },
+      message: "カードが正常に生成されました",
+    });
   } catch (error) {
     console.error("リクエスト処理中にエラーが発生:", error);
-    res.status(500).send({ error: "PDF生成中にエラーが発生しました" });
+    res
+      .status(500)
+      .json({ success: false, message: "PDF生成中にエラーが発生しました" });
   }
-};
+}
 
-module.exports = app;
+module.exports = {
+  generateCard,
+  createPdf,
+  generateBarcode,
+};

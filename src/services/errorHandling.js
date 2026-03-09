@@ -1,7 +1,14 @@
 /**
- * @param {res} はexpress routerのres
- * @param {number} はhttpステータスコード
- * @param {string} はエラーメッセージ
+ * エラーハンドリングサービス
+ * HTTPエラーレスポンスを管理する
+ */
+
+/**
+ * エラーレスポンスを返す関数
+ * @param {object} res - Expressレスポンスオブジェクト
+ * @param {number} status - HTTPステータスコード
+ * @param {string} message - エラーメッセージ
+ * @returns {object} - エラーレスポンス
  */
 function errorResponse(res, status, message) {
   try {
@@ -14,11 +21,13 @@ function errorResponse(res, status, message) {
         "'status' cannot specify out of error code value.\nPlease specify range of 400-599",
       );
     }
-    return res.status(status).json({ message });
+    return res.status(status).json({ success: false, message });
   } catch (error) {
     new Error("res or status was invaild.\nerror: ", error);
     console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
   }
 }
 

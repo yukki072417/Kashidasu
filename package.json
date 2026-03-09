@@ -8,7 +8,10 @@
   "main": "./src/app.js",
   "scripts": {
     "start": "nodemon src/app.js",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --detectOpenHandles",
+    "test:unit": "jest src/tests/unit --detectOpenHandles",
+    "test:integration": "jest src/tests/integration --detectOpenHandles",
+    "test:all": "jest --detectOpenHandles"
   },
   "author": "yukki072417",
   "license": "MIT",
@@ -29,6 +32,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "jest": "^30.2.0",
     "nodemon": "^3.1.10",
-    "prettier": "^3.8.1"
+    "prettier": "^3.8.1",
+    "supertest": "^7.0.0"
   }
 }
