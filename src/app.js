@@ -10,15 +10,17 @@ const log4js = require("log4js");
 const fs = require("fs");
 const path = require("path");
 const https = require("https");
+
 const app = express();
 
 const logDir = path.join(__dirname, "../logs");
 
-const userRoutes = require("./router/userRoutes");
 const bookRoutes = require("./router/bookRoutes");
+const userRoutes = require("./router/userRoutes");
 const adminRoutes = require("./router/adminRoutes");
 const pageRoutes = require("./router/pageRoutes");
 const apiRoutes = require("./router/apiRoutes");
+const publicRoutes = require("./router/publicRoutes");
 
 const initDb = require("./db/init");
 const PORT = 443; // HTTPSサーバーの標準ポート
@@ -46,18 +48,11 @@ app.use("/api/user", userRoutes);
 app.use("/api/book", bookRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api", apiRoutes);
+app.use("/public", publicRoutes);
 app.use("/", pageRoutes);
-
-// デバッグ：ルートが正しく登録されているか確認
-console.log("Registered routes:");
-console.log(
-  "- /api/book routes:",
-  bookRoutes.stack.map((r) => r.route?.path).filter(Boolean),
-);
 
 // logsディレクトリが存在しない場合は作成
 if (!fs.existsSync(logDir)) {
-  console.log("logsディレクトリを生成");
   fs.mkdirSync(logDir);
 }
 
@@ -77,6 +72,5 @@ const options = {
 https.createServer(options, app).listen(PORT, () => {
   logger.info(`Kashidasuサーバーがポート ${PORT} で起動しました`);
   console.log(`Kashidasuサーバーがポート ${PORT} で起動しました`);
-
   initDb.initDb();
 });

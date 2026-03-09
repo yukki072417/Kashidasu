@@ -29,7 +29,6 @@ async function createBook(req, res, next) {
  * @param {function} next - ミドルウェア関数
  */
 async function getBook(req, res, next) {
-  console.log("getBook function called with query:", req.query);
   const { isbn, manual_search_mode } = req.query;
   try {
     if (manual_search_mode) {
@@ -46,7 +45,6 @@ async function getBook(req, res, next) {
       }
     } else {
       // 全書籍取得の場合
-      console.log("Getting all books");
       const allBooks = await bookModel.getAllBooks();
       const count = allBooks.length;
 
@@ -58,7 +56,6 @@ async function getBook(req, res, next) {
       // ページング処理
       const paginatedBooks = allBooks.slice(offset, offset + limit);
 
-      console.log("Returning", paginatedBooks.length, "books");
       res.json({
         success: true,
         data: [{ "COUNT(isbn)": count }, ...paginatedBooks],
@@ -174,13 +171,10 @@ async function getLoanByIsbn(req, res, next) {
 async function getAllLoans(req, res, next) {
   try {
     const limit = parseInt(req.query.limit) || 100;
-    console.log("Getting all loans with limit:", limit);
 
     const allLoansResult = await loanModel.getUserLoans();
-    console.log("User loans result:", allLoansResult);
 
     if (!allLoansResult.success) {
-      console.error("getUserLoans failed:", allLoansResult.message);
       return res.status(500).json({
         success: false,
         message: allLoansResult.message,
@@ -188,11 +182,9 @@ async function getAllLoans(req, res, next) {
     }
 
     const allLoans = allLoansResult.data;
-    console.log("All loans count:", allLoans.length);
 
     // アクティブな貸出のみをフィルタ
     const activeLoans = allLoans.filter((loan) => !loan.returnDate);
-    console.log("Active loans count:", activeLoans.length);
 
     // 書籍情報を取得して貸出情報を付加
     const loansWithBookInfo = await Promise.all(
@@ -281,14 +273,12 @@ async function deleteBook(req, res, next) {
 
 async function lend(req, res, next) {
   const { user_id, isbn } = req.body;
-  console.log("Lend request:", { user_id, isbn });
 
   try {
     // loanModelのトランザクション機能を使用して貸出処理
     const loanDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD形式
     const result = await loanModel.lendBook(isbn, user_id, loanDate);
 
-    console.log("Loan result:", result);
     res.json({ success: true, message: "本が正常に貸出されました" });
   } catch (error) {
     console.error("Error lending book:", error);
@@ -308,14 +298,12 @@ async function lend(req, res, next) {
 // 返却機能（ReadCode.jsから呼び出される）
 async function returnBook(req, res, next) {
   const { user_id, isbn } = req.body;
-  console.log("Return request:", { user_id, isbn });
 
   try {
     // loanModelのトランザクション機能を使用して返却処理
     const returnDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD形式
     const result = await loanModel.returnBook(isbn, user_id, returnDate);
 
-    console.log("Return result:", result);
     res.json({ success: true, message: "本が正常に返却されました" });
   } catch (error) {
     console.error("Error returning book:", error);

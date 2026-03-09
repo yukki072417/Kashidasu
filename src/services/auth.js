@@ -5,7 +5,34 @@
 const { getAdminById, authenticateAdmin } = require("../model/adminModel");
 
 /**
- * 管理者認証ミドルウェア
+ * APIキー認証ミドルウェア（公開用エンドポイント用）
+ * @param {object} req - リクエストオブジェクト
+ * @param {object} res - レスポンスオブジェクト
+ * @param {function} next - ミドルウェア関数
+ */
+function apiKeyAuth(req, res, next) {
+  const apiKey = req.headers["x-api-key"] || req.query.api_key;
+  const validApiKey = process.env.BOOKS_API_KEY;
+
+  if (!validApiKey) {
+    return res.status(500).json({
+      success: false,
+      message: "APIキーが設定されていません",
+    });
+  }
+
+  if (!apiKey || apiKey !== validApiKey) {
+    return res.status(401).json({
+      success: false,
+      message: "無効なAPIキーです",
+    });
+  }
+
+  next();
+}
+
+/**
+ * 管理者認証ミドルウェア（Webページ用）
  * @param {object} req - リクエストオブジェクト
  * @param {object} res - レスポンスオブジェクト
  * @param {function} next - ミドルウェア関数
@@ -23,6 +50,31 @@ async function adminAuth(req, res, next) {
     next();
   } else {
     res.redirect("/login"); // 管理者が存在しない場合もログインページへ
+  }
+}
+
+/**
+ * API認証ミドルウェア（セッション認証用）
+ * @param {object} req - リクエストオブジェクト
+ * @param {object} res - レスポンスオブジェクト
+ * @param {function} next - ミドルウェア関数
+ */
+async function apiAuth(req, res, next) {
+  if (req.session.admin == null) {
+    return res.status(401).json({
+      success: false,
+      message: "認証が必要です",
+    });
+  }
+
+  const isExist = (await getAdminById(req.session.admin)).success;
+  if (isExist === true) {
+    next();
+  } else {
+    return res.status(401).json({
+      success: false,
+      message: "無効なセッションです",
+    });
   }
 }
 
@@ -72,6 +124,8 @@ async function logout(req, res) {
 
 module.exports = {
   adminAuth,
+  apiAuth,
+  apiKeyAuth,
   renderMainPage,
   login,
   logout,
