@@ -257,7 +257,7 @@ function processingBook(userBarcode, isbnBarcode) {
     isbn: isbnBarcode,
   };
 
-  fetch(`/api/book/${currentMode}`, {
+  fetch(`/api/book/${currentMode === "lend" ? "lend" : "return"}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -272,24 +272,12 @@ function processingBook(userBarcode, isbnBarcode) {
 
       updateStatus("処理完了", "", 100, "active");
 
-      switch (json.message) {
-        case "BOOK_NOT_EXIST":
-          showError("エラー: 本が存在しません");
-          break;
-        case "BOOK_ALREADY_LENDING":
-          showError("エラー: この本はすでに借りられています");
-          break;
-        case "BOOK_NOT_LENDING":
-          showError("エラー: この本は貸出されていません");
-          break;
-        default:
-          if (json.success) {
-            showSuccess(
-              `本が正常に${currentMode === "lend" ? "貸出" : "返却"}されました。`,
-            );
-          } else {
-            showError(`エラー: ${json.message}`);
-          }
+      if (json.success) {
+        showSuccess(
+          `本が正常に${currentMode === "lend" ? "貸出" : "返却"}されました。`,
+        );
+      } else {
+        showError(`エラー: ${json.message}`);
       }
 
       // 2秒後にリロード

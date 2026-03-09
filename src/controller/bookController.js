@@ -73,7 +73,16 @@ async function getBook(req, res, next) {
 
 async function getAllBooks(req, res, next) {
   try {
-    const allBooks = await bookModel.getAllBooks();
+    const allBooksResult = await bookModel.getAllBooks();
+
+    if (!allBooksResult.success) {
+      return res.status(500).json({
+        success: false,
+        message: allBooksResult.message,
+      });
+    }
+
+    const allBooks = allBooksResult.data;
     const count = allBooks.length;
 
     // ページングパラメータ
@@ -107,7 +116,16 @@ async function getLoanByIsbn(req, res, next) {
       });
     }
 
-    const activeLoans = await loanModel.getActiveLoans(isbn);
+    const activeLoansResult = await loanModel.getActiveLoans(isbn);
+
+    if (!activeLoansResult.success) {
+      return res.status(500).json({
+        success: false,
+        message: activeLoansResult.message,
+      });
+    }
+
+    const activeLoans = activeLoansResult.data;
 
     if (activeLoans.length === 0) {
       return res.json({
@@ -156,31 +174,60 @@ async function getLoanByIsbn(req, res, next) {
 async function getAllLoans(req, res, next) {
   try {
     const limit = parseInt(req.query.limit) || 100;
-    const allLoans = await loanModel.getUserLoans();
+    console.log("Getting all loans with limit:", limit);
+
+    const allLoansResult = await loanModel.getUserLoans();
+    console.log("User loans result:", allLoansResult);
+
+    if (!allLoansResult.success) {
+      console.error("getUserLoans failed:", allLoansResult.message);
+      return res.status(500).json({
+        success: false,
+        message: allLoansResult.message,
+      });
+    }
+
+    const allLoans = allLoansResult.data;
+    console.log("All loans count:", allLoans.length);
 
     // アクティブな貸出のみをフィルタ
     const activeLoans = allLoans.filter((loan) => !loan.returnDate);
+    console.log("Active loans count:", activeLoans.length);
 
     // 書籍情報を取得して貸出情報を付加
     const loansWithBookInfo = await Promise.all(
       activeLoans.map(async (loan) => {
-        const book = await bookModel.getBookByIsbn(loan.bookId);
-        const loanDate = new Date(loan.loanDate);
-        const daysBorrowed = loan.loanDate
-          ? Math.floor(
-              (new Date() - new Date(loan.loanDate)) / (1000 * 60 * 60 * 24),
-            )
-          : 0;
+        try {
+          const book = await bookModel.getBookByIsbn(loan.bookId);
+          const loanDate = new Date(loan.loanDate);
+          const daysBorrowed = loan.loanDate
+            ? Math.floor(
+                (new Date() - new Date(loan.loanDate)) / (1000 * 60 * 60 * 24),
+              )
+            : 0;
 
-        return {
-          loanId: loan.loanId,
-          bookId: loan.bookId,
-          userId: loan.userId,
-          loanDate: loan.loanDate,
-          returnDate: loan.returnDate,
-          daysBorrowed: daysBorrowed,
-          bookInfo: book.success ? book.book : null,
-        };
+          return {
+            loanId: loan.loanId,
+            bookId: loan.bookId,
+            userId: loan.userId,
+            loanDate: loan.loanDate,
+            returnDate: loan.returnDate,
+            daysBorrowed: daysBorrowed,
+            bookInfo: book.success ? book.data : null,
+          };
+        } catch (error) {
+          console.error("Error processing loan:", loan.loanId, error);
+          return {
+            loanId: loan.loanId,
+            bookId: loan.bookId,
+            userId: loan.userId,
+            loanDate: loan.loanDate,
+            returnDate: loan.returnDate,
+            daysBorrowed: 0,
+            bookInfo: null,
+            error: error.message,
+          };
+        }
       }),
     );
 
@@ -192,6 +239,7 @@ async function getAllLoans(req, res, next) {
       data: limitedLoans,
       count: limitedLoans.length,
       totalActive: activeLoans.length,
+      message: "貸出一覧が正常に取得されました",
     });
   } catch (error) {
     console.error("Error getting all loans:", error);

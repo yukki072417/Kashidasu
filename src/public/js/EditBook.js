@@ -6,30 +6,35 @@ window.onload = () => {
 
   // 本の情報をサーバーから取得してフォームに反映
   $.ajax({
-    url: "/api/book/search", // /search-book -> /api/book/search に変更
+    url: "/api/book/search",
     type: "POST",
     data: {
-      isbn: isbn, // book_id -> isbn に変更
-      manual_search_mode: true,
+      query: isbn, // isbnをqueryとして渡す
+      searchType: "isbn",
     },
     success: function (response) {
       const bookName_textbox = $("#book-name");
       const writter_textbox = $("#writter");
-      const isbn_textbox = $("#book-id"); // bookID_textbox -> isbn_textbox に変更
+      const isbn_textbox = $("#book-id");
 
-      beforeIsbn = response.isbn; // beforeBookID -> beforeIsbn に変更, response.book_id -> response.isbn に変更
+      if (response.success && response.data) {
+        beforeIsbn = response.data.isbn;
 
-      // 取得した情報をフォームにセット
-      isbn_textbox.val(response.isbn); // bookID_textbox -> isbn_textbox に変更, response.book_id -> response.isbn に変更
-      bookName_textbox.val(response.title); // response.book_name -> response.title に変更
-      writter_textbox.val(response.author); // response.book_auther -> response.author に変更
+        // 取得した情報をフォームにセット
+        isbn_textbox.val(response.data.isbn);
+        bookName_textbox.val(response.data.title);
+        writter_textbox.val(response.data.author);
 
-      // 貸出中の場合は編集不可にする
-      if (response.isBorrowed) // book_is_lending -> isBorrowed に変更
-        DisableTextBox(isbn_textbox, bookName_textbox, writter_textbox); // bookID_textbox -> isbn_textbox に変更
+        // 貸出中の場合は編集不可にする
+        if (response.data.isBorrowed)
+          DisableTextBox(isbn_textbox, bookName_textbox, writter_textbox);
+      } else {
+        alert("書籍が見つかりません");
+      }
     },
     error: function (xhr, status, error) {
       console.error("Error:", error);
+      alert("書籍情報の取得に失敗しました");
     },
   });
 
@@ -49,49 +54,61 @@ window.onload = () => {
 };
 
 // 本の情報を編集する関数
-function EditBook(beforeIsbn, isbn, title, author) { // beforeBookID -> beforeIsbn, bookID -> isbn, bookName -> title, bookWritter -> author に変更
+function EditBook(beforeIsbn, isbn, title, author) {
   $.ajax({
-    url: "/api/book/update", // /upload-book -> /api/book/update に変更
-    type: "PUT", // POST -> PUT に変更
+    url: "/api/book",
+    type: "PUT",
     data: {
-      before_isbn: beforeIsbn, // before_book_id -> before_isbn に変更
-      isbn: isbn, // book_id -> isbn に変更
-      title: title, // book_name -> title に変更
-      author: author, // book_auther -> author に変更
+      before_isbn: beforeIsbn,
+      isbn: isbn,
+      title: title,
+      author: author,
     },
     success: function (response) {
-      if (response.result === "SUCCESS") return alert("変更が適用されました");
-      else return alert("エラー: 変更に失敗しました。もう一度お試しください");
+      if (response.success) {
+        alert("変更が適用されました");
+        window.location.href = "/edit";
+      } else {
+        alert("エラー: " + response.message);
+      }
     },
     error: function (xhr, status, error) {
-      alert("エラー発生:", error);
+      console.error("Error:", error);
+      alert("エラー発生: " + error);
     },
   });
 }
 
 // 本を削除する関数
-function DeleteBook(isbn) { // bookID -> isbn に変更
+function DeleteBook(isbn) {
   if (!confirm("本当に削除しますか？")) return;
 
   $.ajax({
-    url: "/api/book/delete", // /delete-book -> /api/book/delete に変更
-    type: "DELETE", // POST -> DELETE に変更
+    url: "/api/book",
+    type: "DELETE",
     contentType: "application/json",
     data: JSON.stringify({
-      isbn: isbn, // book_id -> isbn に変更
+      isbn: isbn,
     }),
     success: function (response) {
       console.log(response);
-      window.location.href = "/edit"; // 削除後に編集ページへリダイレクト
+      if (response.success) {
+        alert("書籍が削除されました");
+        window.location.href = "/edit"; // 削除後に編集ページへリダイレクト
+      } else {
+        alert("エラー: " + response.message);
+      }
     },
     error: function (xhr, status, error) {
       console.error("Error:", error);
+      alert("エラー発生: " + error);
     },
   });
 }
 
 // 貸出中の場合にテキストボックスを無効化し警告を表示する関数
-function DisableTextBox(isbn_textbox, bookName_textbox, writter_textbox) { // bookID_textbox -> isbn_textbox に変更
+function DisableTextBox(isbn_textbox, bookName_textbox, writter_textbox) {
+  // bookID_textbox -> isbn_textbox に変更
   const warningText = $("<p>貸出中は変更できません</p>").css("color", "red");
 
   writter_textbox.prop("disabled", true); // #writter -> writter_textbox に変更

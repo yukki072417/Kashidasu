@@ -281,7 +281,7 @@ function RegisterBook(isbn, title, author) {
   };
 
   // 本の登録のリクエストを送信
-  fetch("/api/book/register", {
+  fetch("/api/book", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -290,10 +290,15 @@ function RegisterBook(isbn, title, author) {
   })
     .then(async (response) => {
       const json = await response.json();
-      if (json.result === "BOOK_ALRADY_EXIST") {
-        showError("この本はすでに登録されています");
-        updateStatus("登録エラー", "書籍は既に登録されています", 0, "error");
-      } else if (json.result === "SUCCESS") {
+      if (!json.success) {
+        if (json.message.includes("既に存在")) {
+          showError("この本はすでに登録されています");
+          updateStatus("登録エラー", "書籍は既に登録されています", 0, "error");
+        } else {
+          showError("登録エラー: " + json.message);
+          updateStatus("登録エラー", json.message, 0, "error");
+        }
+      } else {
         showSuccess("本が正常に登録されました。");
         updateStatus("登録完了", "書籍の登録が完了しました", 100, "success");
 
@@ -301,8 +306,6 @@ function RegisterBook(isbn, title, author) {
         setTimeout(() => {
           location.reload();
         }, 3000);
-      } else {
-        throw new Error("Registration failed");
       }
     })
     .catch((error) => {

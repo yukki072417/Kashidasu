@@ -113,8 +113,8 @@ function convertTextToArray(textContent) {
 
 // サーバーに本データを登録する関数
 function RegisterBook(bookArray) {
-  const Register_URL = "/api/book/register";
-  const AllDeleteDB_URL = "/api/book/delete";
+  const Register_URL = "/api/book";
+  const AllDeleteDB_URL = "/api/book";
 
   // ISBNコードが空でない本だけを送信データにする
   const datas = JSON.stringify({
