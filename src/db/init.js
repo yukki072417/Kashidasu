@@ -1,8 +1,17 @@
+/**
+ * データベース初期化モジュール
+ * リポジトリファイルの初期化と管理者アカウント作成を管理する
+ */
 const path = require("path");
 const { createAdmin } = require("../model/adminModel");
 const fs = require("fs").promises;
 const fsSync = require("fs");
 
+/**
+ * ファイルを作成する関数
+ * @param {string} filePath - ファイルパス
+ * @param {string} fileName - ファイル名
+ */
 async function createFile(filePath, fileName) {
   const target = path.join(filePath, fileName);
 
@@ -14,6 +23,9 @@ async function createFile(filePath, fileName) {
   }
 }
 
+/**
+ * データベースを初期化する関数
+ */
 async function initializeDatabase() {
   const repositoryPath = path.join(__dirname, "../../repository");
 

@@ -32,7 +32,7 @@ async function adminAuth(req, res, next) {
  * @param {object} res - レスポンスオブジェクト
  */
 function renderMainPage(req, res) {
-  res.render("Main", { adminId: req.session.admin }); // Main.ejs に adminId を渡す
+  res.render("main", { adminId: req.session.admin }); // main.ejs に adminId を渡す
 }
 
 /**
