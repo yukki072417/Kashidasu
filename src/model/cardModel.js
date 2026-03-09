@@ -11,7 +11,7 @@ class CardModel {
    */
   constructor() {
     this.outputDir = path.join(__dirname, "../../public/pdf");
-    this.ensureOutputDir();
+    // ディレクトリは必要時にのみ作成するため、ここでは自動作成しない
   }
 
   /**
@@ -40,6 +40,9 @@ class CardModel {
       if (!id || !gread || !className || !number) {
         throw new Error("すべてのフィールドを入力してください");
       }
+
+      // 必要時にのみディレクトリを作成
+      this.ensureOutputDir();
 
       // PDF生成（ここでは簡単な実装）
       const pdfPath = path.join(this.outputDir, "kashidasu_card.pdf");
@@ -77,6 +80,20 @@ class CardModel {
    */
   async getCardFiles() {
     try {
+      // ディレクトリが存在しない場合は空のステータスを返す
+      if (!fs.existsSync(this.outputDir)) {
+        return {
+          success: true,
+          data: {
+            pdfExists: false,
+            pngExists: false,
+            pdfPath: "/pdf/kashidasu_card.pdf",
+            pngPath: "/pdf/kashidasu_card.png",
+          },
+          message: "カードファイルが存在しません",
+        };
+      }
+
       const pdfPath = path.join(this.outputDir, "kashidasu_card.pdf");
       const pngPath = path.join(this.outputDir, "kashidasu_card.png");
 

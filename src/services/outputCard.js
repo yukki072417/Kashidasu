@@ -10,7 +10,7 @@ const fontkit = require("@pdf-lib/fontkit");
 
 const width = 400; // カードの幅（ピクセル）
 const height = 200; // カードの高さ（ピクセル）
-const OUTPUT_DIR = "/usr/app/src/public/pdf"; // 出力ディレクトリ
+const OUTPUT_DIR = path.join(__dirname, "../public/pdf"); // 出力ディレクトリ（相対パス）
 
 /**
  * ディレクトリが存在することを確認する関数
