@@ -13,9 +13,11 @@ async function createBook(req, res, next) {
 }
 
 async function getBook(req, res, next) {
-  const { isbn, manual_search_mode } = req.body; // book_id -> isbn
+  console.log("getBook function called with query:", req.query);
+  const { isbn, manual_search_mode } = req.query;
   try {
     if (manual_search_mode) {
+      // 特定の書籍を取得
       const { success, book } = await bookModel.getBookByIsbn(isbn);
       if (success) {
         res.json(book);
@@ -23,11 +25,21 @@ async function getBook(req, res, next) {
         res.status(404).json({ result: "FAILED", message: "Book not found." });
       }
     } else {
-      const allBooks = await bookModel.getAllBooks(); // getAllBooks は後で定義する
+      // 全書籍取得の場合
+      console.log("Getting all books");
+      const allBooks = await bookModel.getAllBooks();
       const count = allBooks.length;
-      // 実際には book_num を使ってスライスする
-      const books = allBooks.slice(0, 30); // 仮で最初の30件
-      res.json([{ "COUNT(isbn)": count }, ...books]);
+
+      // ページングパラメータ
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 30;
+      const offset = (page - 1) * limit;
+
+      // ページング処理
+      const paginatedBooks = allBooks.slice(offset, offset + limit);
+
+      console.log("Returning", paginatedBooks.length, "books");
+      res.json([{ "COUNT(isbn)": count }, ...paginatedBooks]);
     }
   } catch (error) {
     console.error("Error getting book:", error);
@@ -56,85 +68,9 @@ async function getAllBooks(req, res, next) {
   }
 }
 
-async function getBooksWithLoanInfo(req, res, next) {
-  try {
-    const allBooks = await bookModel.getAllBooks();
-    const allLoans = await loanModel.getUserLoans(); // すべての貸出情報を取得
-
-    // 各書籍に貸出情報を付加
-    const booksWithLoanInfo = allBooks.map((book) => {
-      const activeLoan = allLoans.find(
-        (loan) => loan.bookId === book.isbn && !loan.returnDate,
-      );
-
-      return {
-        ...book,
-        isBorrowed: activeLoan ? true : false,
-        userId: activeLoan ? activeLoan.userId : null,
-        loanDate: activeLoan ? activeLoan.loanDate : null,
-        returnDate: activeLoan ? activeLoan.returnDate : null,
-      };
-    });
-
-    const count = booksWithLoanInfo.length;
-
-    // ページング処理
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 30;
-    const offset = (page - 1) * limit;
-    const paginatedBooks = booksWithLoanInfo.slice(offset, offset + limit);
-
-    res.json([{ "COUNT(isbn)": count }, ...paginatedBooks]);
-  } catch (error) {
-    console.error("Error getting books with loan info:", error);
-    res.status(500).json({ result: "FAILED", message: error.message });
-  }
-}
-
-async function getOverdueBooks(req, res, next) {
-  try {
-    const overdueBooks = await loanModel.getOverdueBooks();
-
-    // 期限切れ本の書籍情報を取得
-    const booksWithOverdueInfo = await Promise.all(
-      overdueBooks.map(async (loan) => {
-        const book = await bookModel.getBookByIsbn(loan.bookId);
-        const loanDate = new Date(loan.loanDate);
-        const dueDate = new Date(loan.loanDate);
-        dueDate.setDate(dueDate.getDate() + 14);
-        const daysOverdue = Math.floor(
-          (new Date() - dueDate) / (1000 * 60 * 60 * 24),
-        );
-
-        return {
-          ...book,
-          loanId: loan.loanId,
-          userId: loan.userId,
-          loanDate: loan.loanDate,
-          returnDate: loan.returnDate,
-          daysOverdue: daysOverdue,
-        };
-      }),
-    );
-
-    const count = booksWithOverdueInfo.length;
-
-    // ページング処理
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 30;
-    const offset = (page - 1) * limit;
-    const paginatedBooks = booksWithOverdueInfo.slice(offset, offset + limit);
-
-    res.json([{ "COUNT(isbn)": count }, ...paginatedBooks]);
-  } catch (error) {
-    console.error("Error getting overdue books:", error);
-    res.status(500).json({ result: "FAILED", message: error.message });
-  }
-}
-
 async function getLoanByIsbn(req, res, next) {
   try {
-    const { isbn } = req.params;
+    const { isbn } = req.query; // クエリパラメータから取得
 
     if (!isbn) {
       return res.status(400).json({
@@ -272,37 +208,24 @@ async function lend(req, res, next) {
   console.log("Lend request:", { user_id, isbn });
 
   try {
-    // 書籍が存在するか確認
-    const { success, book } = await bookModel.getBookByIsbn(isbn);
-    console.log("Book lookup result:", { success, book });
-
-    if (!success) {
-      return res.json({ success: false, message: "BOOK_NOT_EXIST" });
-    }
-
-    // loanデータベースで貸出状態を確認
-    const isCurrentlyLoaned = await loanModel.isBookCurrentlyLoaned(isbn);
-    console.log("Book loan status from loan DB:", isCurrentlyLoaned);
-
-    if (isCurrentlyLoaned) {
-      return res.json({ success: false, message: "BOOK_ALREADY_LENDING" });
-    }
-
-    // 書籍を貸出中に更新
-    console.log("Updating book status...");
-    await bookModel.updateBook(isbn, book.title, book.author, true);
-
-    // 貸出記録を作成
-    const loanId = `loan_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // loanModelのトランザクション機能を使用して貸出処理
     const loanDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD形式
-    console.log("Creating loan record:", { loanId, isbn, user_id, loanDate });
+    const result = await loanModel.lendBook(isbn, user_id, loanDate);
 
-    await loanModel.createLoan(isbn, user_id, loanDate);
-
+    console.log("Loan result:", result);
     res.json({ success: true, message: "本が正常に貸出されました" });
   } catch (error) {
     console.error("Error lending book:", error);
-    res.status(500).json({ success: false, message: error.message });
+
+    // エラーメッセージの処理
+    let errorMessage = error.message;
+    if (error.message === "BOOK_NOT_EXIST") {
+      errorMessage = "指定された本が見つかりません";
+    } else if (error.message === "BOOK_ALREADY_LENDING") {
+      errorMessage = "この本はすでに貸出中です";
+    }
+
+    res.status(500).json({ success: false, message: errorMessage });
   }
 }
 
@@ -312,41 +235,24 @@ async function returnBook(req, res, next) {
   console.log("Return request:", { user_id, isbn });
 
   try {
-    // 書籍が存在するか確認
-    const { success, book } = await bookModel.getBookByIsbn(isbn);
-    console.log("Book lookup result:", { success, book });
+    // loanModelのトランザクション機能を使用して返却処理
+    const returnDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD形式
+    const result = await loanModel.returnBook(isbn, user_id, returnDate);
 
-    if (!success) {
-      return res.json({ success: false, message: "BOOK_NOT_EXIST" });
-    }
-
-    // loanデータベースで貸出状態を確認
-    const isCurrentlyLoaned = await loanModel.isBookCurrentlyLoaned(isbn);
-    console.log("Book loan status from loan DB:", isCurrentlyLoaned);
-
-    if (!isCurrentlyLoaned) {
-      return res.json({ success: false, message: "BOOK_NOT_LENDING" });
-    }
-
-    // 書籍を利用可能に更新
-    console.log("Updating book status to available...");
-    await bookModel.updateBook(isbn, book.title, book.author, false);
-
-    // 貸出記録を更新（返却日を設定）
-    console.log("Finding active loan...");
-    const activeLoan = await loanModel.findActiveLoan(isbn, user_id);
-    console.log("Active loan found:", activeLoan);
-
-    if (activeLoan) {
-      const returnDate = new Date().toISOString().split("T")[0];
-      console.log("Updating loan with return date:", returnDate);
-      await loanModel.updateLoan(activeLoan.loanId, { returnDate });
-    }
-
+    console.log("Return result:", result);
     res.json({ success: true, message: "本が正常に返却されました" });
   } catch (error) {
     console.error("Error returning book:", error);
-    res.status(500).json({ success: false, message: error.message });
+
+    // エラーメッセージの処理
+    let errorMessage = error.message;
+    if (error.message === "BOOK_NOT_EXIST") {
+      errorMessage = "指定された本が見つかりません";
+    } else if (error.message === "BOOK_NOT_LENDING") {
+      errorMessage = "この本は貸出されていません";
+    }
+
+    res.status(500).json({ success: false, message: errorMessage });
   }
 }
 
@@ -384,15 +290,19 @@ async function search(req, res, next) {
 }
 
 module.exports = {
+  // 本のエンティティ操作
   createBook,
   getBook,
   getAllBooks,
-  getOverdueBooks,
-  getLoanByIsbn,
-  getAllLoans,
   updateBook,
   deleteBook,
+  search,
+
+  // 貸出情報取得（別APIエンドポイント）
+  getLoanByIsbn,
+  getAllLoans,
+
+  // 貸出・返却操作（loanModel経由）
   lend,
   returnBook,
-  search,
 };

@@ -4,12 +4,16 @@ const { writeJsonFile, readJsonFile } = require("../operation");
 const repositoryPath = path.join(__dirname, "../../../repository");
 
 class BookModel {
+  constructor() {
+    this.dataDir = repositoryPath;
+  }
+
   async create(title, author, isbn) {
     const books = await readJsonFile(repositoryPath, "book.json");
     if (books.find((book) => book.isbn === isbn)) {
       throw new Error("Book with this ISBN already exists.");
     }
-    books.push({ title, author, isbn, isBorrowed: false });
+    books.push({ title, author, isbn });
     await writeJsonFile(repositoryPath, "book.json", books);
   }
 

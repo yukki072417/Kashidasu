@@ -4,13 +4,19 @@ const { writeJsonFile, readJsonFile } = require("../operation");
 const repositoryPath = path.join(__dirname, "../../../repository");
 
 class LoanModel {
+  constructor() {
+    this.dataDir = repositoryPath;
+  }
+
   async create(loanId, bookId, userId, loanDate, returnDate = null) {
     const loans = await readJsonFile(repositoryPath, "loan.json");
     if (loans.find((loan) => loan.loanId === loanId)) {
       throw new Error("Loan with this ID already exists.");
     }
-    loans.push({ loanId, bookId, userId, loanDate, returnDate });
+    const newLoan = { loanId, bookId, userId, loanDate, returnDate };
+    loans.push(newLoan);
     await writeJsonFile(repositoryPath, "loan.json", loans);
+    return newLoan;
   }
 
   async findOne(loanId) {
@@ -25,7 +31,11 @@ class LoanModel {
 
   async findByUserId(userId) {
     const loans = await readJsonFile(repositoryPath, "loan.json");
-    return loans.filter((loan) => loan.userId === userId);
+    if (userId) {
+      return loans.filter((loan) => loan.userId === userId);
+    } else {
+      return loans; // userIdが未指定の場合は全ローンを返す
+    }
   }
 
   async isBookCurrentlyLoaned(isbn) {

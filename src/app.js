@@ -44,6 +44,13 @@ app.use("/api/admin", adminRoutes);
 app.use("/api", apiRoutes); // apiRoutesをマウント
 app.use("/", pageRoutes);
 
+// デバッグ：ルートが正しく登録されているか確認
+console.log("Registered routes:");
+console.log(
+  "- /api/book routes:",
+  bookRoutes.stack.map((r) => r.route?.path).filter(Boolean),
+);
+
 // logsディレクトリが存在しない場合は作成
 if (!fs.existsSync(logDir)) {
   console.log("logsディレクトリを生成");

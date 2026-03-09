@@ -123,32 +123,38 @@ function RegisterBook(bookArray) {
 
   // まず全ての本を削除してから新しい本を登録
   fetch(AllDeleteDB_URL, {
-    method: "DELETE", // POSTからDELETEに変更
+    method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ all_delete: true }),
   })
     .then((response) => {
+      if (!response.ok) {
+        throw new Error("削除処理に失敗しました");
+      }
       // 削除が終わったら本の登録リクエストを送信
-      fetch(Register_URL, {
+      return fetch(Register_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: datas,
-      })
-        .then(async (response) => {
-          const json = await response.json();
-          alert(`${bookArray.length}冊の本が正常に登録されました`);
-        })
-        .catch((error) => {
-          console.error("Fetch error:", error);
-          alert("登録中にエラーが発生しました");
-        });
+      });
+    })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error("登録処理に失敗しました");
+      }
+      const json = await response.json();
+      if (json.result === "SUCCESS") {
+        alert(`${bookArray.length}冊の本が正常に登録されました`);
+      } else {
+        alert(`登録エラー: ${json.message || "不明なエラー"}`);
+      }
     })
     .catch((error) => {
-      console.error("Delete error:", error);
-      alert("既存データの削除中にエラーが発生しました");
+      console.error("Fetch error:", error);
+      alert("登録中にエラーが発生しました: " + error.message);
     });
 }
