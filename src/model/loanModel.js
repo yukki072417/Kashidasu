@@ -1,3 +1,7 @@
+/**
+ * 貸出モデル
+ * 貸出・返却のデータベース操作を管理する
+ */
 const path = require("path");
 const LoanModel = require("../db/models/loan");
 const BookModel = require("../db/models/book");
@@ -25,66 +29,85 @@ function createError(status, message) {
 
 /**
  * 貸出処理（原子的）
- *
- * 1. 本が存在することを確認
- * 2. アクティブなローンがないことを確認
- * 3. ローンレコードを作成
- *
- * 失敗時はローンレコードもロールバックする。
+ * @param {string} isbn - ISBN番号
+ * @param {string} userId - ユーザーID
+ * @param {string} loanDate - 貸出日
+ * @returns {Promise<object>} - 貸出結果
  */
 async function lendBook(isbn, userId, loanDate) {
-  return withTransaction([getLoanFilePath(), getBookFilePath()], async () => {
-    const book = await bookModelInstance.findOne(isbn);
-    if (!book) {
-      throw createError(404, "BOOK_NOT_EXIST");
-    }
+  try {
+    return await withTransaction(
+      [getLoanFilePath(), getBookFilePath()],
+      async () => {
+        const book = await bookModelInstance.findOne(isbn);
+        if (!book) {
+          throw createError(404, "BOOK_NOT_EXIST");
+        }
 
-    const activeLoan = await findActiveLoan(isbn);
-    if (activeLoan) {
-      throw createError(409, "BOOK_ALREADY_LENDING");
-    }
+        const activeLoan = await findActiveLoan(isbn);
+        if (activeLoan) {
+          throw createError(409, "BOOK_ALREADY_LENDING");
+        }
 
-    const loanId = Date.now().toString();
-    const loan = await loanModelInstance.create(
-      loanId,
-      isbn,
-      userId,
-      loanDate,
-      null,
+        const loanId = Date.now().toString();
+        const loan = await loanModelInstance.create(
+          loanId,
+          isbn,
+          userId,
+          loanDate,
+          null,
+        );
+
+        if (!loan) {
+          throw createError(500, "Failed to create loan record.");
+        }
+
+        return {
+          success: true,
+          data: { loanId },
+          message: "書籍が正常に貸出されました",
+        };
+      },
     );
-
-    if (!loan) {
-      throw createError(500, "Failed to create loan record.");
-    }
-
-    return { success: true, loanId };
-  });
+  } catch (error) {
+    throw error;
+  }
 }
 
 /**
  * 返却処理（原子的）
- *
- * 1. アクティブなローンを検索
- * 2. ローンの returnDate を更新
- *
- * 失敗時はロールバックする。
+ * @param {string} isbn - ISBN番号
+ * @param {string} userId - ユーザーID
+ * @param {string} returnDate - 返却日
+ * @returns {Promise<object>} - 返却結果
  */
 async function returnBook(isbn, userId, returnDate) {
-  return withTransaction([getLoanFilePath(), getBookFilePath()], async () => {
-    const book = await bookModelInstance.findOne(isbn);
-    if (!book) {
-      throw createError(404, "BOOK_NOT_EXIST");
-    }
+  try {
+    return await withTransaction(
+      [getLoanFilePath(), getBookFilePath()],
+      async () => {
+        const book = await bookModelInstance.findOne(isbn);
+        if (!book) {
+          throw createError(404, "BOOK_NOT_EXIST");
+        }
 
-    const activeLoan = await findActiveLoan(isbn, userId);
-    if (!activeLoan) {
-      throw createError(409, "BOOK_NOT_LENDING");
-    }
+        const activeLoan = await findActiveLoan(isbn, userId);
+        if (!activeLoan) {
+          throw createError(409, "BOOK_NOT_LENDING");
+        }
 
-    await loanModelInstance.update(activeLoan.loanId, { returnDate });
+        await loanModelInstance.update(activeLoan.loanId, { returnDate });
 
-    return { success: true };
-  });
+        return {
+          success: true,
+          data: null,
+          message: "書籍が正常に返却されました",
+        };
+      },
+    );
+  } catch (error) {
+    throw error;
+  }
 }
 
 /**

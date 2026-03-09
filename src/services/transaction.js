@@ -1,3 +1,7 @@
+/**
+ * トランザクションサービス
+ * ファイルベースのトランザクション処理を管理する
+ */
 const fs = require("fs").promises;
 const path = require("path");
 

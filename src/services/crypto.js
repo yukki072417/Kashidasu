@@ -1,7 +1,16 @@
+/**
+ * 暗号化サービス
+ * パスワードのハッシュ化と検証を管理する
+ */
 const bcrypt = require("bcrypt");
 
-const saltRounds = 10;
+const saltRounds = 10; // bcryptのソルトラウンド数
 
+/**
+ * コンテンツをハッシュ化する関数
+ * @param {string} content - ハッシュ化するコンテンツ
+ * @returns {string} - ハッシュ化されたコンテンツ
+ */
 function hash(content) {
   if (content == null || content == "") {
     throw new Error("Content cannot be empty.");
@@ -10,6 +19,12 @@ function hash(content) {
   return hashedContent;
 }
 
+/**
+ * コンテンツとハッシュ化されたコンテンツを比較する関数
+ * @param {string} content - 検証するコンテンツ
+ * @param {string} hashedContent - ハッシュ化されたコンテンツ
+ * @returns {boolean} - 検証結果
+ */
 function isValid(content, hashedContent) {
   try {
     if (

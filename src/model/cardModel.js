@@ -1,39 +1,67 @@
+/**
+ * カードモデル
+ * カード生成とファイル管理を管理する
+ */
 const fs = require("fs");
 const path = require("path");
 
 class CardModel {
+  /**
+   * コンストラクタ
+   */
   constructor() {
     this.outputDir = path.join(__dirname, "../../public/pdf");
     this.ensureOutputDir();
   }
 
+  /**
+   * 出力ディレクトリを確保する関数
+   */
   ensureOutputDir() {
     if (!fs.existsSync(this.outputDir)) {
       fs.mkdirSync(this.outputDir, { recursive: true });
     }
   }
 
+  /**
+   * カードを生成する関数
+   * @param {object} cardData - カードデータ
+   * @param {string} cardData.id - ID
+   * @param {string} cardData.gread - 学年
+   * @param {string} cardData.class - クラス
+   * @param {string} cardData.number - 番号
+   * @returns {Promise<object>} - 生成結果
+   */
   async generateCard(cardData) {
-    const { id, gread, class: className, number } = cardData;
+    try {
+      const { id, gread, class: className, number } = cardData;
 
-    // カード情報を検証
-    if (!id || !gread || !className || !number) {
-      throw new Error("すべてのフィールドを入力してください");
+      // カード情報を検証
+      if (!id || !gread || !className || !number) {
+        throw new Error("すべてのフィールドを入力してください");
+      }
+
+      // PDF生成（ここでは簡単な実装）
+      const pdfPath = path.join(this.outputDir, "kashidasu_card.pdf");
+
+      // 実際のプロジェクトではpuppeteerなどのライブラリを使用してPDFを生成
+      // ここではダミーのPDFファイルを作成
+      this.createDummyPdf(pdfPath);
+
+      return {
+        success: true,
+        data: { pdfPath: "/pdf/kashidasu_card.pdf" },
+        message: "カードが正常に生成されました",
+      };
+    } catch (error) {
+      throw error;
     }
-
-    // PDF生成（ここでは簡単な実装）
-    const pdfPath = path.join(this.outputDir, "kashidasu_card.pdf");
-
-    // 実際のプロジェクトではpuppeteerなどのライブラリを使用してPDFを生成
-    // ここではダミーのPDFファイルを作成
-    this.createDummyPdf(pdfPath);
-
-    return {
-      success: true,
-      pdfPath: "/pdf/kashidasu_card.pdf",
-    };
   }
 
+  /**
+   * ダミーPDFを作成する関数
+   * @param {string} pdfPath - PDFファイルパス
+   */
   createDummyPdf(pdfPath) {
     // ダミーのPDFファイルを作成
     // 実際のプロジェクトではpuppeteerなどのライブラリを使用
@@ -43,16 +71,28 @@ class CardModel {
     fs.writeFileSync(pdfPath, dummyContent, "binary");
   }
 
+  /**
+   * カードファイルのステータスを取得する関数
+   * @returns {Promise<object>} - ファイルステータス
+   */
   async getCardFiles() {
-    const pdfPath = path.join(this.outputDir, "kashidasu_card.pdf");
-    const pngPath = path.join(this.outputDir, "kashidasu_card.png");
+    try {
+      const pdfPath = path.join(this.outputDir, "kashidasu_card.pdf");
+      const pngPath = path.join(this.outputDir, "kashidasu_card.png");
 
-    return {
-      pdfExists: fs.existsSync(pdfPath),
-      pngExists: fs.existsSync(pngPath),
-      pdfPath: "/pdf/kashidasu_card.pdf",
-      pngPath: "/pdf/kashidasu_card.png",
-    };
+      return {
+        success: true,
+        data: {
+          pdfExists: fs.existsSync(pdfPath),
+          pngExists: fs.existsSync(pngPath),
+          pdfPath: "/pdf/kashidasu_card.pdf",
+          pngPath: "/pdf/kashidasu_card.png",
+        },
+        message: "カードファイルステータスが正常に取得されました",
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

@@ -1,18 +1,22 @@
+/**
+ * 書籍ルーター
+ * 書籍関連のAPIエンドポイントを定義する
+ */
 const express = require("express");
 const router = express.Router();
 const bookController = require("../controller/bookController");
 
-// 本のエンティティ操作
-router.post("/register", bookController.createBook);
-router.get("/get", bookController.getBook);
-router.get("/get/all", bookController.getAllBooks);
-router.put("/update", bookController.updateBook);
-router.delete("/delete", bookController.deleteBook);
+// 書籍のエンティティ操作
+router.post("/", bookController.createBook);
+router.get("/one", bookController.getBook);
+router.get("/all", bookController.getAllBooks);
+router.put("/", bookController.updateBook);
+router.delete("/", bookController.deleteBook);
 router.post("/search", bookController.search);
 
-// 本の貸出情報取得（クエリパラメータで分岐）
-router.get("/get/loan", bookController.getLoanByIsbn);
-router.get("/get/loan/all", bookController.getAllLoans);
+// 書籍の貸出情報取得（クエリパラメータで分岐）
+router.get("/loan", bookController.getLoanByIsbn);
+router.get("/loan/all", bookController.getAllLoans);
 
 // 貸出・返却操作
 router.post("/lend", bookController.lend);

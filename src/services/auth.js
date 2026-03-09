@@ -1,5 +1,15 @@
+/**
+ * 認証サービス
+ * 管理者の認証とセッション管理を管理する
+ */
 const { getAdminById, authenticateAdmin } = require("../model/adminModel");
 
+/**
+ * 管理者認証ミドルウェア
+ * @param {object} req - リクエストオブジェクト
+ * @param {object} res - レスポンスオブジェクト
+ * @param {function} next - ミドルウェア関数
+ */
 async function adminAuth(req, res, next) {
   if (req.session.admin == null) {
     // req.session が直接 true になることはないため、admin プロパティを確認
@@ -16,10 +26,20 @@ async function adminAuth(req, res, next) {
   }
 }
 
+/**
+ * メインページをレンダリングする関数
+ * @param {object} req - リクエストオブジェクト
+ * @param {object} res - レスポンスオブジェクト
+ */
 function renderMainPage(req, res) {
   res.render("Main", { adminId: req.session.admin }); // Main.ejs に adminId を渡す
 }
 
+/**
+ * ログイン処理を行う関数
+ * @param {object} req - リクエストオブジェクト
+ * @param {object} res - レスポンスオブジェクト
+ */
 async function login(req, res) {
   const { admin_id, admin_password } = req.body;
 
@@ -40,6 +60,11 @@ async function login(req, res) {
   }
 }
 
+/**
+ * ログアウト処理を行う関数
+ * @param {object} req - リクエストオブジェクト
+ * @param {object} res - レスポンスオブジェクト
+ */
 async function logout(req, res) {
   req.session.destroy();
   res.redirect("/login");

@@ -1,17 +1,33 @@
+/**
+ * 書籍コントローラー
+ * 書籍のCRUD操作と貸出・返却機能を管理する
+ */
 const bookModel = require("../model/bookModel");
 const loanModel = require("../model/loanModel");
 
+/**
+ * 新規書籍を作成する関数
+ * @param {object} req - リクエストオブジェクト
+ * @param {object} res - レスポンスオブジェクト
+ * @param {function} next - ミドルウェア関数
+ */
 async function createBook(req, res, next) {
   const { isbn, title, author } = req.body;
   try {
     await bookModel.createBook(isbn, title, author);
-    res.json({ result: "SUCCESS" });
+    res.json({ success: true, message: "書籍が正常に作成されました" });
   } catch (error) {
     console.error("Error creating book:", error);
-    res.status(500).json({ result: "FAILED", message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 
+/**
+ * 書籍情報を取得する関数
+ * @param {object} req - リクエストオブジェクト
+ * @param {object} res - レスポンスオブジェクト
+ * @param {function} next - ミドルウェア関数
+ */
 async function getBook(req, res, next) {
   console.log("getBook function called with query:", req.query);
   const { isbn, manual_search_mode } = req.query;
@@ -20,9 +36,13 @@ async function getBook(req, res, next) {
       // 特定の書籍を取得
       const { success, book } = await bookModel.getBookByIsbn(isbn);
       if (success) {
-        res.json(book);
+        res.json({
+          success: true,
+          data: book,
+          message: "書籍が正常に取得されました",
+        });
       } else {
-        res.status(404).json({ result: "FAILED", message: "Book not found." });
+        res.status(404).json({ success: false, message: "Book not found." });
       }
     } else {
       // 全書籍取得の場合
@@ -39,11 +59,15 @@ async function getBook(req, res, next) {
       const paginatedBooks = allBooks.slice(offset, offset + limit);
 
       console.log("Returning", paginatedBooks.length, "books");
-      res.json([{ "COUNT(isbn)": count }, ...paginatedBooks]);
+      res.json({
+        success: true,
+        data: [{ "COUNT(isbn)": count }, ...paginatedBooks],
+        message: "書籍一覧が正常に取得されました",
+      });
     }
   } catch (error) {
     console.error("Error getting book:", error);
-    res.status(500).json({ result: "FAILED", message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 
@@ -61,10 +85,14 @@ async function getAllBooks(req, res, next) {
     const paginatedBooks = allBooks.slice(offset, offset + limit);
 
     // レスポンス形式
-    res.json([{ "COUNT(isbn)": count }, ...paginatedBooks]);
+    res.json({
+      success: true,
+      data: [{ "COUNT(isbn)": count }, ...paginatedBooks],
+      message: "書籍一覧が正常に取得されました",
+    });
   } catch (error) {
     console.error("Error getting all books:", error);
-    res.status(500).json({ result: "FAILED", message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 
@@ -180,10 +208,10 @@ async function updateBook(req, res, next) {
     // bookModel.updateBook は before_isbn を使わないので、isbn が変更された場合は
     // 削除＆新規作成が必要になるが、ここでは単純な更新として扱う
     await bookModel.updateBook(isbn, title, author);
-    res.json({ result: "SUCCESS" });
+    res.json({ success: true, message: "書籍が正常に更新されました" });
   } catch (error) {
     console.error("Error updating book:", error);
-    res.status(500).json({ result: "FAILED", message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 
@@ -192,14 +220,14 @@ async function deleteBook(req, res, next) {
   try {
     if (all_delete) {
       await bookModel.deleteAllBooks();
-      res.json({ result: "SUCCESS", message: "All books deleted." });
+      res.json({ success: true, message: "全書籍が正常に削除されました" });
     } else {
       await bookModel.deleteBook(isbn);
-      res.json({ result: "SUCCESS", message: "Book deleted." });
+      res.json({ success: true, message: "書籍が正常に削除されました" });
     }
   } catch (error) {
     console.error("Error deleting book:", error);
-    res.status(500).json({ result: "FAILED", message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 
@@ -275,17 +303,21 @@ async function search(req, res, next) {
       default:
         return res
           .status(400)
-          .json({ result: "FAILED", message: "Invalid search type." });
+          .json({ success: false, message: "Invalid search type." });
     }
 
     if (result.success) {
-      res.json({ result: "SUCCESS", data: result.book });
+      res.json({
+        success: true,
+        data: result.book,
+        message: "検索が正常に完了しました",
+      });
     } else {
-      res.json({ result: "SUCCESS", data: [] }); // 検索結果がない場合は空配列
+      res.json({ success: true, data: [], message: "検索結果がありません" }); // 検索結果がない場合は空配列
     }
   } catch (error) {
     console.error("Error searching book:", error);
-    res.status(500).json({ result: "FAILED", message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 }
 
