@@ -10,7 +10,7 @@
   </head>
   <body>
     <script src="/js/jquery-3.7.1.min.js"></script>
-    <script src="/js/CollectiveRegister.js"></script>
+    <script src="/js/collectiveRegister.js"></script>
     <%- include('../Header') %>
     <button class="animation-btn" onclick="location.href = '/register'">
       ←戻る
@@ -21,21 +21,24 @@
 
       <div class="tab-buttons">
         <button class="tab-button active" onclick="switchTab('csv')">
-          CSVファイル登録
+          CSVファイル登録(上書き)
         </button>
         <button class="tab-button" onclick="switchTab('text')">
-          テキスト入力登録
+          テキスト入力登録(追加)
         </button>
       </div>
 
       <!-- CSVファイル登録タブ -->
       <div id="csv-tab" class="tab-content active">
-        <h3>CSVファイル読み込み登録方式</h3>
+        <h3>CSVファイル読み込み登録方式(上書き)</h3>
         <div class="input-format">
-          <h4>CSVファイル形式：</h4>
-          <p>1行目：ヘッダー（ISBN,タイトル,著者）</p>
-          <p>2行目以降：<code>ISBNコード,本のタイトル,著者名</code></p>
-          <p>例：<code>9784167159005,吾輩は猫である,夏目漱石</code></p>
+          <h4>CSVファイル形式:</h4>
+          <p>1行目:ヘッダー(ISBN,タイトル,著者)</p>
+          <p>2行目以降:<code>ISBNコード,本のタイトル,著者名</code></p>
+          <p>例:<code>9784167159005,吾輩は猫である,夏目漱石</code></p>
+          <p class="warning">
+            既存の書籍データはすべて削除され、CSVファイルの内容で上書きされます
+          </p>
         </div>
         <form method="post">
           <div id="input-form">
@@ -59,23 +62,26 @@
 
       <!-- テキスト入力登録タブ -->
       <div id="text-tab" class="tab-content">
-        <h3>テキスト入力登録方式</h3>
+        <h3>テキスト入力登録方式(追加)</h3>
         <div class="input-format">
-          <h4>入力形式：</h4>
+          <h4>入力形式:</h4>
           <p>1行に1冊の情報を入力してください</p>
-          <p>形式：<code>ISBNコード,本のタイトル,著者名</code></p>
-          <p>例：<code>9784167159005,吾輩は猫である,夏目漱石</code></p>
+          <p>形式:<code>ISBNコード,本のタイトル,著者名</code></p>
+          <p>例:<code>9784167159005,吾輩は猫である,夏目漱石</code></p>
+          <p class="info">
+            既存の書籍データは保持されたまま、新しい書籍が追加されます
+          </p>
         </div>
         <textarea
           id="text-input"
           class="text-input-area"
-          placeholder="ISBNコード,本のタイトル,著者名&#10;9784167159005,吾輩は猫である,夏目漱石&#10;9784101010014,坊っちゃん,夏目漱石"
+          placeholder="9784167159005,吾輩は猫である,夏目漱石&#10;9784101010014,坊っちゃん,夏目漱石"
         ></textarea>
         <input
           type="button"
           id="text-submit-btn"
           onclick="RegisterBooksByText()"
-          value="上書き登録"
+          value="追加登録"
         />
       </div>
     </div>
