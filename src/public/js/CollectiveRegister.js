@@ -127,9 +127,14 @@ function RegisterBook(bookArray, isOverwrite) {
       },
       body: JSON.stringify({ all_delete: true }),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (!response.ok) {
-          throw new Error("削除処理に失敗しました");
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "削除処理に失敗しました");
+        }
+        const json = await response.json();
+        if (!json.success) {
+          throw new Error(json.message || "削除処理に失敗しました");
         }
         // 削除が終わったら本の登録リクエストを送信
         return fetch(Register_URL, {
@@ -142,7 +147,8 @@ function RegisterBook(bookArray, isOverwrite) {
       })
       .then(async (response) => {
         if (!response.ok) {
-          throw new Error("登録処理に失敗しました");
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "登録処理に失敗しました");
         }
         const json = await response.json();
         if (json.success) {
@@ -166,7 +172,8 @@ function RegisterBook(bookArray, isOverwrite) {
     })
       .then(async (response) => {
         if (!response.ok) {
-          throw new Error("登録処理に失敗しました");
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "登録処理に失敗しました");
         }
         const json = await response.json();
         if (json.success) {

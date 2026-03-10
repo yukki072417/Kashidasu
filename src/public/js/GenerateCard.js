@@ -34,15 +34,34 @@ function SendContent() {
     },
     body: JSON.stringify(datas),
   })
-    .then((response) => {
-      if (response.ok) {
+    .then(async (response) => {
+      const json = await response.json();
+
+      if (response.ok && json.success) {
         ShowImage();
       } else {
+        // ステータスコードに応じたエラーメッセージ
+        let errorMessage = json.message || "カード生成に失敗しました";
+
+        if (response.status === 400) {
+          errorMessage = "入力エラー: " + errorMessage;
+        } else if (response.status === 500) {
+          errorMessage = "サーバーエラー: " + errorMessage;
+        }
+
+        alert(errorMessage);
         console.error("Error:", response.statusText);
+
+        // 生成中の画像を削除
+        $("#card").remove();
       }
     })
     .catch((error) => {
       console.error("Fetch error:", error);
+      alert("カード生成中にエラーが発生しました: " + error.message);
+
+      // 生成中の画像を削除
+      $("#card").remove();
     });
 }
 

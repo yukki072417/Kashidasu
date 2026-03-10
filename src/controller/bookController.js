@@ -147,16 +147,22 @@ async function getLoanByIsbn(req, res, next) {
       });
     }
 
-    const activeLoansResult = await loanModel.getActiveLoans(isbn);
+    // getUserLoansを使用して全貸出情報を取得し、ISBNでフィルタ
+    const allLoansResult = await loanModel.getUserLoans();
 
-    if (!activeLoansResult.success) {
+    if (!allLoansResult.success) {
       return res.status(500).json({
         success: false,
-        message: activeLoansResult.message,
+        message: allLoansResult.message,
       });
     }
 
-    const activeLoans = activeLoansResult.data;
+    const allLoans = allLoansResult.data;
+
+    // 指定ISBNのアクティブな貸出をフィルタ
+    const activeLoans = allLoans.filter(
+      (loan) => loan.bookId === isbn && !loan.returnDate,
+    );
 
     if (activeLoans.length === 0) {
       return res.status(200).json({

@@ -15,6 +15,14 @@
   <body>
     <%- include('Header') %>
 
+    <!-- エラーメッセージ表示エリア -->
+    <div id="error-message" class="error-message" style="display: none"></div>
+    <div
+      id="success-message"
+      class="success-message"
+      style="display: none"
+    ></div>
+
     <form method="post" action="/api/admin/login">
       <h1 id="form-title">ログインページ</h1>
       <div class="form-container">
@@ -51,5 +59,63 @@
     />
 
     <%- include('Footer') %>
+
+    <style>
+      .error-message {
+        background-color: #ffebee;
+        color: #c62828;
+        padding: 12px 20px;
+        margin: 20px auto;
+        max-width: 500px;
+        border-radius: 4px;
+        border-left: 4px solid #c62828;
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .success-message {
+        background-color: #e8f5e8;
+        color: #2e7d32;
+        padding: 12px 20px;
+        margin: 20px auto;
+        max-width: 500px;
+        border-radius: 4px;
+        border-left: 4px solid #2e7d32;
+        font-size: 14px;
+        text-align: center;
+      }
+    </style>
+
+    <script>
+      // エラーメッセージ表示関数
+      function showError(message) {
+        const errorElement = document.getElementById("error-message");
+        const successElement = document.getElementById("success-message");
+
+        errorElement.textContent = message;
+        errorElement.style.display = "block";
+        successElement.style.display = "none";
+
+        // 5秒後に自動で非表示
+        setTimeout(() => {
+          errorElement.style.display = "none";
+        }, 5000);
+      }
+
+      // 成功メッセージ表示関数
+      function showSuccess(message) {
+        const errorElement = document.getElementById("error-message");
+        const successElement = document.getElementById("success-message");
+
+        successElement.textContent = message;
+        successElement.style.display = "block";
+        errorElement.style.display = "none";
+
+        // 3秒後に自動で非表示
+        setTimeout(() => {
+          successElement.style.display = "none";
+        }, 3000);
+      }
+    </script>
   </body>
 </html>

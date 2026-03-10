@@ -13,9 +13,18 @@ const cardModel = new CardModel();
  * @param {function} next - ミドルウェア関数
  */
 async function generateCard(req, res, next) {
-  const { id, gread, class: className, number } = req.body;
-
   try {
+    const { id, gread, class: className, number } = req.body;
+
+    // ビジネスロジック: バリデーション
+    if (!id || !gread || !className || !number) {
+      return res.status(400).json({
+        success: false,
+        message: "すべてのフィールドは必須です",
+      });
+    }
+
+    // モデル層の呼び出し
     const result = await cardModel.generateCard({
       id,
       gread,
@@ -23,14 +32,20 @@ async function generateCard(req, res, next) {
       number,
     });
 
-    res.json({
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(201).json({
       success: true,
-      message: "カードが正常に生成されました",
-      ...result,
+      data: result.data,
+      message: result.message,
     });
   } catch (error) {
-    console.error("Error generating card:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 
@@ -42,15 +57,23 @@ async function generateCard(req, res, next) {
  */
 async function getCardStatus(req, res, next) {
   try {
-    const files = await cardModel.getCardFiles();
-    res.json({
+    // モデル層の呼び出し
+    const result = await cardModel.getCardFiles();
+
+    if (!result.success) {
+      return res.status(500).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(200).json({
       success: true,
-      message: "カードステータスが正常に取得されました",
-      ...files,
+      data: result.data,
+      message: result.message,
     });
   } catch (error) {
-    console.error("Error getting card status:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 

@@ -44,50 +44,66 @@ async function LoadBooks(pageNum) {
 
     if (booksResponse.ok) {
       const booksData = await booksResponse.json();
-      totalRecords = booksData.data[0]["COUNT(isbn)"];
-      const books = booksData.data.slice(1);
 
-      // 貸出情報を取得
-      const loansResponse = await fetch(
-        `https://localhost:443/api/book/loan/all`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
+      // 新しいレスポンス形式に対応
+      if (booksData.success && booksData.data) {
+        totalRecords = booksData.data[0]["COUNT(isbn)"];
+        const books = booksData.data.slice(1);
+
+        // 貸出情報を取得
+        const loansResponse = await fetch(
+          `https://localhost:443/api/book/loan/all`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
           },
-        },
-      );
-
-      let loans = [];
-      if (loansResponse.ok) {
-        const loansData = await loansResponse.json();
-        loans = loansData.data || [];
-      }
-
-      // 書籍に貸出情報を付加
-      const booksWithLoanInfo = books.map((book) => {
-        const activeLoan = loans.find(
-          (loan) => loan.bookId === book.isbn && !loan.returnDate,
         );
 
-        return {
-          ...book,
-          isBorrowed: activeLoan ? true : false,
-          userId: activeLoan ? activeLoan.userId : null,
-          loanDate: activeLoan ? activeLoan.loanDate : null,
-          returnDate: activeLoan ? activeLoan.returnDate : null,
-          dueDate: activeLoan ? activeLoan.dueDate : null,
-        };
-      });
+        let loans = [];
+        if (loansResponse.ok) {
+          const loansData = await loansResponse.json();
+          if (loansData.success && loansData.data) {
+            loans = loansData.data || [];
+          }
+        }
 
-      await SetTable(booksWithLoanInfo);
-      UpdatePageInfo();
+        // 書籍に貸出情報を付加
+        const booksWithLoanInfo = books.map((book) => {
+          const activeLoan = loans.find(
+            (loan) => loan.bookId === book.isbn && !loan.returnDate,
+          );
+
+          return {
+            ...book,
+            isBorrowed: activeLoan ? true : false,
+            userId: activeLoan ? activeLoan.userId : null,
+            loanDate: activeLoan ? activeLoan.loanDate : null,
+            returnDate: activeLoan ? activeLoan.returnDate : null,
+            dueDate: activeLoan ? activeLoan.dueDate : null,
+          };
+        });
+
+        await SetTable(booksWithLoanInfo);
+        UpdatePageInfo();
+      } else {
+        console.error("APIエラー:", booksData.message);
+        alert("書籍データの取得に失敗しました: " + booksData.message);
+        UpdatePageInfo();
+      }
     } else {
       console.error("API呼び出しエラー:", booksResponse.status);
+      const errorData = await booksResponse.json().catch(() => ({}));
+      alert(
+        "書籍データの取得に失敗しました: " +
+          (errorData.message || "サーバーエラー"),
+      );
       UpdatePageInfo();
     }
   } catch (error) {
-    console.error("LoadBooks エラー:", error);
+    console.error("Error:", error);
+    alert("エラー発生: " + error.message);
     UpdatePageInfo();
   }
 }

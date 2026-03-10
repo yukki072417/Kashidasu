@@ -265,19 +265,27 @@ function processingBook(userBarcode, isbnBarcode) {
     body: JSON.stringify(data),
   })
     .then(async (response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
       const json = await response.json();
 
       updateStatus("処理完了", "", 100, "active");
 
-      if (json.success) {
+      if (response.ok && json.success) {
         showSuccess(
           `本が正常に${currentMode === "lend" ? "貸出" : "返却"}されました。`,
         );
       } else {
-        showError(`エラー: ${json.message}`);
+        // ステータスコードに応じたエラーメッセージ
+        let errorMessage = json.message || "処理に失敗しました";
+
+        if (response.status === 400) {
+          errorMessage = "入力エラー: " + errorMessage;
+        } else if (response.status === 404) {
+          errorMessage = "データが見つかりません: " + errorMessage;
+        } else if (response.status === 500) {
+          errorMessage = "サーバーエラー: " + errorMessage;
+        }
+
+        showError(errorMessage);
       }
 
       // 2秒後にリロード
@@ -288,7 +296,7 @@ function processingBook(userBarcode, isbnBarcode) {
     .catch((error) => {
       console.error("Fetch error:", error);
       updateStatus("エラー", "通信エラーが発生しました", 0, "error");
-      showError("本の登録中にエラーが発生しました。");
+      showError("本の登録中にエラーが発生しました: " + error.message);
 
       // 3秒後にリロード
       setTimeout(() => {

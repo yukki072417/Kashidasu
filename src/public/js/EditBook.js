@@ -88,6 +88,12 @@ window.onload = async function () {
 // 本の情報を編集する関数
 async function EditBook(beforeIsbn, isbn, title, author) {
   try {
+    // バリデーション
+    if (!isbn || !title || !author) {
+      alert("ISBN、タイトル、著者名は必須です");
+      return;
+    }
+
     const response = await fetch("/api/book", {
       method: "PUT",
       headers: {
@@ -102,15 +108,24 @@ async function EditBook(beforeIsbn, isbn, title, author) {
     });
 
     const result = await response.json();
-    if (result.success) {
+
+    // ステータスコードに応じた処理
+    if (response.ok && result.success) {
       alert("変更が適用されました");
       window.location.href = "/book-list";
     } else {
-      alert("エラー: " + result.message);
+      // 400エラー（バリデーションエラー）の場合
+      if (response.status === 400) {
+        alert("入力エラー: " + result.message);
+      } else if (response.status === 404) {
+        alert("書籍が見つかりません: " + result.message);
+      } else {
+        alert("エラー: " + (result.message || "書籍の更新に失敗しました"));
+      }
     }
   } catch (error) {
     console.error("Error:", error);
-    alert("エラー発生: " + error);
+    alert("エラー発生: " + error.message);
   }
 }
 
@@ -119,6 +134,12 @@ async function DeleteBook(isbn) {
   if (!confirm("本当に削除しますか？")) return;
 
   try {
+    // バリデーション
+    if (!isbn) {
+      alert("ISBNは必須です");
+      return;
+    }
+
     const response = await fetch("/api/book", {
       method: "DELETE",
       headers: {
@@ -131,15 +152,26 @@ async function DeleteBook(isbn) {
 
     const result = await response.json();
     console.log(result);
-    if (result.success) {
+
+    // ステータスコードに応じた処理
+    if (response.ok && result.success) {
       alert("書籍が削除されました");
       window.location.href = "/book-list"; // 削除後に書籍一覧ページへリダイレクト
     } else {
-      alert("エラー: " + result.message);
+      // 400エラー（バリデーションエラー）の場合
+      if (response.status === 400) {
+        alert("入力エラー: " + result.message);
+      } else if (response.status === 404) {
+        alert("書籍が見つかりません: " + result.message);
+      } else if (response.status === 500) {
+        alert("サーバーエラー: " + result.message);
+      } else {
+        alert("エラー: " + (result.message || "書籍の削除に失敗しました"));
+      }
     }
   } catch (error) {
     console.error("Error:", error);
-    alert("エラー発生: " + error);
+    alert("エラー発生: " + error.message);
   }
 }
 

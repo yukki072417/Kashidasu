@@ -35,15 +35,43 @@ $(document).ready(function () {
           admin_password: password,
         },
         success: function (response) {
-          console.log(response.result);
-          if (response.result == "FAILED") {
-            alert("パスワードまたはIDが間違っています");
+          console.log("APIレスポンス:", response);
+
+          // 新しいレスポンス形式に対応
+          if (response.success) {
+            // ログイン成功
+            showSuccess("ログインに成功しました");
+            setTimeout(() => {
+              window.location.href = "/main";
+            }, 1000);
           } else {
-            window.location.href = "/main";
+            // ログイン失敗
+            showError(
+              "ログインに失敗しました: " +
+                (response.message || "IDまたはパスワードが間違っています"),
+            );
           }
         },
         error: function (xhr, status, error) {
           console.error("エラー:", error);
+
+          // ステータスコードに応じたエラーメッセージ
+          let errorMessage = "ログイン中にエラーが発生しました";
+
+          if (xhr.status === 400) {
+            errorMessage = "入力エラー: IDまたはパスワードを確認してください";
+          } else if (xhr.status === 401) {
+            errorMessage = "認証エラー: IDまたはパスワードが間違っています";
+          } else if (xhr.status === 500) {
+            errorMessage = "サーバーエラー: しばらくしてから再度お試しください";
+          }
+
+          // レスポンスボディから詳細エラーを取得
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            errorMessage = xhr.responseJSON.message;
+          }
+
+          showError(errorMessage);
         },
       });
     }

@@ -28,6 +28,31 @@ function createError(status, message) {
 }
 
 /**
+ * 貸出期限日を計算する関数
+ * @param {string} userId - ユーザーID
+ * @param {string} loanDate - 貸出日
+ * @returns {Promise<string>} - 貸出期限日（YYYY-MM-DD形式）
+ */
+async function calculateDueDate(userId, loanDate) {
+  try {
+    // 貸出期間を2週間（14日）とする
+    const loanPeriodDays = 14;
+    const loanDateObj = new Date(loanDate);
+
+    // 貸出日から14日後を計算
+    const dueDate = new Date(loanDateObj);
+    dueDate.setDate(dueDate.getDate() + loanPeriodDays);
+
+    // YYYY-MM-DD形式に変換
+    const dueDateStr = dueDate.toISOString().split("T")[0];
+
+    return dueDateStr;
+  } catch (error) {
+    throw createError(500, "Failed to calculate due date.");
+  }
+}
+
+/**
  * 貸出処理（原子的）
  * @param {string} isbn - ISBN番号
  * @param {string} userId - ユーザーID
@@ -44,7 +69,14 @@ async function lendBook(isbn, userId, loanDate) {
           throw createError(404, "BOOK_NOT_EXIST");
         }
 
-        const activeLoan = await findActiveLoan(isbn);
+        const allLoansResult = await getUserLoans();
+        if (!allLoansResult.success) {
+          throw createError(500, "Failed to get loan records.");
+        }
+
+        const activeLoan = allLoansResult.data.find(
+          (loan) => loan.bookId === isbn && !loan.returnDate,
+        );
         if (activeLoan) {
           throw createError(409, "BOOK_ALREADY_LENDING");
         }
@@ -96,7 +128,16 @@ async function returnBook(isbn, userId, returnDate) {
           throw createError(404, "BOOK_NOT_EXIST");
         }
 
-        const activeLoan = await findActiveLoan(isbn, userId);
+        const allLoansResult = await getUserLoans();
+        if (!allLoansResult.success) {
+          throw createError(500, "Failed to get loan records.");
+        }
+
+        const activeLoan = allLoansResult.data.find(
+          (loan) =>
+            loan.bookId === isbn && loan.userId === userId && !loan.returnDate,
+        );
+
         if (!activeLoan) {
           throw createError(409, "BOOK_NOT_LENDING");
         }
@@ -214,12 +255,6 @@ module.exports = {
   createLoan,
   lendBook,
   returnBook,
-  findActiveLoan,
   updateLoan,
   getUserLoans,
-  isBookCurrentlyLoaned,
-  getActiveLoans,
-  getOverdueBooks,
-  getLoanHistory,
-  checkIfOverdue,
 };

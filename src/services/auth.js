@@ -88,7 +88,7 @@ function renderMainPage(req, res) {
 }
 
 /**
- * ログイン処理を行う関数
+ * ログイン処理を行う関数（API用）
  * @param {object} req - リクエストオブジェクト
  * @param {object} res - レスポンスオブジェクト
  */
@@ -96,19 +96,37 @@ async function login(req, res) {
   const { admin_id, admin_password } = req.body;
 
   try {
+    // ビジネスロジック: バリデーション
+    if (!admin_id || !admin_password) {
+      return res.status(400).json({
+        success: false,
+        message: "IDとパスワードは必須です",
+      });
+    }
+
     const isAuthenticated = await authenticateAdmin(admin_id, admin_password);
 
     if (isAuthenticated) {
       req.session.admin = admin_id; // セッションに管理者IDを保存
-      res.redirect("/main"); // メインページへリダイレクト
+
+      return res.status(200).json({
+        success: true,
+        message: "ログインに成功しました",
+        data: { adminId: admin_id },
+      });
     } else {
       // 認証失敗
-      // エラーメッセージをクエリパラメータとして渡すか、フラッシュメッセージを使用するなど
-      res.redirect("/login?error=Invalid credentials"); // エラーメッセージ付きでログインページへ
+      return res.status(401).json({
+        success: false,
+        message: "IDまたはパスワードが間違っています",
+      });
     }
   } catch (error) {
     console.error("Login error:", error);
-    res.redirect("/login?error=Server error during login"); // サーバーエラーの場合
+    return res.status(500).json({
+      success: false,
+      message: "ログイン処理中にエラーが発生しました",
+    });
   }
 }
 
