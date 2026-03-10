@@ -163,14 +163,14 @@ sleep 3
 if screen -list | grep -q "$SCREEN_NAME"; then
     echo -e "${GREEN}✓ screenセッション '$SCREEN_NAME' が正常に起動しました${NC}"
     echo -e "${BLUE}========================================${NC}"
-    echo -e "${GREEN}📋 操作方法:${NC}"
+    echo -e "${GREEN} 操作方法:${NC}"
     echo -e "${YELLOW}• セッションに接続: screen -r $SCREEN_NAME${NC}"
     echo -e "${YELLOW}• セッションから離脱: Ctrl+A, D${NC}"
     echo -e "${YELLOW}• セッション一覧: screen -list${NC}"
     echo -e "${YELLOW}• セッション終了: screen -S $SCREEN_NAME -X quit${NC}"
     echo -e "${BLUE}========================================${NC}"
-    echo -e "${GREEN}🌐 アクセス情報:${NC}"
-    echo -e "${YELLOW}• URL: https://localhost${NC}"
+    echo -e "${GREEN} アクセス情報:${NC}"
+    echo -e "${YELLOW}• URL: https://10.100.240.171${NC}"
     echo -e "${YELLOW}• 管理者ID: 0123456789${NC}"
     echo -e "${YELLOW}• パスワード: password${NC}"
     echo -e "${BLUE}========================================${NC}"
@@ -181,4 +181,4 @@ else
     exit 1
 fi
 
-echo -e "${GREEN}🎉 Kashidasuサーバーのscreen起動が完了しました！${NC}"
+echo -e "${GREEN}Kashidasuサーバーのscreen起動が完了しました！${NC}"
