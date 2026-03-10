@@ -21,6 +21,21 @@ const crypto = require("../../../services/crypto");
 describe("Admin Model Tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // デフォルトのモックを設定
+    const mockAdminModel = new AdminModel();
+    mockAdminModel.create.mockResolvedValue({
+      success: true,
+      data: { adminId: "testadmin" },
+    });
+    mockAdminModel.findOne.mockResolvedValue({
+      success: true,
+      data: { adminId: "testadmin", password: "hashed" },
+    });
+    mockAdminModel.findAll.mockResolvedValue({ success: true, data: [] });
+    mockAdminModel.update.mockResolvedValue({ success: true, data: null });
+    mockAdminModel.delete.mockResolvedValue({ success: true, data: null });
+    crypto.hashPassword.mockResolvedValue("hashedpassword");
   });
 
   describe("createAdmin", () => {
