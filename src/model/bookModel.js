@@ -4,7 +4,24 @@
  */
 const BookModel = require("../db/models/book");
 
-const bookModel = new BookModel();
+// デフォルトのDBモデルインスタンス
+let bookModelInstance = new BookModel();
+
+/**
+ * DBモデルインスタンスを設定する関数（テスト用）
+ * @param {object} instance - DBモデルインスタンス
+ */
+function setBookModelInstance(instance) {
+  bookModelInstance = instance;
+}
+
+/**
+ * DBモデルインスタンスを取得する関数
+ * @returns {object} - DBモデルインスタンス
+ */
+function getBookModelInstance() {
+  return bookModelInstance;
+}
 
 /**
  * 新規書籍を作成する関数
@@ -15,11 +32,18 @@ const bookModel = new BookModel();
  */
 async function createBook(isbn, title, author) {
   try {
-    if (isbn == null || title == null || author == null) {
+    if (
+      isbn == null ||
+      title == null ||
+      author == null ||
+      isbn === "" ||
+      title === "" ||
+      author === ""
+    ) {
       throw new Error("Cannot empty isbn, title, and author.");
     }
 
-    const result = await bookModel.create(title, author, isbn);
+    const result = await bookModelInstance.create(title, author, isbn);
     if (!result.success) {
       return { success: false, message: result.message };
     }
@@ -37,13 +61,18 @@ async function createBook(isbn, title, author) {
  */
 async function getBookByIsbn(isbn) {
   try {
-    if (isbn == null) {
+    if (isbn == null || isbn === "") {
       throw new Error("Cannot empty isbn.");
     }
 
-    const result = await bookModel.findOne(isbn);
+    const result = await bookModelInstance.findOne(isbn);
     if (!result.success) {
       return { success: false, data: null, message: "書籍が見つかりません" };
+    }
+
+    // データ整合性チェック - ISBNフィールドの存在確認
+    if (!result.data || !result.data.isbn) {
+      return { success: false, data: null, message: "書籍データが不正です" };
     }
 
     return {
@@ -63,11 +92,11 @@ async function getBookByIsbn(isbn) {
  */
 async function getBookByName(title) {
   try {
-    if (title == null) {
+    if (title == null || title === "") {
       throw new Error("Cannot empty title.");
     }
 
-    const result = await bookModel.findAll();
+    const result = await bookModelInstance.findAll();
     if (!result.success) {
       return { success: false, data: null, message: "書籍が見つかりません" };
     }
@@ -96,17 +125,17 @@ async function getBookByName(title) {
  */
 async function getBookByAuthor(author) {
   try {
-    if (author == null) {
+    if (author == null || author === "") {
       throw new Error("Cannot empty author.");
     }
 
-    const result = await bookModel.findAll();
+    const result = await bookModelInstance.findAll();
     if (!result.success) {
       return { success: false, data: null, message: "書籍が見つかりません" };
     }
 
     const books = result.data;
-    const foundBooks = books.filter((b) => b.author === author);
+    const foundBooks = books.filter((b) => b.author === author && b.isbn);
 
     if (foundBooks.length > 0) {
       return {
@@ -131,11 +160,18 @@ async function getBookByAuthor(author) {
  */
 async function updateBook(isbn, title, author) {
   try {
-    if (isbn == null || title == null || author == null) {
+    if (
+      isbn == null ||
+      title == null ||
+      author == null ||
+      isbn === "" ||
+      title === "" ||
+      author === ""
+    ) {
       throw new Error("Cannot empty isbn, title, and author.");
     }
 
-    const result = await bookModel.update(isbn, { title, author });
+    const result = await bookModelInstance.update(isbn, { title, author });
     if (!result.success) {
       return { success: false, message: result.message };
     }
@@ -153,11 +189,11 @@ async function updateBook(isbn, title, author) {
  */
 async function deleteBook(isbn) {
   try {
-    if (isbn == null) {
+    if (isbn == null || isbn === "") {
       throw new Error("Cannot empty isbn.");
     }
 
-    const result = await bookModel.delete(isbn);
+    const result = await bookModelInstance.delete(isbn);
     if (!result.success) {
       return { success: false, message: result.message };
     }
@@ -174,7 +210,7 @@ async function deleteBook(isbn) {
  */
 async function deleteAllBooks() {
   try {
-    const result = await bookModel.deleteAll();
+    const result = await bookModelInstance.deleteAll();
     if (!result.success) {
       return { success: false, message: result.message };
     }
@@ -195,7 +231,7 @@ async function deleteAllBooks() {
  */
 async function getAllBooks() {
   try {
-    const result = await bookModel.findAll();
+    const result = await bookModelInstance.findAll();
     if (!result.success) {
       return { success: false, message: result.message };
     }
@@ -219,4 +255,6 @@ module.exports = {
   deleteBook,
   deleteAllBooks,
   getAllBooks,
+  setBookModelInstance,
+  getBookModelInstance,
 };
