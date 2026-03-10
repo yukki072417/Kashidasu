@@ -21,7 +21,10 @@ async function createAdmin(adminId, password) {
 
     const hashedPassword = crypto.hash(password);
 
-    await adminModel.create(adminId, hashedPassword);
+    const result = await adminModel.create(adminId, hashedPassword);
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
 
     return {
       success: true,
@@ -44,17 +47,16 @@ async function getAdminById(adminId) {
       throw new Error("Cannot empty userId.");
     }
 
-    const admin = await adminModel.findOne(adminId);
-
-    if (admin && admin.adminId) {
-      return {
-        success: true,
-        data: admin,
-        message: "管理者が正常に取得されました",
-      };
+    const result = await adminModel.findOne(adminId);
+    if (!result.success) {
+      return { success: false, message: "管理者が見つかりません" };
     }
 
-    return { success: false, data: null, message: "管理者が見つかりません" };
+    return {
+      success: true,
+      data: result.data,
+      message: "管理者が正常に取得されました",
+    };
   } catch (error) {
     throw error;
   }
@@ -72,9 +74,8 @@ async function authenticateAdmin(adminId, password) {
       throw new Error("Cannot empty adminId and password.");
     }
 
-    const admin = await adminModel.findOne(adminId);
-
-    if (!admin) {
+    const result = await adminModel.findOne(adminId);
+    if (!result.success) {
       crypto.isValid(
         "dummy_password_for_timing_attack_prevention",
         "dummy_hash",
@@ -82,7 +83,7 @@ async function authenticateAdmin(adminId, password) {
       return false;
     }
 
-    return crypto.isValid(password, admin.password);
+    return crypto.isValid(password, result.data.password);
   } catch (error) {
     throw error;
   }
@@ -104,10 +105,13 @@ async function updateAdmin(adminId, changedAdminId, changedPassword) {
     }
     const hashedPassword = crypto.hash(changedPassword);
 
-    await adminModel.update(adminId, {
+    const result = await adminModel.update(adminId, {
       adminId: changedAdminId,
       password: hashedPassword,
     });
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
 
     return {
       success: true,
@@ -130,8 +134,8 @@ async function isAdmin(userId) {
       return false;
     }
 
-    const admin = await adminModel.findOne(userId);
-    return admin && admin.adminId ? true : false;
+    const result = await adminModel.findOne(userId);
+    return result.success && result.data && result.data.adminId ? true : false;
   } catch (error) {
     throw error;
   }
@@ -144,7 +148,11 @@ async function isAdmin(userId) {
  */
 async function deleteAdmin(adminId) {
   try {
-    await adminModel.delete(adminId);
+    const result = await adminModel.delete(adminId);
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
+
     return {
       success: true,
       data: null,

@@ -2,7 +2,7 @@
  * カードコントローラー
  * カードの生成とステータス管理を管理する
  */
-const CardModel = require("../model/cardModel");
+const CardModel = require("../services/cardService");
 
 const cardModel = new CardModel();
 

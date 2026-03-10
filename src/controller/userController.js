@@ -11,13 +11,34 @@ const userModel = require("../model/userModel");
  * @param {function} next - ミドルウェア関数
  */
 async function createUser(req, res, next) {
-  const { userId, password } = req.body;
   try {
-    await userModel.createUser(userId, password);
-    res.json({ success: true, message: "ユーザーが正常に作成されました" });
+    const { userId, password } = req.body;
+
+    // ビジネスロジック: バリデーション
+    if (!userId || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "ユーザーIDとパスワードは必須です",
+      });
+    }
+
+    // モデル層の呼び出し
+    const result = await userModel.createUser(userId, password);
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      data: result.data,
+      message: result.message,
+    });
   } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 
@@ -28,21 +49,34 @@ async function createUser(req, res, next) {
  * @param {function} next - ミドルウェア関数
  */
 async function getUser(req, res, next) {
-  const { userId } = req.body;
   try {
-    const { success, user } = await userModel.getUserByID(userId);
-    if (success) {
-      res.json({
-        success: true,
-        data: user,
-        message: "ユーザーが正常に取得されました",
+    const { userId } = req.params;
+
+    // ビジネスロジック: パラメータ検証
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "ユーザーIDは必須です",
       });
-    } else {
-      res.status(404).json({ success: false, message: "User not found." });
     }
+
+    // モデル層の呼び出し
+    const result = await userModel.getUserByID(userId);
+
+    if (!result.success) {
+      return res.status(404).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+      message: result.message,
+    });
   } catch (error) {
-    console.error("Error getting user:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 
@@ -53,13 +87,35 @@ async function getUser(req, res, next) {
  * @param {function} next - ミドルウェア関数
  */
 async function updateUser(req, res, next) {
-  const { user_id, user_password } = req.body;
   try {
-    await userModel.updateUser(user_id, user_password);
-    res.json({ success: true, message: "ユーザーが正常に更新されました" });
+    const { userId } = req.params;
+    const { password } = req.body;
+
+    // ビジネスロジック: バリデーション
+    if (!userId || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "ユーザーIDとパスワードは必須です",
+      });
+    }
+
+    // モデル層の呼び出し
+    const result = await userModel.updateUser(userId, password);
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+      message: result.message,
+    });
   } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 
@@ -70,13 +126,34 @@ async function updateUser(req, res, next) {
  * @param {function} next - ミドルウェア関数
  */
 async function deleteUser(req, res, next) {
-  const { user_id } = req.body;
   try {
-    await userModel.deleteUser(user_id);
-    res.json({ success: true, message: "ユーザーが正常に削除されました" });
+    const { userId } = req.params;
+
+    // ビジネスロジック: パラメータ検証
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "ユーザーIDは必須です",
+      });
+    }
+
+    // モデル層の呼び出し
+    const result = await userModel.deleteUser(userId);
+
+    if (!result.success) {
+      return res.status(404).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+      message: result.message,
+    });
   } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 

@@ -3,7 +3,6 @@
  * 管理者のCRUD操作を管理する
  */
 const adminModel = require("../model/adminModel");
-const { errorResponse } = require("../services/errorHandling");
 
 /**
  * 新規管理者を作成する関数
@@ -12,19 +11,38 @@ const { errorResponse } = require("../services/errorHandling");
  * @param {function} next - ミドルウェア関数
  */
 async function createAdmin(req, res, next) {
-  const adminData = req.body;
-  if (adminData.id == undefined || adminData.password == undefined) {
-    return errorResponse(res, 200);
-  }
+  try {
+    const adminData = req.body;
 
-  const result = await adminModel.createAdmin(adminData.id, adminData.password);
-  if (result.success == false) {
-    return errorResponse(res, 500);
-  }
+    // ビジネスロジック: バリデーション
+    if (adminData.id == undefined || adminData.password == undefined) {
+      return res.status(400).json({
+        success: false,
+        message: "IDとパスワードは必須です",
+      });
+    }
 
-  return res
-    .status(200)
-    .json({ success: true, message: "管理者が正常に作成されました" });
+    // モデル層の呼び出し
+    const result = await adminModel.createAdmin(
+      adminData.id,
+      adminData.password,
+    );
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      data: result.data,
+      message: result.message,
+    });
+  } catch (error) {
+    throw error;
+  }
 }
 
 /**
@@ -33,12 +51,36 @@ async function createAdmin(req, res, next) {
  * @param {object} res - レスポンスオブジェクト
  * @param {function} next - ミドルウェア関数
  */
-function getAdmin(req, res, next) {
-  res.json({
-    success: true,
-    message: "管理者情報が正常に取得されました",
-    data: null,
-  });
+async function getAdmin(req, res, next) {
+  try {
+    const { adminId } = req.params;
+
+    // ビジネスロジック: パラメータ検証
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        message: "管理者IDは必須です",
+      });
+    }
+
+    // モデル層の呼び出し
+    const result = await adminModel.getAdminById(adminId);
+
+    if (!result.success) {
+      return res.status(404).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+      message: result.message,
+    });
+  } catch (error) {
+    throw error;
+  }
 }
 
 /**
@@ -47,12 +89,41 @@ function getAdmin(req, res, next) {
  * @param {object} res - レスポンスオブジェクト
  * @param {function} next - ミドルウェア関数
  */
-function updateAdmin(req, res, next) {
-  res.json({
-    success: true,
-    message: "管理者情報が正常に更新されました",
-    data: null,
-  });
+async function updateAdmin(req, res, next) {
+  try {
+    const { adminId } = req.params;
+    const { id: changedAdminId, password: changedPassword } = req.body;
+
+    // ビジネスロジック: バリデーション
+    if (!adminId || !changedAdminId || !changedPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "すべてのフィールドは必須です",
+      });
+    }
+
+    // モデル層の呼び出し
+    const result = await adminModel.updateAdmin(
+      adminId,
+      changedAdminId,
+      changedPassword,
+    );
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+      message: result.message,
+    });
+  } catch (error) {
+    throw error;
+  }
 }
 
 /**
@@ -61,12 +132,36 @@ function updateAdmin(req, res, next) {
  * @param {object} res - レスポンスオブジェクト
  * @param {function} next - ミドルウェア関数
  */
-function deleteAdmin(req, res, next) {
-  res.json({
-    success: true,
-    message: "管理者が正常に削除されました",
-    data: null,
-  });
+async function deleteAdmin(req, res, next) {
+  try {
+    const { adminId } = req.params;
+
+    // ビジネスロジック: パラメータ検証
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        message: "管理者IDは必須です",
+      });
+    }
+
+    // モデル層の呼び出し
+    const result = await adminModel.deleteAdmin(adminId);
+
+    if (!result.success) {
+      return res.status(404).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+      message: result.message,
+    });
+  } catch (error) {
+    throw error;
+  }
 }
 
 module.exports = {

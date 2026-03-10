@@ -12,13 +12,34 @@ const loanModel = require("../model/loanModel");
  * @param {function} next - ミドルウェア関数
  */
 async function createBook(req, res, next) {
-  const { isbn, title, author } = req.body;
   try {
-    await bookModel.createBook(isbn, title, author);
-    res.json({ success: true, message: "書籍が正常に作成されました" });
+    const { isbn, title, author } = req.body;
+
+    // ビジネスロジック: バリデーション
+    if (!isbn || !title || !author) {
+      return res.status(400).json({
+        success: false,
+        message: "ISBN、タイトル、著者名は必須です",
+      });
+    }
+
+    // モデル層の呼び出し
+    const result = await bookModel.createBook(isbn, title, author);
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      data: result.data,
+      message: result.message,
+    });
   } catch (error) {
-    console.error("Error creating book:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 
@@ -29,42 +50,58 @@ async function createBook(req, res, next) {
  * @param {function} next - ミドルウェア関数
  */
 async function getBook(req, res, next) {
-  const { isbn, manual_search_mode } = req.query;
   try {
+    const { isbn, manual_search_mode } = req.query;
+
     if (manual_search_mode) {
-      // 特定の書籍を取得
-      const bookResult = await bookModel.getBookByIsbn(isbn);
-      if (bookResult.success) {
-        res.json({
-          success: true,
-          data: bookResult.data,
-          message: "書籍が正常に取得されました",
+      // ビジネスロジック: 特定の書籍を取得
+      if (!isbn) {
+        return res.status(400).json({
+          success: false,
+          message: "ISBNは必須です",
         });
-      } else {
-        res.status(404).json({ success: false, message: "Book not found." });
       }
+
+      const bookResult = await bookModel.getBookByIsbn(isbn);
+      if (!bookResult.success) {
+        return res.status(404).json({
+          success: false,
+          message: bookResult.message,
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: bookResult.data,
+        message: bookResult.message,
+      });
     } else {
-      // 全書籍取得の場合
-      const allBooks = await bookModel.getAllBooks();
+      // ビジネスロジック: 全書籍取得の場合
+      const allBooksResult = await bookModel.getAllBooks();
+      if (!allBooksResult.success) {
+        return res.status(500).json({
+          success: false,
+          message: allBooksResult.message,
+        });
+      }
+
+      const allBooks = allBooksResult.data;
       const count = allBooks.length;
 
-      // ページングパラメータ
+      // ビジネスロジック: ページング処理
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 30;
       const offset = (page - 1) * limit;
-
-      // ページング処理
       const paginatedBooks = allBooks.slice(offset, offset + limit);
 
-      res.json({
+      return res.status(200).json({
         success: true,
         data: [{ "COUNT(isbn)": count }, ...paginatedBooks],
         message: "書籍一覧が正常に取得されました",
       });
     }
   } catch (error) {
-    console.error("Error getting book:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 
@@ -82,34 +119,31 @@ async function getAllBooks(req, res, next) {
     const allBooks = allBooksResult.data;
     const count = allBooks.length;
 
-    // ページングパラメータ
+    // ビジネスロジック: ページング処理
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 30;
     const offset = (page - 1) * limit;
-
-    // ページング処理
     const paginatedBooks = allBooks.slice(offset, offset + limit);
 
-    // レスポンス形式
-    res.json({
+    return res.status(200).json({
       success: true,
       data: [{ "COUNT(isbn)": count }, ...paginatedBooks],
       message: "書籍一覧が正常に取得されました",
     });
   } catch (error) {
-    console.error("Error getting all books:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 
 async function getLoanByIsbn(req, res, next) {
   try {
-    const { isbn } = req.query; // クエリパラメータから取得
+    const { isbn } = req.query;
 
+    // ビジネスロジック: パラメータ検証
     if (!isbn) {
       return res.status(400).json({
         success: false,
-        message: "isbn is required",
+        message: "ISBNは必須です",
       });
     }
 
@@ -125,14 +159,14 @@ async function getLoanByIsbn(req, res, next) {
     const activeLoans = activeLoansResult.data;
 
     if (activeLoans.length === 0) {
-      return res.json({
+      return res.status(200).json({
         success: true,
         data: null,
-        message: "No active loans found for this ISBN",
+        message: "このISBNのアクティブな貸出が見つかりません",
       });
     }
 
-    // 書籍情報を取得して貸出情報を付加
+    // ビジネスロジック: 書籍情報を取得して貸出情報を付加
     const loanWithBookInfo = await Promise.all(
       activeLoans.map(async (loan) => {
         const book = await bookModel.getBookByIsbn(loan.bookId);
@@ -149,28 +183,26 @@ async function getLoanByIsbn(req, res, next) {
           userId: loan.userId,
           loanDate: loan.loanDate,
           returnDate: loan.returnDate,
-          dueDate: loan.dueDate, // dueDateを含める
+          dueDate: loan.dueDate,
           daysBorrowed: daysBorrowed,
           bookInfo: book.success ? book.data : null,
         };
       }),
     );
 
-    res.json({
+    return res.status(200).json({
       success: true,
       data: loanWithBookInfo,
+      message: "貸出情報が正常に取得されました",
     });
   } catch (error) {
-    console.error("Error getting loan by ISBN:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    throw error;
   }
 }
 
 async function getAllLoans(req, res, next) {
   try {
+    // ビジネスロジック: 制限件数の取得
     const limit = parseInt(req.query.limit) || 100;
 
     const allLoansResult = await loanModel.getUserLoans();
@@ -184,10 +216,10 @@ async function getAllLoans(req, res, next) {
 
     const allLoans = allLoansResult.data;
 
-    // アクティブな貸出のみをフィルタ
+    // ビジネスロジック: アクティブな貸出のみをフィルタ
     const activeLoans = allLoans.filter((loan) => !loan.returnDate);
 
-    // 書籍情報を取得して貸出情報を付加
+    // ビジネスロジック: 書籍情報を取得して貸出情報を付加
     const loansWithBookInfo = await Promise.all(
       activeLoans.map(async (loan) => {
         try {
@@ -205,19 +237,18 @@ async function getAllLoans(req, res, next) {
             userId: loan.userId,
             loanDate: loan.loanDate,
             returnDate: loan.returnDate,
-            dueDate: loan.dueDate, // dueDateを含める
+            dueDate: loan.dueDate,
             daysBorrowed: daysBorrowed,
             bookInfo: book.success ? book.data : null,
           };
         } catch (error) {
-          console.error("Error processing loan:", loan.loanId, error);
           return {
             loanId: loan.loanId,
             bookId: loan.bookId,
             userId: loan.userId,
             loanDate: loan.loanDate,
             returnDate: loan.returnDate,
-            dueDate: loan.dueDate, // dueDateを含める
+            dueDate: loan.dueDate,
             daysBorrowed: 0,
             bookInfo: null,
             error: error.message,
@@ -226,10 +257,10 @@ async function getAllLoans(req, res, next) {
       }),
     );
 
-    // 指定された件数に制限
+    // ビジネスロジック: 指定された件数に制限
     const limitedLoans = loansWithBookInfo.slice(0, limit);
 
-    res.json({
+    return res.status(200).json({
       success: true,
       data: limitedLoans,
       count: limitedLoans.length,
@@ -237,63 +268,115 @@ async function getAllLoans(req, res, next) {
       message: "貸出一覧が正常に取得されました",
     });
   } catch (error) {
-    console.error("Error getting all loans:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    throw error;
   }
 }
 
 async function updateBook(req, res, next) {
-  const { before_isbn, isbn, title, author } = req.body;
   try {
-    // bookModel.updateBook は before_isbn を使わないので、isbn が変更された場合は
-    // 削除＆新規作成が必要になるが、ここでは単純な更新として扱う
-    await bookModel.updateBook(isbn, title, author);
-    res.json({ success: true, message: "書籍が正常に更新されました" });
+    const { before_isbn, isbn, title, author } = req.body;
+
+    // ビジネスロジック: バリデーション
+    if (!isbn || !title || !author) {
+      return res.status(400).json({
+        success: false,
+        message: "ISBN、タイトル、著者名は必須です",
+      });
+    }
+
+    // モデル層の呼び出し
+    const result = await bookModel.updateBook(isbn, title, author);
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: result.data,
+      message: result.message,
+    });
   } catch (error) {
-    console.error("Error updating book:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 
 async function deleteBook(req, res, next) {
-  const { isbn, all_delete } = req.body;
   try {
+    const { isbn, all_delete } = req.body;
+
+    // ビジネスロジック: 削除タイプの判定
     if (all_delete) {
-      await bookModel.deleteAllBooks();
-      res.json({ success: true, message: "全書籍が正常に削除されました" });
+      // 全書籍削除
+      const result = await bookModel.deleteAllBooks();
+      if (!result.success) {
+        return res.status(500).json({
+          success: false,
+          message: result.message,
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: result.data,
+        message: result.message,
+      });
     } else {
-      await bookModel.deleteBook(isbn);
-      res.json({ success: true, message: "書籍が正常に削除されました" });
+      // 個別書籍削除
+      if (!isbn) {
+        return res.status(400).json({
+          success: false,
+          message: "ISBNは必須です",
+        });
+      }
+
+      const result = await bookModel.deleteBook(isbn);
+      if (!result.success) {
+        return res.status(404).json({
+          success: false,
+          message: result.message,
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: result.data,
+        message: result.message,
+      });
     }
   } catch (error) {
-    console.error("Error deleting book:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 
 async function lend(req, res, next) {
-  const { user_id, isbn } = req.body;
-
   try {
-    // loanModelのトランザクション機能を使用して貸出処理
-    const loanDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD形式
+    const { user_id, isbn } = req.body;
+
+    // ビジネスロジック: バリデーション
+    if (!user_id || !isbn) {
+      return res.status(400).json({
+        success: false,
+        message: "ユーザーIDとISBNは必須です",
+      });
+    }
+
+    // ビジネスロジック: 貸出日付の設定
+    const loanDate = new Date().toISOString().split("T")[0];
+
+    // モデル層の呼び出し
     const result = await loanModel.lendBook(isbn, user_id, loanDate);
 
-    res.json({
+    return res.status(201).json({
       success: true,
-      message: "本が正常に貸出されました",
-      data: {
-        loanId: result.data.loanId,
-        dueDate: result.data.dueDate,
-      },
+      message: result.message,
+      data: result.data,
     });
   } catch (error) {
-    console.error("Error lending book:", error);
-
-    // エラーメッセージの処理
+    // ビジネスロジック: エラーメッセージの処理
     let errorMessage = error.message;
     if (error.message === "BOOK_NOT_EXIST") {
       errorMessage = "指定された本が見つかりません";
@@ -301,24 +384,38 @@ async function lend(req, res, next) {
       errorMessage = "この本はすでに貸出中です";
     }
 
-    res.status(500).json({ success: false, message: errorMessage });
+    return res.status(400).json({
+      success: false,
+      message: errorMessage,
+    });
   }
 }
 
-// 返却機能（ReadCode.jsから呼び出される）
 async function returnBook(req, res, next) {
-  const { user_id, isbn } = req.body;
-
   try {
-    // loanModelのトランザクション機能を使用して返却処理
-    const returnDate = new Date().toISOString().split("T")[0]; // YYYY-MM-DD形式
+    const { user_id, isbn } = req.body;
+
+    // ビジネスロジック: バリデーション
+    if (!user_id || !isbn) {
+      return res.status(400).json({
+        success: false,
+        message: "ユーザーIDとISBNは必須です",
+      });
+    }
+
+    // ビジネスロジック: 返却日付の設定
+    const returnDate = new Date().toISOString().split("T")[0];
+
+    // モデル層の呼び出し
     const result = await loanModel.returnBook(isbn, user_id, returnDate);
 
-    res.json({ success: true, message: "本が正常に返却されました" });
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.data,
+    });
   } catch (error) {
-    console.error("Error returning book:", error);
-
-    // エラーメッセージの処理
+    // ビジネスロジック: エラーメッセージの処理
     let errorMessage = error.message;
     if (error.message === "BOOK_NOT_EXIST") {
       errorMessage = "指定された本が見つかりません";
@@ -326,16 +423,28 @@ async function returnBook(req, res, next) {
       errorMessage = "この本は貸出されていません";
     }
 
-    res.status(500).json({ success: false, message: errorMessage });
+    return res.status(400).json({
+      success: false,
+      message: errorMessage,
+    });
   }
 }
 
-// 検索機能
 async function search(req, res, next) {
-  const { query, searchType } = req.body; // searchType: 'title', 'author', 'isbn'
   try {
+    const { query, searchType } = req.body;
+
+    // ビジネスロジック: バリデーション
+    if (!query || !searchType) {
+      return res.status(400).json({
+        success: false,
+        message: "検索クエリと検索タイプは必須です",
+      });
+    }
+
     let result;
 
+    // ビジネスロジック: 検索タイプに応じた処理
     switch (searchType) {
       case "isbn":
         result = await bookModel.getBookByIsbn(query);
@@ -349,21 +458,24 @@ async function search(req, res, next) {
       default:
         return res
           .status(400)
-          .json({ success: false, message: "Invalid search type." });
+          .json({ success: false, message: "無効な検索タイプです" });
     }
 
     if (result.success) {
-      res.json({
+      return res.status(200).json({
         success: true,
-        data: result.book,
+        data: result.data,
         message: "検索が正常に完了しました",
       });
     } else {
-      res.json({ success: true, data: [], message: "検索結果がありません" }); // 検索結果がない場合は空配列
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "検索結果がありません",
+      });
     }
   } catch (error) {
-    console.error("Error searching book:", error);
-    res.status(500).json({ success: false, message: error.message });
+    throw error;
   }
 }
 
