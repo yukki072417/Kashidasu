@@ -15,7 +15,7 @@ async function createAdmin(req, res, next) {
     const adminData = req.body;
 
     // ビジネスロジック: バリデーション
-    if (adminData.id == undefined || adminData.password == undefined) {
+    if (!adminData.id || !adminData.password) {
       return res.status(400).json({
         success: false,
         message: "IDとパスワードは必須です",
@@ -41,7 +41,7 @@ async function createAdmin(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -79,7 +79,7 @@ async function getAdmin(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -122,7 +122,7 @@ async function updateAdmin(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -160,7 +160,7 @@ async function deleteAdmin(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 

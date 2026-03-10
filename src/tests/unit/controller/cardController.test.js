@@ -2,15 +2,16 @@
  * Cardコントローラーの単体テスト
  */
 
-const {
-  generateCard,
-  getCardStatus,
-} = require("../../../controller/cardController");
-
 // モックの設定
 jest.mock("../../../services/cardService");
 
 const CardModel = require("../../../services/cardService");
+const {
+  generateCard,
+  getCardStatus,
+  setCardModelInstance,
+} = require("../../../controller/cardController");
+
 const mockCardModel = new CardModel();
 
 describe("Card Controller Tests", () => {
@@ -32,6 +33,22 @@ describe("Card Controller Tests", () => {
     };
 
     mockNext = jest.fn();
+
+    // モックの設定
+    mockCardModel.generateCard = jest.fn().mockResolvedValue({
+      success: true,
+      data: { pdfPath: "/pdf/kashidasu_card.pdf" },
+      message: "カードが正常に生成されました",
+    });
+
+    mockCardModel.getCardFiles = jest.fn().mockResolvedValue({
+      success: true,
+      data: [{ file: "card1.pdf" }, { file: "card2.pdf" }],
+      message: "カードファイル一覧が正常に取得されました",
+    });
+
+    // 依存性注入
+    setCardModelInstance(mockCardModel);
   });
 
   describe("generateCard", () => {
@@ -203,9 +220,8 @@ describe("Card Controller Tests", () => {
         new Error("カード生成エラー"),
       );
 
-      await expect(generateCard(mockReq, mockRes, mockNext)).rejects.toThrow(
-        "カード生成エラー",
-      );
+      // コントローラー関数を実行
+      await generateCard(mockReq, mockRes, mockNext);
 
       expect(mockCardModel.generateCard).toHaveBeenCalledWith({
         id: "1234567890",
@@ -214,6 +230,7 @@ describe("Card Controller Tests", () => {
         number: "01",
       });
       expect(mockNext).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
 
     test("レスポンス形式が正しいことを確認", async () => {
@@ -359,12 +376,12 @@ describe("Card Controller Tests", () => {
         new Error("ファイルアクセスエラー"),
       );
 
-      await expect(getCardStatus(mockReq, mockRes, mockNext)).rejects.toThrow(
-        "ファイルアクセスエラー",
-      );
+      // コントローラー関数を実行
+      await getCardStatus(mockReq, mockRes, mockNext);
 
       expect(mockCardModel.getCardFiles).toHaveBeenCalled();
       expect(mockNext).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
 
     test("レスポンス形式が正しいことを確認", async () => {

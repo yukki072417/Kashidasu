@@ -4,7 +4,16 @@
  */
 const CardModel = require("../services/cardService");
 
-const cardModel = new CardModel();
+let cardModelInstance = new CardModel();
+
+// 依存性注入用関数
+function setCardModelInstance(instance) {
+  cardModelInstance = instance;
+}
+
+function getCardModelInstance() {
+  return cardModelInstance;
+}
 
 /**
  * カードを生成する関数
@@ -25,17 +34,17 @@ async function generateCard(req, res, next) {
     }
 
     // モデル層の呼び出し
-    const result = await cardModel.generateCard({
+    const result = await cardModelInstance.generateCard({
       id,
       gread,
       class: className,
       number,
     });
 
-    if (!result.success) {
+    if (!result || !result.success) {
       return res.status(400).json({
         success: false,
-        message: result.message,
+        message: result?.message || "カード生成に失敗しました",
       });
     }
 
@@ -45,7 +54,7 @@ async function generateCard(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -58,12 +67,12 @@ async function generateCard(req, res, next) {
 async function getCardStatus(req, res, next) {
   try {
     // モデル層の呼び出し
-    const result = await cardModel.getCardFiles();
+    const result = await cardModelInstance.getCardFiles();
 
-    if (!result.success) {
+    if (!result || !result.success) {
       return res.status(500).json({
         success: false,
-        message: result.message,
+        message: result?.message || "カードステータスの取得に失敗しました",
       });
     }
 
@@ -73,11 +82,13 @@ async function getCardStatus(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
 module.exports = {
   generateCard,
   getCardStatus,
+  setCardModelInstance,
+  getCardModelInstance,
 };

@@ -155,15 +155,15 @@ describe("Admin Controller Tests", () => {
       // モックの設定
       adminModel.createAdmin.mockRejectedValue(new Error("データベースエラー"));
 
-      await expect(createAdmin(mockReq, mockRes, mockNext)).rejects.toThrow(
-        "データベースエラー",
-      );
+      // コントローラー関数を実行
+      await createAdmin(mockReq, mockRes, mockNext);
 
       expect(adminModel.createAdmin).toHaveBeenCalledWith(
         "testadmin",
         "testpass123",
       );
       expect(mockNext).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -227,12 +227,12 @@ describe("Admin Controller Tests", () => {
         new Error("データベースエラー"),
       );
 
-      await expect(getAdmin(mockReq, mockRes, mockNext)).rejects.toThrow(
-        "データベースエラー",
-      );
+      // コントローラー関数を実行
+      await getAdmin(mockReq, mockRes, mockNext);
 
       expect(adminModel.getAdminById).toHaveBeenCalledWith(adminId);
       expect(mockNext).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -331,9 +331,8 @@ describe("Admin Controller Tests", () => {
 
       adminModel.updateAdmin.mockRejectedValue(new Error("データベースエラー"));
 
-      await expect(updateAdmin(mockReq, mockRes, mockNext)).rejects.toThrow(
-        "データベースエラー",
-      );
+      // コントローラー関数を実行
+      await updateAdmin(mockReq, mockRes, mockNext);
 
       expect(adminModel.updateAdmin).toHaveBeenCalledWith(
         adminId,
@@ -341,6 +340,7 @@ describe("Admin Controller Tests", () => {
         "newpass123",
       );
       expect(mockNext).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -402,12 +402,12 @@ describe("Admin Controller Tests", () => {
 
       adminModel.deleteAdmin.mockRejectedValue(new Error("データベースエラー"));
 
-      await expect(deleteAdmin(mockReq, mockRes, mockNext)).rejects.toThrow(
-        "データベースエラー",
-      );
+      // コントローラー関数を実行
+      await deleteAdmin(mockReq, mockRes, mockNext);
 
       expect(adminModel.deleteAdmin).toHaveBeenCalledWith(adminId);
       expect(mockNext).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 

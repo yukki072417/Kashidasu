@@ -38,7 +38,7 @@ async function createUser(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -76,7 +76,7 @@ async function getUser(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -115,7 +115,7 @@ async function updateUser(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -153,7 +153,7 @@ async function deleteUser(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
