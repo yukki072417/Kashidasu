@@ -21,7 +21,10 @@ async function createUser(userId, password) {
 
     const hashedPassword = crypto.hash(password);
 
-    await userModel.create(userId, hashedPassword);
+    const result = await userModel.create(userId, hashedPassword);
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
 
     return {
       success: true,
@@ -44,17 +47,16 @@ async function getUserByID(userId) {
       throw new Error("Cannot empty userId.");
     }
 
-    const user = await userModel.findOne(userId);
-
-    if (user && user.userId) {
-      return {
-        success: true,
-        data: user,
-        message: "ユーザーが正常に取得されました",
-      };
+    const result = await userModel.findOne(userId);
+    if (!result.success) {
+      return { success: false, message: "ユーザーが見つかりません" };
     }
 
-    return { success: false, data: null, message: "ユーザーが見つかりません" };
+    return {
+      success: true,
+      data: result.data,
+      message: "ユーザーが正常に取得されました",
+    };
   } catch (error) {
     throw error;
   }
@@ -62,16 +64,22 @@ async function getUserByID(userId) {
 
 /**
  * 名前でユーザーを取得する関数
- * @param {string} userId - ユーザーID
+ * @param {string} userName - ユーザー名
  * @returns {Promise<object>} - 取得結果
  */
-async function getUserByName(userId) {
+async function getUserByName(userName) {
   try {
-    if (userId == null) {
-      throw new Error("Cannot empty user_id.");
+    if (userName == null) {
+      throw new Error("Cannot empty userName.");
     }
 
-    const user = await userModel.findOne(userId);
+    const result = await userModel.findAll();
+    if (!result.success) {
+      return { success: false, message: "ユーザーが見つかりません" };
+    }
+
+    const users = result.data;
+    const user = users.find((user) => user.userId === userName);
 
     if (user && user.userId) {
       return {
@@ -81,7 +89,7 @@ async function getUserByName(userId) {
       };
     }
 
-    return { success: false, data: null, message: "ユーザーが見つかりません" };
+    return { success: false, message: "ユーザーが見つかりません" };
   } catch (error) {
     throw error;
   }
@@ -101,7 +109,10 @@ async function updateUser(userId, password) {
 
     const hashedPassword = crypto.hash(password);
 
-    await userModel.update(userId, { password: hashedPassword });
+    const result = await userModel.update(userId, { password: hashedPassword });
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
 
     return {
       success: true,
@@ -115,16 +126,19 @@ async function updateUser(userId, password) {
 
 /**
  * ユーザーを削除する関数
- * @param {string} user_id - ユーザーID
+ * @param {string} userId - ユーザーID
  * @returns {Promise<object>} - 削除結果
  */
-async function deleteUser(user_id) {
+async function deleteUser(userId) {
   try {
-    if (user_id == null) {
-      throw new Error("Cannot empty user_id.");
+    if (userId == null) {
+      throw new Error("Cannot empty userId.");
     }
 
-    await userModel.delete(user_id);
+    const result = await userModel.delete(userId);
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
 
     return {
       success: true,

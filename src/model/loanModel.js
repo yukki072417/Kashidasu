@@ -39,8 +39,8 @@ async function lendBook(isbn, userId, loanDate) {
     return await withTransaction(
       [getLoanFilePath(), getBookFilePath()],
       async () => {
-        const book = await bookModelInstance.findOne(isbn);
-        if (!book) {
+        const bookResult = await bookModelInstance.findOne(isbn);
+        if (!bookResult.success) {
           throw createError(404, "BOOK_NOT_EXIST");
         }
 
@@ -51,7 +51,7 @@ async function lendBook(isbn, userId, loanDate) {
 
         const loanId = Date.now().toString();
         const dueDate = await calculateDueDate(userId, loanDate);
-        const loan = await loanModelInstance.create(
+        const loanResult = await loanModelInstance.create(
           loanId,
           isbn,
           userId,
@@ -60,7 +60,7 @@ async function lendBook(isbn, userId, loanDate) {
           dueDate, // dueDateを保存
         );
 
-        if (!loan) {
+        if (!loanResult.success) {
           throw createError(500, "Failed to create loan record.");
         }
 
@@ -80,28 +80,6 @@ async function lendBook(isbn, userId, loanDate) {
 }
 
 /**
- * 貸出期限を計算する関数
- * @param {string} userId - ユーザーID
- * @param {string} loanDate - 貸出日
- * @returns {Promise<string>} - 貸出期限日
- */
-async function calculateDueDate(userId, loanDate) {
-  try {
-    const { isAdmin } = require("./adminModel");
-    const isAdminUser = await isAdmin(userId);
-
-    const dueDate = new Date(loanDate);
-    // 管理者は2週間後、一般ユーザーは1週間後
-    const daysToAdd = isAdminUser ? 14 : 7;
-    dueDate.setDate(dueDate.getDate() + daysToAdd);
-
-    return dueDate.toISOString().split("T")[0]; // YYYY-MM-DD形式
-  } catch (error) {
-    throw error;
-  }
-}
-
-/**
  * 返却処理（原子的）
  * @param {string} isbn - ISBN番号
  * @param {string} userId - ユーザーID
@@ -113,8 +91,8 @@ async function returnBook(isbn, userId, returnDate) {
     return await withTransaction(
       [getLoanFilePath(), getBookFilePath()],
       async () => {
-        const book = await bookModelInstance.findOne(isbn);
-        if (!book) {
+        const bookResult = await bookModelInstance.findOne(isbn);
+        if (!bookResult.success) {
           throw createError(404, "BOOK_NOT_EXIST");
         }
 
@@ -123,7 +101,12 @@ async function returnBook(isbn, userId, returnDate) {
           throw createError(409, "BOOK_NOT_LENDING");
         }
 
-        await loanModelInstance.update(activeLoan.loanId, { returnDate });
+        const updateResult = await loanModelInstance.update(activeLoan.loanId, {
+          returnDate,
+        });
+        if (!updateResult.success) {
+          throw createError(500, "Failed to update loan record.");
+        }
 
         return {
           success: true,
@@ -149,12 +132,12 @@ async function returnBook(isbn, userId, returnDate) {
 async function createLoan(isbn, userId, loanDate, returnDate = null) {
   try {
     const loanId = Date.now().toString();
-    const book = await bookModelInstance.findOne(isbn);
-    if (!book) {
+    const bookResult = await bookModelInstance.findOne(isbn);
+    if (!bookResult.success) {
       throw createError(404, "Book not found.");
     }
 
-    const loan = await loanModelInstance.create(
+    const loanResult = await loanModelInstance.create(
       loanId,
       isbn,
       userId,
@@ -162,7 +145,7 @@ async function createLoan(isbn, userId, loanDate, returnDate = null) {
       returnDate,
     );
 
-    if (!loan) {
+    if (!loanResult.success) {
       throw createError(500, "Failed to create loan.");
     }
 
@@ -177,29 +160,6 @@ async function createLoan(isbn, userId, loanDate, returnDate = null) {
 }
 
 /**
- * 指定ISBNのアクティブなローンを取得する関数
- * @param {string} isbn - ISBN番号
- * @param {string|null} userId - ユーザーID（オプション）
- * @returns {Promise<object|null>} - アクティブローンデータ
- */
-async function findActiveLoan(isbn, userId = null) {
-  try {
-    const loansResult = await getUserLoans(userId);
-    if (!loansResult.success) {
-      throw new Error(loansResult.message);
-    }
-
-    const loans = loansResult.data;
-    const activeLoan =
-      loans.find((loan) => loan.bookId === isbn && !loan.returnDate) ?? null;
-
-    return activeLoan;
-  } catch (error) {
-    throw error;
-  }
-}
-
-/**
  * ローンを更新する関数
  * @param {string} loanId - ローンID
  * @param {object} updateData - 更新データ
@@ -207,7 +167,11 @@ async function findActiveLoan(isbn, userId = null) {
  */
 async function updateLoan(loanId, updateData) {
   try {
-    await loanModelInstance.update(loanId, updateData);
+    const result = await loanModelInstance.update(loanId, updateData);
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
+
     return {
       success: true,
       data: null,
@@ -225,177 +189,22 @@ async function updateLoan(loanId, updateData) {
  */
 async function getUserLoans(userId = null) {
   try {
-    let loans;
+    let loansResult;
     if (userId) {
-      loans = await loanModelInstance.findByUserId(userId);
+      loansResult = await loanModelInstance.findByUserId(userId);
     } else {
-      loans = await loanModelInstance.findByUserId();
+      loansResult = await loanModelInstance.findByUserId();
+    }
+
+    if (!loansResult.success) {
+      return { success: false, message: loansResult.message };
     }
 
     return {
       success: true,
-      data: loans,
+      data: loansResult.data,
       message: "ローンが正常に取得されました",
     };
-  } catch (error) {
-    throw error;
-  }
-}
-
-/**
- * 指定ISBNの本が現在貸出中かどうかを確認する。
- * @param {string} isbn - ISBN番号
- * @returns {Promise<boolean>} - 貸出中かどうか
- */
-async function isBookCurrentlyLoaned(isbn) {
-  try {
-    const loansResult = await getUserLoans();
-    if (!loansResult.success) {
-      throw new Error(loansResult.message);
-    }
-
-    const loans = loansResult.data;
-    const activeLoans = loans.filter(
-      (loan) => loan.bookId === isbn && !loan.returnDate,
-    );
-    return activeLoans.length > 0;
-  } catch (error) {
-    throw error;
-  }
-}
-
-/**
- * 指定ISBNのアクティブな貸出を取得する関数
- * @param {string} isbn - ISBN番号
- * @returns {Promise<object>} - 貸出データ
- */
-async function getActiveLoans(isbn) {
-  try {
-    const loansResult = await getUserLoans();
-    if (!loansResult.success) {
-      throw new Error(loansResult.message);
-    }
-
-    const loans = loansResult.data;
-    const activeLoans = loans.filter(
-      (loan) => loan.bookId === isbn && !loan.returnDate,
-    );
-
-    return {
-      success: true,
-      data: activeLoans,
-      message: "アクティブな貸出が正常に取得されました",
-    };
-  } catch (error) {
-    throw error;
-  }
-}
-
-/**
- * 期限切れの書籍を取得する関数
- * @returns {Promise<object>} - 期限切れ書籍データ
- */
-async function getOverdueBooks() {
-  try {
-    const loansResult = await getUserLoans();
-    if (!loansResult.success) {
-      throw new Error(loansResult.message);
-    }
-
-    const loans = loansResult.data;
-    const today = new Date();
-
-    const overdueLoans = loans.filter((loan) => {
-      if (!loan.returnDate && loan.loanDate) {
-        // 保存されているdueDateがあれば使用し、なければ計算
-        const targetDueDate =
-          loan.dueDate ||
-          (() => {
-            // 旧データの場合は計算（互換性のため）
-            const loanDate = new Date(loan.loanDate);
-            const dueDate = new Date(loan.loanDate);
-            dueDate.setDate(dueDate.getDate() + 14); // デフォルト14日
-            return dueDate.toISOString().split("T")[0];
-          })();
-
-        const dueDateObj = new Date(targetDueDate);
-        return today > dueDateObj;
-      }
-      return false;
-    });
-
-    return {
-      success: true,
-      data: overdueLoans,
-      message: "期限切れ書籍が正常に取得されました",
-    };
-  } catch (error) {
-    throw error;
-  }
-}
-
-/**
- * ユーザーの貸出履歴を取得する関数
- * @param {string} userId - ユーザーID
- * @returns {Promise<object>} - 貸出履歴データ
- */
-async function getLoanHistory(userId) {
-  try {
-    const loansResult = await getUserLoans(userId);
-    if (!loansResult.success) {
-      throw new Error(loansResult.message);
-    }
-
-    const loans = loansResult.data;
-    const loanHistory = loans.map((loan) => {
-      const isOverdue = loan.returnDate
-        ? false
-        : loan.loanDate && loan.dueDate
-          ? new Date() > new Date(loan.dueDate)
-          : loan.loanDate
-            ? (() => {
-                // 旧データの場合は計算（互換性のため）
-                const loanDate = new Date(loan.loanDate);
-                const dueDate = new Date(loan.loanDate);
-                dueDate.setDate(dueDate.getDate() + 14);
-                return new Date() > dueDate;
-              })()
-            : false;
-
-      return {
-        loanId: loan.loanId,
-        bookId: loan.bookId,
-        userId: loan.userId,
-        loanDate: loan.loanDate,
-        returnDate: loan.returnDate,
-        dueDate: loan.dueDate, // dueDateを含める
-        isOverdue: isOverdue,
-      };
-    });
-
-    return {
-      success: true,
-      data: loanHistory,
-      message: "貸出履歴が正常に取得されました",
-    };
-  } catch (error) {
-    throw error;
-  }
-}
-
-/**
- * 期限切れかどうかをチェックする関数
- * @param {string} userId - ユーザーID
- * @param {string} loanDate - 貸出日
- * @param {string|null} dueDate - 貸出期限（保存されている場合）
- * @returns {Promise<boolean>} - 期限切れの場合はtrue
- */
-async function checkIfOverdue(userId, loanDate, dueDate = null) {
-  try {
-    // 保存されているdueDateがあれば使用し、なければ計算
-    const targetDueDate = dueDate || (await calculateDueDate(userId, loanDate));
-    const dueDateObj = new Date(targetDueDate);
-    return new Date() > dueDateObj;
   } catch (error) {
     throw error;
   }
@@ -412,4 +221,5 @@ module.exports = {
   getActiveLoans,
   getOverdueBooks,
   getLoanHistory,
+  checkIfOverdue,
 };

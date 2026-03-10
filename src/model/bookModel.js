@@ -19,7 +19,10 @@ async function createBook(isbn, title, author) {
       throw new Error("Cannot empty isbn, title, and author.");
     }
 
-    await bookModel.create(title, author, isbn);
+    const result = await bookModel.create(title, author, isbn);
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
 
     return { success: true, data: null, message: "書籍が正常に作成されました" };
   } catch (error) {
@@ -38,17 +41,16 @@ async function getBookByIsbn(isbn) {
       throw new Error("Cannot empty isbn.");
     }
 
-    const book = await bookModel.findOne(isbn);
-
-    if (book && book.isbn) {
-      return {
-        success: true,
-        data: book,
-        message: "書籍が正常に取得されました",
-      };
+    const result = await bookModel.findOne(isbn);
+    if (!result.success) {
+      return { success: false, data: null, message: "書籍が見つかりません" };
     }
 
-    return { success: false, data: null, message: "書籍が見つかりません" };
+    return {
+      success: true,
+      data: result.data,
+      message: "書籍が正常に取得されました",
+    };
   } catch (error) {
     throw error;
   }
@@ -65,7 +67,12 @@ async function getBookByName(title) {
       throw new Error("Cannot empty title.");
     }
 
-    const books = await bookModel.findAll();
+    const result = await bookModel.findAll();
+    if (!result.success) {
+      return { success: false, data: null, message: "書籍が見つかりません" };
+    }
+
+    const books = result.data;
     const book = books.find((b) => b.title === title);
 
     if (book && book.isbn) {
@@ -93,7 +100,12 @@ async function getBookByAuthor(author) {
       throw new Error("Cannot empty author.");
     }
 
-    const books = await bookModel.findAll();
+    const result = await bookModel.findAll();
+    if (!result.success) {
+      return { success: false, data: null, message: "書籍が見つかりません" };
+    }
+
+    const books = result.data;
     const foundBooks = books.filter((b) => b.author === author);
 
     if (foundBooks.length > 0) {
@@ -123,7 +135,10 @@ async function updateBook(isbn, title, author) {
       throw new Error("Cannot empty isbn, title, and author.");
     }
 
-    await bookModel.update(isbn, { title, author });
+    const result = await bookModel.update(isbn, { title, author });
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
 
     return { success: true, data: null, message: "書籍が正常に更新されました" };
   } catch (error) {
@@ -142,7 +157,10 @@ async function deleteBook(isbn) {
       throw new Error("Cannot empty isbn.");
     }
 
-    await bookModel.delete(isbn);
+    const result = await bookModel.delete(isbn);
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
 
     return { success: true, data: null, message: "書籍が正常に削除されました" };
   } catch (error) {
@@ -156,7 +174,11 @@ async function deleteBook(isbn) {
  */
 async function deleteAllBooks() {
   try {
-    await bookModel.deleteAll();
+    const result = await bookModel.deleteAll();
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
+
     return {
       success: true,
       data: null,
@@ -173,10 +195,14 @@ async function deleteAllBooks() {
  */
 async function getAllBooks() {
   try {
-    const books = await bookModel.findAll();
+    const result = await bookModel.findAll();
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
+
     return {
       success: true,
-      data: books,
+      data: result.data,
       message: "全書籍が正常に取得されました",
     };
   } catch (error) {
