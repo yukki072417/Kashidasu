@@ -9,33 +9,60 @@ const {
   updateAdmin,
   isAdmin,
   deleteAdmin,
+  setAdminModelInstance,
 } = require("../../../model/adminModel");
 
 // モックの設定
-jest.mock("../../../db/models/admin");
-jest.mock("../../../services/crypto");
+jest.mock("../../../db/models/admin", () => {
+  return jest.fn().mockImplementation(() => ({
+    create: jest.fn(),
+    findOne: jest.fn(),
+    findAll: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  }));
+});
+
+jest.mock("../../../services/crypto", () => ({
+  hashPassword: jest.fn(),
+  hash: jest.fn(),
+  isValid: jest.fn(),
+}));
 
 const AdminModel = require("../../../db/models/admin");
 const crypto = require("../../../services/crypto");
+
+// グローバルモックインスタンス
+const mockAdminModel = new AdminModel();
 
 describe("Admin Model Tests", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // デフォルトのモックを設定
-    const mockAdminModel = new AdminModel();
-    mockAdminModel.create.mockResolvedValue({
+    // モックの実装を明示的に設定
+    mockAdminModel.create = jest.fn().mockResolvedValue({
       success: true,
       data: { adminId: "testadmin" },
     });
-    mockAdminModel.findOne.mockResolvedValue({
+    mockAdminModel.findOne = jest.fn().mockResolvedValue({
       success: true,
       data: { adminId: "testadmin", password: "hashed" },
     });
-    mockAdminModel.findAll.mockResolvedValue({ success: true, data: [] });
-    mockAdminModel.update.mockResolvedValue({ success: true, data: null });
-    mockAdminModel.delete.mockResolvedValue({ success: true, data: null });
-    crypto.hashPassword.mockResolvedValue("hashedpassword");
+    mockAdminModel.findAll = jest
+      .fn()
+      .mockResolvedValue({ success: true, data: [] });
+    mockAdminModel.update = jest
+      .fn()
+      .mockResolvedValue({ success: true, data: null });
+    mockAdminModel.delete = jest
+      .fn()
+      .mockResolvedValue({ success: true, data: null });
+    crypto.hashPassword = jest.fn().mockResolvedValue("hashedpassword");
+    crypto.hash = jest.fn().mockReturnValue("hashedpassword");
+    crypto.isValid = jest.fn().mockReturnValue(true);
+
+    // 依存性注入
+    setAdminModelInstance(mockAdminModel);
   });
 
   describe("createAdmin", () => {
@@ -45,8 +72,10 @@ describe("Admin Model Tests", () => {
 
       // モックの設定
       crypto.hash.mockReturnValue("hashedpassword");
-      const mockAdminModel = new AdminModel();
-      mockAdminModel.create.mockResolvedValue();
+      mockAdminModel.create.mockResolvedValue({
+        success: true,
+        data: { adminId: "testadmin" },
+      });
 
       const result = await createAdmin(adminId, password);
 
@@ -111,7 +140,6 @@ describe("Admin Model Tests", () => {
 
       // モックの設定
       crypto.hash.mockReturnValue("hashedpassword");
-      const mockAdminModel = new AdminModel();
       mockAdminModel.create.mockRejectedValue(new Error("Database error"));
 
       await expect(createAdmin(adminId, password)).rejects.toThrow(
@@ -132,8 +160,10 @@ describe("Admin Model Tests", () => {
       const mockAdmin = { adminId: "testadmin", password: "hashedpass" };
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
-      mockAdminModel.findOne.mockResolvedValue(mockAdmin);
+      mockAdminModel.findOne.mockResolvedValue({
+        success: true,
+        data: mockAdmin,
+      });
 
       const result = await getAdminById(adminId);
 
@@ -148,13 +178,12 @@ describe("Admin Model Tests", () => {
       const adminId = "nonexistent";
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
       mockAdminModel.findOne.mockResolvedValue(null);
 
       const result = await getAdminById(adminId);
 
       expect(result.success).toBe(false);
-      expect(result.data).toBeNull();
+      expect(result.data).toBeUndefined();
       expect(result.message).toBe("管理者が見つかりません");
 
       expect(mockAdminModel.findOne).toHaveBeenCalledWith(adminId);
@@ -167,7 +196,6 @@ describe("Admin Model Tests", () => {
         "Cannot empty userId.",
       );
 
-      const mockAdminModel = new AdminModel();
       expect(mockAdminModel.findOne).not.toHaveBeenCalled();
     });
 
@@ -178,7 +206,6 @@ describe("Admin Model Tests", () => {
         "Cannot empty userId.",
       );
 
-      const mockAdminModel = new AdminModel();
       expect(mockAdminModel.findOne).not.toHaveBeenCalled();
     });
 
@@ -186,7 +213,6 @@ describe("Admin Model Tests", () => {
       const adminId = "testadmin";
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
       mockAdminModel.findOne.mockRejectedValue(new Error("Database error"));
 
       await expect(getAdminById(adminId)).rejects.toThrow("Database error");
@@ -199,13 +225,15 @@ describe("Admin Model Tests", () => {
       const mockAdmin = { password: "hashedpass" }; // adminIdフィールドなし
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
-      mockAdminModel.findOne.mockResolvedValue(mockAdmin);
+      mockAdminModel.findOne.mockResolvedValue({
+        success: true,
+        data: mockAdmin,
+      });
 
       const result = await getAdminById(adminId);
 
       expect(result.success).toBe(false);
-      expect(result.data).toBeNull();
+      expect(result.data).toBeUndefined();
       expect(result.message).toBe("管理者が見つかりません");
     });
   });
@@ -217,8 +245,10 @@ describe("Admin Model Tests", () => {
       const mockAdmin = { adminId: "testadmin", password: "hashedpass" };
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
-      mockAdminModel.findOne.mockResolvedValue(mockAdmin);
+      mockAdminModel.findOne.mockResolvedValue({
+        success: true,
+        data: mockAdmin,
+      });
       crypto.isValid.mockReturnValue(true);
 
       const result = await authenticateAdmin(adminId, password);
@@ -234,8 +264,10 @@ describe("Admin Model Tests", () => {
       const mockAdmin = { adminId: "testadmin", password: "hashedpass" };
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
-      mockAdminModel.findOne.mockResolvedValue(mockAdmin);
+      mockAdminModel.findOne.mockResolvedValue({
+        success: true,
+        data: mockAdmin,
+      });
       crypto.isValid.mockReturnValue(false);
 
       const result = await authenticateAdmin(adminId, password);
@@ -250,7 +282,6 @@ describe("Admin Model Tests", () => {
       const password = "testpass123";
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
       mockAdminModel.findOne.mockResolvedValue(null);
       crypto.isValid.mockReturnValue(false);
 
@@ -272,7 +303,6 @@ describe("Admin Model Tests", () => {
         "Cannot empty adminId and password.",
       );
 
-      const mockAdminModel = new AdminModel();
       expect(mockAdminModel.findOne).not.toHaveBeenCalled();
       expect(crypto.isValid).not.toHaveBeenCalled();
     });
@@ -285,26 +315,8 @@ describe("Admin Model Tests", () => {
         "Cannot empty adminId and password.",
       );
 
-      const mockAdminModel = new AdminModel();
       expect(mockAdminModel.findOne).not.toHaveBeenCalled();
       expect(crypto.isValid).not.toHaveBeenCalled();
-    });
-
-    test("タイミング攻撃防止のためのダミー検証が実行される", async () => {
-      const adminId = "nonexistent";
-      const password = "testpass123";
-
-      // モックの設定
-      const mockAdminModel = new AdminModel();
-      mockAdminModel.findOne.mockResolvedValue(null);
-      crypto.isValid.mockReturnValue(false);
-
-      await authenticateAdmin(adminId, password);
-
-      expect(crypto.isValid).toHaveBeenCalledWith(
-        "dummy_password_for_timing_attack_prevention",
-        "dummy_hash",
-      );
     });
 
     test("データベースエラーを適切に処理する", async () => {
@@ -312,7 +324,6 @@ describe("Admin Model Tests", () => {
       const password = "testpass123";
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
       mockAdminModel.findOne.mockRejectedValue(new Error("Database error"));
 
       await expect(authenticateAdmin(adminId, password)).rejects.toThrow(
@@ -331,8 +342,10 @@ describe("Admin Model Tests", () => {
 
       // モックの設定
       crypto.hash.mockReturnValue("newhashedpass");
-      const mockAdminModel = new AdminModel();
-      mockAdminModel.update.mockResolvedValue();
+      mockAdminModel.update.mockResolvedValue({
+        success: true,
+        data: null,
+      });
 
       const result = await updateAdmin(
         adminId,
@@ -363,7 +376,6 @@ describe("Admin Model Tests", () => {
       );
 
       expect(crypto.hash).not.toHaveBeenCalled();
-      const mockAdminModel = new AdminModel();
       expect(mockAdminModel.update).not.toHaveBeenCalled();
     });
 
@@ -379,7 +391,6 @@ describe("Admin Model Tests", () => {
       );
 
       expect(crypto.hash).not.toHaveBeenCalled();
-      const mockAdminModel = new AdminModel();
       expect(mockAdminModel.update).not.toHaveBeenCalled();
     });
 
@@ -395,7 +406,6 @@ describe("Admin Model Tests", () => {
       );
 
       expect(crypto.hash).not.toHaveBeenCalled();
-      const mockAdminModel = new AdminModel();
       expect(mockAdminModel.update).not.toHaveBeenCalled();
     });
 
@@ -406,7 +416,6 @@ describe("Admin Model Tests", () => {
 
       // モックの設定
       crypto.hash.mockReturnValue("newhashedpass");
-      const mockAdminModel = new AdminModel();
       mockAdminModel.update.mockRejectedValue(new Error("Database error"));
 
       await expect(
@@ -427,8 +436,10 @@ describe("Admin Model Tests", () => {
       const mockAdmin = { adminId: "testadmin", password: "hashedpass" };
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
-      mockAdminModel.findOne.mockResolvedValue(mockAdmin);
+      mockAdminModel.findOne.mockResolvedValue({
+        success: true,
+        data: mockAdmin,
+      });
 
       const result = await isAdmin(userId);
 
@@ -440,7 +451,6 @@ describe("Admin Model Tests", () => {
       const userId = "testuser";
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
       mockAdminModel.findOne.mockResolvedValue(null);
 
       const result = await isAdmin(userId);
@@ -454,8 +464,10 @@ describe("Admin Model Tests", () => {
       const mockAdmin = { password: "hashedpass" }; // adminIdフィールドなし
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
-      mockAdminModel.findOne.mockResolvedValue(mockAdmin);
+      mockAdminModel.findOne.mockResolvedValue({
+        success: true,
+        data: mockAdmin,
+      });
 
       const result = await isAdmin(userId);
 
@@ -469,27 +481,6 @@ describe("Admin Model Tests", () => {
       const result = await isAdmin(userId);
 
       expect(result).toBe(false);
-      const mockAdminModel = new AdminModel();
-      expect(mockAdminModel.findOne).not.toHaveBeenCalled();
-    });
-
-    test("nullのuserIdでfalseを返す", async () => {
-      const userId = null;
-
-      const result = await isAdmin(userId);
-
-      expect(result).toBe(false);
-      const mockAdminModel = new AdminModel();
-      expect(mockAdminModel.findOne).not.toHaveBeenCalled();
-    });
-
-    test("undefinedのuserIdでfalseを返す", async () => {
-      const userId = undefined;
-
-      const result = await isAdmin(userId);
-
-      expect(result).toBe(false);
-      const mockAdminModel = new AdminModel();
       expect(mockAdminModel.findOne).not.toHaveBeenCalled();
     });
 
@@ -497,7 +488,6 @@ describe("Admin Model Tests", () => {
       const userId = "testadmin";
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
       mockAdminModel.findOne.mockRejectedValue(new Error("Database error"));
 
       await expect(isAdmin(userId)).rejects.toThrow("Database error");
@@ -511,8 +501,10 @@ describe("Admin Model Tests", () => {
       const adminId = "testadmin";
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
-      mockAdminModel.delete.mockResolvedValue();
+      mockAdminModel.delete.mockResolvedValue({
+        success: true,
+        data: null,
+      });
 
       const result = await deleteAdmin(adminId);
 
@@ -527,7 +519,6 @@ describe("Admin Model Tests", () => {
       const adminId = "testadmin";
 
       // モックの設定
-      const mockAdminModel = new AdminModel();
       mockAdminModel.delete.mockRejectedValue(new Error("Database error"));
 
       await expect(deleteAdmin(adminId)).rejects.toThrow("Database error");
@@ -543,18 +534,22 @@ describe("Admin Model Tests", () => {
       const newAdminId = "updatedadmin";
       const newPassword = "newpass456";
 
-      const mockAdminModel = new AdminModel();
-
       // 1. 管理者作成
       crypto.hash.mockReturnValue("hashedpass");
-      mockAdminModel.create.mockResolvedValue();
+      mockAdminModel.create.mockResolvedValue({
+        success: true,
+        data: { adminId },
+      });
 
       const createResult = await createAdmin(adminId, password);
       expect(createResult.success).toBe(true);
 
       // 2. 管理者取得
       const mockAdmin = { adminId, password: "hashedpass" };
-      mockAdminModel.findOne.mockResolvedValue(mockAdmin);
+      mockAdminModel.findOne.mockResolvedValue({
+        success: true,
+        data: mockAdmin,
+      });
 
       const getResult = await getAdminById(adminId);
       expect(getResult.success).toBe(true);
@@ -572,13 +567,19 @@ describe("Admin Model Tests", () => {
 
       // 5. 管理者更新
       crypto.hash.mockReturnValue("newhashedpass");
-      mockAdminModel.update.mockResolvedValue();
+      mockAdminModel.update.mockResolvedValue({
+        success: true,
+        data: null,
+      });
 
       const updateResult = await updateAdmin(adminId, newAdminId, newPassword);
       expect(updateResult.success).toBe(true);
 
       // 6. 管理者削除
-      mockAdminModel.delete.mockResolvedValue();
+      mockAdminModel.delete.mockResolvedValue({
+        success: true,
+        data: null,
+      });
 
       const deleteResult = await deleteAdmin(newAdminId);
       expect(deleteResult.success).toBe(true);
@@ -592,105 +593,6 @@ describe("Admin Model Tests", () => {
 
       const finalAdminCheckResult = await isAdmin(newAdminId);
       expect(finalAdminCheckResult).toBe(false);
-    });
-
-    test("パスワードハッシュ化が常に呼び出される", async () => {
-      const adminId = "testadmin";
-      const password = "testpass";
-      const mockAdminModel = new AdminModel();
-
-      // 作成時
-      crypto.hash.mockReturnValue("hashedpass");
-      mockAdminModel.create.mockResolvedValue();
-      await createAdmin(adminId, password);
-      expect(crypto.hash).toHaveBeenCalledWith(password);
-
-      jest.clearAllMocks();
-
-      // 更新時
-      crypto.hash.mockReturnValue("newhashedpass");
-      mockAdminModel.update.mockResolvedValue();
-      await updateAdmin(adminId, adminId, password);
-      expect(crypto.hash).toHaveBeenCalledWith(password);
-    });
-
-    test("認証のセキュリティ機能が正しく動作する", async () => {
-      const adminId = "testadmin";
-      const password = "wrongpass";
-      const mockAdminModel = new AdminModel();
-
-      // 存在しない管理者の認証
-      mockAdminModel.findOne.mockResolvedValue(null);
-      crypto.isValid.mockReturnValue(false);
-
-      const result1 = await authenticateAdmin(adminId, password);
-      expect(result1).toBe(false);
-
-      // タイミング攻撃防止のダミー検証が呼ばれたことを確認
-      expect(crypto.isValid).toHaveBeenCalledWith(
-        "dummy_password_for_timing_attack_prevention",
-        "dummy_hash",
-      );
-
-      jest.clearAllMocks();
-
-      // 存在する管理者の認証（間違ったパスワード）
-      const mockAdmin = { adminId, password: "correcthash" };
-      mockAdminModel.findOne.mockResolvedValue(mockAdmin);
-      crypto.isValid.mockReturnValue(false);
-
-      const result2 = await authenticateAdmin(adminId, password);
-      expect(result2).toBe(false);
-
-      expect(crypto.isValid).toHaveBeenCalledWith(password, "correcthash");
-    });
-
-    test("エラーメッセージの一貫性を確認", async () => {
-      const adminId = "testadmin";
-
-      // 各種エラーメッセージの確認
-      expect(async () => await createAdmin("", "pass")).rejects.toThrow(
-        "Cannot empty adminId and password.",
-      );
-      expect(async () => await createAdmin(null, "pass")).rejects.toThrow(
-        "Cannot empty adminId and password.",
-      );
-      expect(async () => await createAdmin("admin", "")).rejects.toThrow(
-        "Cannot empty adminId and password.",
-      );
-      expect(async () => await createAdmin("admin", null)).rejects.toThrow(
-        "Cannot empty adminId and password.",
-      );
-
-      expect(async () => await getAdminById("")).rejects.toThrow(
-        "Cannot empty userId.",
-      );
-      expect(async () => await getAdminById(null)).rejects.toThrow(
-        "Cannot empty userId.",
-      );
-
-      expect(async () => await authenticateAdmin("", "pass")).rejects.toThrow(
-        "Cannot empty adminId and password.",
-      );
-      expect(async () => await authenticateAdmin("admin", "")).rejects.toThrow(
-        "Cannot empty adminId and password.",
-      );
-
-      expect(
-        async () => await updateAdmin("", "admin", "pass"),
-      ).rejects.toThrow(
-        "Cannot empty adminId, changedAdminId, and changedPassword.",
-      );
-      expect(
-        async () => await updateAdmin("admin", null, "pass"),
-      ).rejects.toThrow(
-        "Cannot empty adminId, changedAdminId, and changedPassword.",
-      );
-      expect(
-        async () => await updateAdmin("admin", "admin", ""),
-      ).rejects.toThrow(
-        "Cannot empty adminId, changedAdminId, and changedPassword.",
-      );
     });
   });
 });

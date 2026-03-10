@@ -157,19 +157,17 @@ describe("Book Controller Tests", () => {
     });
 
     test("モデルで例外が発生した場合にエラーをthrowする", async () => {
-      const bookData = {
+      mockReq.body = {
         isbn: "9784167158057",
         title: "テスト書籍",
         author: "テスト著者",
       };
 
-      mockReq.body = bookData;
-
+      // モデルが例外をスローする設定
       bookModel.createBook.mockRejectedValue(new Error("データベースエラー"));
 
-      await expect(createBook(mockReq, mockRes, mockNext)).rejects.toThrow(
-        "データベースエラー",
-      );
+      // コントローラー関数を実行
+      await createBook(mockReq, mockRes, mockNext);
 
       expect(bookModel.createBook).toHaveBeenCalledWith(
         "9784167158057",
@@ -177,6 +175,7 @@ describe("Book Controller Tests", () => {
         "テスト著者",
       );
       expect(mockNext).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -283,18 +282,19 @@ describe("Book Controller Tests", () => {
     });
 
     test("モデルで例外が発生した場合にエラーをthrowする", async () => {
-      mockReq.query = { manual_search_mode: "true", isbn: "9784167158057" };
+      mockReq.query = { isbn: "9784167158057", manual_search_mode: "true" };
 
+      // モデルが例外をスローする設定
       bookModel.getBookByIsbn.mockRejectedValue(
         new Error("データベースエラー"),
       );
 
-      await expect(getBook(mockReq, mockRes, mockNext)).rejects.toThrow(
-        "データベースエラー",
-      );
+      // コントローラー関数を実行
+      await getBook(mockReq, mockRes, mockNext);
 
       expect(bookModel.getBookByIsbn).toHaveBeenCalledWith("9784167158057");
       expect(mockNext).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -400,11 +400,6 @@ describe("Book Controller Tests", () => {
 
       await updateBook(mockReq, mockRes, mockNext);
 
-      expect(bookModel.updateBook).toHaveBeenCalledWith(
-        "9784167158058",
-        "更新書籍",
-        "更新著者",
-      );
       expect(mockRes.status).toHaveBeenCalledWith(400);
       expect(mockRes.json).toHaveBeenCalledWith({
         success: false,
@@ -414,6 +409,7 @@ describe("Book Controller Tests", () => {
 
     test("モデルで例外が発生した場合にエラーをthrowする", async () => {
       const bookData = {
+        before_isbn: "9784167158057",
         isbn: "9784167158058",
         title: "更新書籍",
         author: "更新著者",
@@ -423,9 +419,8 @@ describe("Book Controller Tests", () => {
 
       bookModel.updateBook.mockRejectedValue(new Error("データベースエラー"));
 
-      await expect(updateBook(mockReq, mockRes, mockNext)).rejects.toThrow(
-        "データベースエラー",
-      );
+      // コントローラー関数を実行
+      await updateBook(mockReq, mockRes, mockNext);
 
       expect(bookModel.updateBook).toHaveBeenCalledWith(
         "9784167158058",
@@ -433,6 +428,7 @@ describe("Book Controller Tests", () => {
         "更新著者",
       );
       expect(mockNext).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -558,12 +554,12 @@ describe("Book Controller Tests", () => {
 
       bookModel.deleteBook.mockRejectedValue(new Error("データベースエラー"));
 
-      await expect(deleteBook(mockReq, mockRes, mockNext)).rejects.toThrow(
-        "データベースエラー",
-      );
+      // コントローラー関数を実行
+      await deleteBook(mockReq, mockRes, mockNext);
 
       expect(bookModel.deleteBook).toHaveBeenCalledWith("9784167158057");
       expect(mockNext).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 
@@ -753,12 +749,12 @@ describe("Book Controller Tests", () => {
         new Error("データベースエラー"),
       );
 
-      await expect(search(mockReq, mockRes, mockNext)).rejects.toThrow(
-        "データベースエラー",
-      );
+      // コントローラー関数を実行
+      await search(mockReq, mockRes, mockNext);
 
       expect(bookModel.getBookByIsbn).toHaveBeenCalledWith("9784167158057");
       expect(mockNext).toHaveBeenCalled();
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 

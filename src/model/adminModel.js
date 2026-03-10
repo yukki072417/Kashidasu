@@ -5,7 +5,16 @@
 const AdminModel = require("../db/models/admin");
 const crypto = require("../services/crypto");
 
-const adminModel = new AdminModel();
+let adminModelInstance = new AdminModel();
+
+// 依存性注入用の関数
+function setAdminModelInstance(instance) {
+  adminModelInstance = instance;
+}
+
+function getAdminModelInstance() {
+  return adminModelInstance;
+}
 
 /**
  * 新規管理者を作成する関数
@@ -15,13 +24,13 @@ const adminModel = new AdminModel();
  */
 async function createAdmin(adminId, password) {
   try {
-    if (adminId == null || password == null) {
+    if (!adminId || !password) {
       throw new Error("Cannot empty adminId and password.");
     }
 
     const hashedPassword = crypto.hash(password);
 
-    const result = await adminModel.create(adminId, hashedPassword);
+    const result = await adminModelInstance.create(adminId, hashedPassword);
     if (!result.success) {
       return { success: false, message: result.message };
     }
@@ -43,12 +52,12 @@ async function createAdmin(adminId, password) {
  */
 async function getAdminById(adminId) {
   try {
-    if (adminId == null) {
+    if (!adminId) {
       throw new Error("Cannot empty userId.");
     }
 
-    const result = await adminModel.findOne(adminId);
-    if (!result.success) {
+    const result = await adminModelInstance.findOne(adminId);
+    if (!result || !result.success || !result.data || !result.data.adminId) {
       return { success: false, message: "管理者が見つかりません" };
     }
 
@@ -74,8 +83,8 @@ async function authenticateAdmin(adminId, password) {
       throw new Error("Cannot empty adminId and password.");
     }
 
-    const result = await adminModel.findOne(adminId);
-    if (!result.success) {
+    const result = await adminModelInstance.findOne(adminId);
+    if (!result || !result.success) {
       crypto.isValid(
         "dummy_password_for_timing_attack_prevention",
         "dummy_hash",
@@ -98,14 +107,14 @@ async function authenticateAdmin(adminId, password) {
  */
 async function updateAdmin(adminId, changedAdminId, changedPassword) {
   try {
-    if (adminId == null || changedAdminId == null || changedPassword == null) {
+    if (!adminId || !changedAdminId || !changedPassword) {
       throw new Error(
         "Cannot empty adminId, changedAdminId, and changedPassword.",
       );
     }
     const hashedPassword = crypto.hash(changedPassword);
 
-    const result = await adminModel.update(adminId, {
+    const result = await adminModelInstance.update(adminId, {
       adminId: changedAdminId,
       password: hashedPassword,
     });
@@ -134,8 +143,10 @@ async function isAdmin(userId) {
       return false;
     }
 
-    const result = await adminModel.findOne(userId);
-    return result.success && result.data && result.data.adminId ? true : false;
+    const result = await adminModelInstance.findOne(userId);
+    return result && result.success && result.data && result.data.adminId
+      ? true
+      : false;
   } catch (error) {
     throw error;
   }
@@ -148,7 +159,7 @@ async function isAdmin(userId) {
  */
 async function deleteAdmin(adminId) {
   try {
-    const result = await adminModel.delete(adminId);
+    const result = await adminModelInstance.delete(adminId);
     if (!result.success) {
       return { success: false, message: result.message };
     }
@@ -170,4 +181,6 @@ module.exports = {
   updateAdmin,
   deleteAdmin,
   isAdmin,
+  setAdminModelInstance,
+  getAdminModelInstance,
 };

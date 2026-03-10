@@ -31,17 +31,33 @@ case $TEST_TYPE in
     echo -e "${YELLOW}単体テストを実行します...${NC}"
     npm run test:unit
     ;;
+  "model")
+    echo -e "${YELLOW}モデル層テストを実行します...${NC}"
+    npm run test:model
+    ;;
+  "router")
+    echo -e "${YELLOW}ルーター層テストを実行します...${NC}"
+    npm run test:router
+    ;;
   "integration")
     echo -e "${YELLOW}統合テストを実行します...${NC}"
     npm run test:integration
     ;;
-  "performance")
-    echo -e "${YELLOW}パフォーマンステストを実行します...${NC}"
-    npm run test:performance
+  "books")
+    echo -e "${YELLOW}書籍API統合テストを実行します...${NC}"
+    npm run test:books
     ;;
-  "e2e")
-    echo -e "${YELLOW}E2Eテストを実行します...${NC}"
-    npm run test:e2e
+  "admin")
+    echo -e "${YELLOW}管理者API統合テストを実行します...${NC}"
+    npm run test:admin
+    ;;
+  "users")
+    echo -e "${YELLOW}ユーザーAPI統合テストを実行します...${NC}"
+    npm run test:users
+    ;;
+  "cards")
+    echo -e "${YELLOW}カードAPI統合テストを実行します...${NC}"
+    npm run test:cards
     ;;
   "all")
     echo -e "${YELLOW}すべてのテストを実行します...${NC}"
@@ -59,17 +75,26 @@ case $TEST_TYPE in
   *)
     echo -e "${RED}エラー: 無効なテストタイプ '${TEST_TYPE}'${NC}"
     echo -e "${YELLOW}使用可能なテストタイプ:${NC}"
-    echo -e "${YELLOW}  unit        - 単体テスト${NC}"
-    echo -e "${YELLOW}  integration - 統合テスト${NC}"
-    echo -e "${YELLOW}  performance - パフォーマンステスト${NC}"
-    echo -e "${YELLOW}  e2e         - E2Eテスト${NC}"
+    echo -e "${YELLOW}  unit        - 単体テスト全体${NC}"
+    echo -e "${YELLOW}  model       - モデル層テスト${NC}"
+    echo -e "${YELLOW}  router      - ルーター層テスト${NC}"
+    echo -e "${YELLOW}  frontend    - フロントエンドテスト${NC}"
+    echo -e "${YELLOW}  integration - 統合テスト全体${NC}"
+    echo -e "${YELLOW}  books       - 書籍API統合テスト${NC}"
+    echo -e "${YELLOW}  admin       - 管理者API統合テスト${NC}"
+    echo -e "${YELLOW}  users       - ユーザーAPI統合テスト${NC}"
+    echo -e "${YELLOW}  cards       - カードAPI統合テスト${NC}"
     echo -e "${YELLOW}  all         - すべてのテスト${NC}"
     echo -e "${YELLOW}  watch       - ウォッチモード${NC}"
     echo -e "${YELLOW}  coverage    - カバレッジ付きテスト${NC}"
     echo ""
     echo -e "${BLUE}使用例:${NC}"
     echo -e "${YELLOW}  ./run-tests.sh unit${NC}"
+    echo -e "${YELLOW}  ./run-tests.sh model${NC}"
+    echo -e "${YELLOW}  ./run-tests.sh router${NC}"
+    echo -e "${YELLOW}  ./run-tests.sh frontend${NC}"
     echo -e "${YELLOW}  ./run-tests.sh integration${NC}"
+    echo -e "${YELLOW}  ./run-tests.sh books${NC}"
     echo -e "${YELLOW}  ./run-tests.sh all true${NC}"
     exit 1
     ;;

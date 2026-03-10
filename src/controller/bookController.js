@@ -39,7 +39,7 @@ async function createBook(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -101,7 +101,7 @@ async function getBook(req, res, next) {
       });
     }
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -131,7 +131,7 @@ async function getAllBooks(req, res, next) {
       message: "書籍一覧が正常に取得されました",
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -202,7 +202,7 @@ async function getLoanByIsbn(req, res, next) {
       message: "貸出情報が正常に取得されました",
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -274,7 +274,7 @@ async function getAllLoans(req, res, next) {
       message: "貸出一覧が正常に取得されました",
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -306,7 +306,7 @@ async function updateBook(req, res, next) {
       message: result.message,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -354,7 +354,7 @@ async function deleteBook(req, res, next) {
       });
     }
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
@@ -481,7 +481,7 @@ async function search(req, res, next) {
       });
     }
   } catch (error) {
-    throw error;
+    next(error);
   }
 }
 
