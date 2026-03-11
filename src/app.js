@@ -10,6 +10,7 @@ const log4js = require("log4js");
 const fs = require("fs");
 const path = require("path");
 const https = require("https");
+const cors = require("cors");
 
 const app = express();
 
@@ -28,6 +29,20 @@ const PORT = 443; // HTTPSサーバーの標準ポート
 app.use(express.static("./src/public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// CORS設定
+app.use(
+  cors({
+    origin: [
+      "https://localhost:443",
+      "https://127.0.0.1:443",
+      process.env.DOMAIN,
+    ], // 本番環境のドメインを追加
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 app.use(
   session({
