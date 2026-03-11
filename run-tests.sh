@@ -1,5 +1,3 @@
-# テスト実行スクリプト
-
 #!/bin/bash
 
 # 色設定
@@ -78,7 +76,6 @@ case $TEST_TYPE in
     echo -e "${YELLOW}  unit        - 単体テスト全体${NC}"
     echo -e "${YELLOW}  model       - モデル層テスト${NC}"
     echo -e "${YELLOW}  router      - ルーター層テスト${NC}"
-    echo -e "${YELLOW}  frontend    - フロントエンドテスト${NC}"
     echo -e "${YELLOW}  integration - 統合テスト全体${NC}"
     echo -e "${YELLOW}  books       - 書籍API統合テスト${NC}"
     echo -e "${YELLOW}  admin       - 管理者API統合テスト${NC}"
@@ -92,7 +89,6 @@ case $TEST_TYPE in
     echo -e "${YELLOW}  ./run-tests.sh unit${NC}"
     echo -e "${YELLOW}  ./run-tests.sh model${NC}"
     echo -e "${YELLOW}  ./run-tests.sh router${NC}"
-    echo -e "${YELLOW}  ./run-tests.sh frontend${NC}"
     echo -e "${YELLOW}  ./run-tests.sh integration${NC}"
     echo -e "${YELLOW}  ./run-tests.sh books${NC}"
     echo -e "${YELLOW}  ./run-tests.sh all true${NC}"

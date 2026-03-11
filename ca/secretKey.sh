@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # certsディレクトリが存在しない場合は作成
 CERTS_DIR="./certs"

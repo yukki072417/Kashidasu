@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 # スクリプトのあるディレクトリ取得
@@ -46,7 +46,7 @@ generate_certificate() {
     -extensions req_ext
 }
 
-sh "$SCRIPT_DIR/secretKey.sh"
+bash "$SCRIPT_DIR/secretKey.sh"
 
 if [ ! -f "$CERT_DIR/server.crt" ]; then
   generate_certificate "server"

@@ -148,13 +148,13 @@ echo -e "${BLUE}========================================${NC}"
 
 # screenセッションを作成してサーバー起動
 screen -dmS $SCREEN_NAME bash -c "
-    echo -e '${GREEN}========================================${NC}'
-    echo -e '${GREEN}  Kashidasu サーバー起動中...${NC}'
-    echo -e '${GREEN}========================================${NC}'
-    echo -e '${YELLOW}起動コマンド: npm start${NC}'
-    echo -e '${YELLOW}アクセスURL: https://localhost${NC}'
-    echo -e '${YELLOW}終了方法: Ctrl+A, D${NC}'
-    echo -e '${GREEN}========================================${NC}'
+    echo -e '\033[0;32m========================================\033[0m'
+    echo -e '\033[0;32m  Kashidasu サーバー起動中...\033[0m'
+    echo -e '\033[0;32m========================================\033[0m'
+    echo -e '\033[1;33m起動コマンド: npm start\033[0m'
+    echo -e '\033[1;33mアクセスURL: https://localhost\033[0m'
+    echo -e '\033[1;33m終了方法: Ctrl+A, D\033[0m'
+    echo -e '\033[0;32m========================================\033[0m'
     npm start
 "
 
