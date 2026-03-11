@@ -52,7 +52,12 @@ async function initializeDatabase() {
       createFile(repositoryPath, "user.json"),
     ]);
 
-    await createAdmin("0123456789", "password");
+    try {
+      await createAdmin("0123456789", "password");
+    } catch (error) {
+      console.error("Failed to create admin:", error);
+      throw error;
+    }
 
     console.log("Store initializing succeeded");
   }

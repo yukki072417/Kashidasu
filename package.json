@@ -9,10 +9,11 @@
   "scripts": {
     "start": "nodemon src/app.js",
     "test": "jest --detectOpenHandles",
+    "test:backend": "jest src/tests --detectOpenHandles",
     "test:unit": "jest src/tests/unit --detectOpenHandles",
     "test:model": "jest src/tests/unit/model --detectOpenHandles",
     "test:router": "jest src/tests/unit/router --detectOpenHandles",
-    "test:integration": "jest src/tests/integration --detectOpenHandles",
+    "test:integration": "jest --config jest.integration.config.js --detectOpenHandles",
     "test:books": "jest src/tests/integration/books.test.js --detectOpenHandles",
     "test:admin": "jest src/tests/integration/admin.test.js --detectOpenHandles",
     "test:users": "jest src/tests/integration/users.test.js --detectOpenHandles",

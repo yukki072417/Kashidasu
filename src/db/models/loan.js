@@ -34,13 +34,13 @@ class LoanModel {
     dueDate = null,
   ) {
     try {
-      const loans = await readJsonFile(repositoryPath, "loan.json");
+      const loans = await readJsonFile(repositoryPath, "loans.json");
       if (loans.find((loan) => loan.loanId === loanId)) {
         return { success: false, message: "Loan with this ID already exists." };
       }
       const newLoan = { loanId, bookId, userId, loanDate, returnDate, dueDate };
       loans.push(newLoan);
-      await writeJsonFile(repositoryPath, "loan.json", loans);
+      await writeJsonFile(repositoryPath, "loans.json", loans);
       return { success: true, data: newLoan };
     } catch (error) {
       throw error;
@@ -54,7 +54,7 @@ class LoanModel {
    */
   async findOne(loanId) {
     try {
-      const loans = await readJsonFile(repositoryPath, "loan.json");
+      const loans = await readJsonFile(repositoryPath, "loans.json");
       const loan = loans.find((loan) => loan.loanId === loanId);
       if (loan) {
         return { success: true, data: loan };
@@ -72,7 +72,7 @@ class LoanModel {
    */
   async findByBookId(bookId) {
     try {
-      const loans = await readJsonFile(repositoryPath, "loan.json");
+      const loans = await readJsonFile(repositoryPath, "loans.json");
       const bookLoans = loans.filter((loan) => loan.bookId === bookId);
       return { success: true, data: bookLoans };
     } catch (error) {
@@ -87,7 +87,7 @@ class LoanModel {
    */
   async findByUserId(userId) {
     try {
-      const loans = await readJsonFile(repositoryPath, "loan.json");
+      const loans = await readJsonFile(repositoryPath, "loans.json");
       let userLoans;
       if (userId) {
         userLoans = loans.filter((loan) => loan.userId === userId);
@@ -107,7 +107,7 @@ class LoanModel {
    */
   async isBookCurrentlyLoaned(isbn) {
     try {
-      const loans = await readJsonFile(repositoryPath, "loan.json");
+      const loans = await readJsonFile(repositoryPath, "loans.json");
       // 返却日がnull（未返却）のレコードが存在するかチェック
       const activeLoans = loans.filter(
         (loan) => loan.bookId === isbn && !loan.returnDate,
@@ -124,7 +124,7 @@ class LoanModel {
    */
   async findAll() {
     try {
-      const loans = await readJsonFile(repositoryPath, "loan.json");
+      const loans = await readJsonFile(repositoryPath, "loans.json");
       return { success: true, data: loans };
     } catch (error) {
       throw error;
@@ -139,13 +139,13 @@ class LoanModel {
    */
   async update(loanId, newData) {
     try {
-      const loans = await readJsonFile(repositoryPath, "loan.json");
+      const loans = await readJsonFile(repositoryPath, "loans.json");
       const index = loans.findIndex((loan) => loan.loanId === loanId);
       if (index === -1) {
         return { success: false, message: "Loan not found." };
       }
       loans[index] = { ...loans[index], ...newData };
-      await writeJsonFile(repositoryPath, "loan.json", loans);
+      await writeJsonFile(repositoryPath, "loans.json", loans);
       return { success: true, data: loans[index] };
     } catch (error) {
       throw error;

@@ -7,15 +7,29 @@ const LoanModel = require("../db/models/loan");
 const BookModel = require("../db/models/book");
 const { withTransaction } = require("../services/transaction");
 
-const loanModelInstance = new LoanModel();
-const bookModelInstance = new BookModel();
+let loanModelInstance;
+let bookModelInstance;
+
+// モデルインスタンスを初期化する関数
+function initializeModels() {
+  if (!loanModelInstance) {
+    const LoanModel = require("../db/models/loan");
+    loanModelInstance = new LoanModel();
+  }
+  if (!bookModelInstance) {
+    const BookModel = require("../db/models/book");
+    bookModelInstance = new BookModel();
+  }
+}
 
 // DB モデルが実際に読み書きするファイルパスを取得する。
 function getLoanFilePath() {
+  initializeModels();
   return path.join(loanModelInstance.dataDir, "loans.json");
 }
 
 function getBookFilePath() {
+  initializeModels();
   return path.join(bookModelInstance.dataDir, "books.json");
 }
 
@@ -171,6 +185,8 @@ async function returnBook(isbn, userId, returnDate) {
  * @returns {Promise<object>} - 作成結果
  */
 async function createLoan(isbn, userId, loanDate, returnDate = null) {
+  initializeModels();
+
   try {
     const loanId = Date.now().toString();
     const bookResult = await bookModelInstance.findOne(isbn);
@@ -207,17 +223,14 @@ async function createLoan(isbn, userId, loanDate, returnDate = null) {
  * @returns {Promise<object>} - 更新結果
  */
 async function updateLoan(loanId, updateData) {
+  initializeModels();
+
   try {
     const result = await loanModelInstance.update(loanId, updateData);
     if (!result.success) {
       return { success: false, message: result.message };
     }
-
-    return {
-      success: true,
-      data: null,
-      message: "ローンが正常に更新されました",
-    };
+    return { success: true, message: "貸出レコードが正常に更新されました" };
   } catch (error) {
     throw error;
   }
@@ -234,7 +247,7 @@ async function getUserLoans(userId = null) {
     if (userId) {
       loansResult = await loanModelInstance.findByUserId(userId);
     } else {
-      loansResult = await loanModelInstance.findByUserId();
+      loansResult = await loanModelInstance.findAll();
     }
 
     if (!loansResult.success) {
