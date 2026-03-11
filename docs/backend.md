@@ -406,7 +406,7 @@ src/
 ### 4.1 必要な環境変数
 
 ```bash
-BOOKS_API_KEY=your_api_key_here
+BOOKS_API_KEY="<Google Books APIキー(任意)>"
 PORT=443
 ```
 
@@ -414,12 +414,15 @@ PORT=443
 
 ```json
 {
-  "dependencies": {
-    "express": "^4.18.0",
-    "ejs": "^3.1.0",
-    "bcrypt": "^5.1.0",
-    "express-session": "^1.17.0"
-  }
+  "@pdf-lib/fontkit": "^1.1.1",
+  "bcrypt": "^6.0.0",
+  "bwip-js": "^4.7.0",
+  "dotenv": "^16.4.7",
+  "ejs": "^3.1.10",
+  "express": "^4.21.1",
+  "express-session": "^1.18.0",
+  "log4js": "^6.9.1",
+  "pdf-lib": "^1.17.1"
 }
 ```
 
@@ -432,15 +435,11 @@ npm start
 
 サーバーはHTTPSでポート443で起動します。
 
-- 貸出貸出機能は実装貸出貸出機能は実装済み（ReadCode.js経由でバーコード読み取り対応）
-- 検索機能は実装済み
-- ページング機能は簡易実装
-
 ### 3.6 貸出・返却機能詳細
 
 #### 3.6.1 バーコードリーダー対応
 
-- **フロントエンド**: ReadCode.js + Quagga.jsを使用
+- **フロントエンド**: Quagga.jsを使用
 - **ユーザー認証**: 10桁のユーザーバーコードを読み取り
 - **書籍認証**: 13桁のISBNバーコードを読み取り
 - **手入力対応**: キーボードからの直接入力も可能
