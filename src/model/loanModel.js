@@ -10,7 +10,9 @@ const { withTransaction } = require("../services/transaction");
 let loanModelInstance;
 let bookModelInstance;
 
-// モデルインスタンスを初期化する関数
+/**
+ * モデルインスタンスを初期化する関数7
+ */
 function initializeModels() {
   if (!loanModelInstance) {
     const LoanModel = require("../db/models/loan");
@@ -22,12 +24,17 @@ function initializeModels() {
   }
 }
 
-// DB モデルが実際に読み書きするファイルパスを取得する。
+/**
+ * DB モデルが実際に読み書きするファイルパスを取得する。
+ */
 function getLoanFilePath() {
   initializeModels();
   return path.join(loanModelInstance.dataDir, "loans.json");
 }
 
+/**
+ * モデルが実際に読み書きするファイルパスを取得する。
+ */
 function getBookFilePath() {
   initializeModels();
   return path.join(bookModelInstance.dataDir, "books.json");
@@ -242,6 +249,8 @@ async function updateLoan(loanId, updateData) {
  * @returns {Promise<object>} - ローンデータ
  */
 async function getUserLoans(userId = null) {
+  initializeModels();
+
   try {
     let loansResult;
     if (userId) {
