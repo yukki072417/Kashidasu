@@ -102,12 +102,7 @@ function initializeQuagga(readerType) {
 
       // ステータスを更新
       if (!isUserBarcodeRead) {
-        updateStatus(
-          "準備完了",
-          "ユーザーカードをスキャンしてください",
-          0,
-          "active",
-        );
+        updateStatus("準備完了", "学籍番号を入力してください", 0, "active");
       } else {
         updateStatus(
           "ユーザー認証済み",
@@ -331,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const modeText = currentMode === "lend" ? "貸出" : "返却";
         updateStatus(
           "準備完了",
-          `${modeText}モード - ユーザーカードをスキャンしてください`,
+          `${modeText}モード - 学籍番号を入力してください`,
           0,
           "active",
         );
