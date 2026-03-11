@@ -84,7 +84,7 @@ async function apiAuth(req, res, next) {
  * @param {object} res - レスポンスオブジェクト
  */
 function renderMainPage(req, res) {
-  res.render("main", { adminId: req.session.admin }); // main.ejs に adminId を渡す
+  res.render("Main", { adminId: req.session.admin }); // main.ejs に adminId を渡す
 }
 
 /**
