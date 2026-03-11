@@ -4,6 +4,7 @@
 
 const request = require("supertest");
 const app = require("./testApp");
+const { setupTestDatabase } = require("./setup");
 
 describe("Users API Integration Tests", () => {
   let testUserId = "testuser123";
@@ -13,6 +14,11 @@ describe("Users API Integration Tests", () => {
     user_name: "テストユーザー",
   };
 
+  // 統合テスト開始前にデータベースをセットアップ
+  beforeAll(async () => {
+    await setupTestDatabase();
+  });
+
   describe("POST /api/users", () => {
     test("認証済み管理者で新規ユーザーを作成できる", async () => {
       // 管理者ログイン
@@ -21,7 +27,7 @@ describe("Users API Integration Tests", () => {
         admin_password: "password123",
       });
 
-      const sessionCookie = loginResponse.headers["set-cookie"];
+      const sessionCookie = loginResponse.headers["set-cookie"][0];
 
       // 新規ユーザー作成
       const response = await request(app)
@@ -32,6 +38,15 @@ describe("Users API Integration Tests", () => {
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe("ユーザーが正常に作成されました");
+
+      // 作成したユーザーが存在することを確認
+      const getResponse = await request(app)
+        .get(`/api/users/${testUserId}`)
+        .set("Cookie", sessionCookie);
+
+      expect(getResponse.status).toBe(200);
+      expect(getResponse.body.success).toBe(true);
+      expect(getResponse.body.data.userId).toBe(testUserId);
     });
 
     test("認証なしではユーザーを作成できない", async () => {
@@ -69,11 +84,11 @@ describe("Users API Integration Tests", () => {
         admin_password: "password123",
       });
 
-      const sessionCookie = loginResponse.headers["set-cookie"];
+      const sessionCookie = loginResponse.headers["set-cookie"][0];
 
       // ユーザー情報取得
       const response = await request(app)
-        .get(`/api/users/one?user_id=${testUserId}`)
+        .get(`/api/users/${testUserId}`)
         .set("Cookie", sessionCookie);
 
       expect(response.status).toBe(200);
@@ -89,11 +104,11 @@ describe("Users API Integration Tests", () => {
         admin_password: "password123",
       });
 
-      const sessionCookie = loginResponse.headers["set-cookie"];
+      const sessionCookie = loginResponse.headers["set-cookie"][0];
 
       // 存在しないユーザーを取得
       const response = await request(app)
-        .get("/api/users/one?user_id=NONEXISTENT")
+        .get("/api/users/nonexistent")
         .set("Cookie", sessionCookie);
 
       expect(response.status).toBe(404);
@@ -109,16 +124,15 @@ describe("Users API Integration Tests", () => {
         admin_password: "password123",
       });
 
-      const sessionCookie = loginResponse.headers["set-cookie"];
+      const sessionCookie = loginResponse.headers["set-cookie"][0];
 
       const updatedData = {
-        user_id: testUserId,
-        user_name: "更新されたユーザー",
+        user_name: "更新テストユーザー",
       };
 
       // ユーザー情報更新
       const response = await request(app)
-        .put("/api/users")
+        .put(`/api/users/${testUserId}`)
         .set("Cookie", sessionCookie)
         .send(updatedData);
 
@@ -128,7 +142,7 @@ describe("Users API Integration Tests", () => {
 
       // 更新確認
       const getResponse = await request(app)
-        .get(`/api/users/one?user_id=${testUserId}`)
+        .get(`/api/users/${testUserId}`)
         .set("Cookie", sessionCookie);
 
       expect(getResponse.body.data.userName).toBe(updatedData.user_name);
@@ -143,11 +157,11 @@ describe("Users API Integration Tests", () => {
         admin_password: "password123",
       });
 
-      const sessionCookie = loginResponse.headers["set-cookie"];
+      const sessionCookie = loginResponse.headers["set-cookie"][0];
 
       // ユーザー削除
       const response = await request(app)
-        .delete(`/api/users?user_id=${testUserId}`)
+        .delete(`/api/users/${testUserId}`)
         .set("Cookie", sessionCookie);
 
       expect(response.status).toBe(200);
@@ -156,7 +170,7 @@ describe("Users API Integration Tests", () => {
 
       // 削除確認
       const getResponse = await request(app)
-        .get(`/api/users/one?user_id=${testUserId}`)
+        .get(`/api/users/${testUserId}`)
         .set("Cookie", sessionCookie);
 
       expect(getResponse.status).toBe(404);

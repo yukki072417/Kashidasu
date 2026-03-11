@@ -1,22 +1,10 @@
 module.exports = {
   testEnvironment: "node",
-  collectCoverage: true,
-  coverageDirectory: "coverage",
-  coverageReporters: ["text", "lcov", "html"],
-  collectCoverageFrom: [
-    "src/**/*.js", 
-    "!src/app.js", 
-    "!**/node_modules/**",
-    "!src/public/**/*.js"
-  ],
-  testMatch: ["**/tests/integration/**/*.test.js"],
-  testPathIgnorePatterns: [
-    "src/public", 
-    "public", 
-    "node_modules"
-  ],
-  setupFilesAfterEnv: ["<rootDir>/src/tests/integration/globalSetup.js"],
+  collectCoverage: false,
   verbose: true,
+  testMatch: ["**/tests/integration/**/*.test.js"],
+  testPathIgnorePatterns: ["src/public", "public", "node_modules"],
+  setupFilesAfterEnv: ["<rootDir>/src/tests/integration/globalSetup.js"],
   detectOpenHandles: true,
   forceExit: true,
   moduleNameMapper: {
