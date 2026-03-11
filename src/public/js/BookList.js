@@ -33,7 +33,7 @@ async function LoadBooks(pageNum) {
   try {
     // 書籍情報を取得
     const booksResponse = await fetch(
-      `https://localhost:443/api/book/all?page=${pageNum}&limit=30`,
+      `/api/book/all?page=${pageNum}&limit=30`,
       {
         method: "GET",
         headers: {
@@ -51,15 +51,12 @@ async function LoadBooks(pageNum) {
         const books = booksData.data.slice(1);
 
         // 貸出情報を取得
-        const loansResponse = await fetch(
-          `https://localhost:443/api/book/loan/all`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
+        const loansResponse = await fetch(`/api/book/loan/all`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+        });
 
         let loans = [];
         if (loansResponse.ok) {
