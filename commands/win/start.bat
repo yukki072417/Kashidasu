@@ -88,6 +88,12 @@ if not exist "%ENV_FILE%" (
     echo ✓ .env は既に存在します
 )
 
+if /i "%KASHIDASU_BOOTSTRAP_ONLY%"=="1" (
+    echo ✓ 初回起動用の初期化が完了しました
+    endlocal
+    exit /b 0
+)
+
 echo [%ROOT_DIR%]
 echo [5/5] サーバーを起動します...
 cd /d "%ROOT_DIR%"
