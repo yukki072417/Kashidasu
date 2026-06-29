@@ -39,3 +39,4 @@ echo === Creating server certificate ===
 
 echo 完了: %CERT_DIR%
 endlocal
+exit /b 0

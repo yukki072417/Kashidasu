@@ -66,6 +66,11 @@ else
     echo -e "${GREEN}✓ .env は既に存在します${NC}"
 fi
 
+if [ "${KASHIDASU_BOOTSTRAP_ONLY:-0}" = "1" ]; then
+    echo -e "${GREEN}✓ 初回起動用の初期化が完了しました${NC}"
+    exit 0
+fi
+
 echo -e "${YELLOW}[5/5] サーバーを起動します...${NC}"
 echo -e "${GREEN}✓ 現在のターミナルで npm start を実行します${NC}"
 echo -e "${BLUE}========================================${NC}"

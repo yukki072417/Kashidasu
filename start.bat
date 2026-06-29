@@ -5,8 +5,8 @@ setlocal ENABLEDELAYEDEXPANSION
 REM この .bat が置かれているディレクトリ
 set SCRIPT_DIR=%~dp0
 
-REM 2階層上に移動し、絶対パスに正規化
-for /f "delims=" %%a in ("%SCRIPT_DIR%..\..") do set ROOT_DIR=%%~fa
+REM スクリプトのあるディレクトリをルートとして正規化
+for /f "delims=" %%a in ("%SCRIPT_DIR%.") do set ROOT_DIR=%%~fa
 
 set CERT_DIR=%ROOT_DIR%\certs
 set CA_INIT=%ROOT_DIR%\ca\init.bat
@@ -86,6 +86,12 @@ if not exist "%ENV_FILE%" (
     echo ✓ .env を作成しました
 ) else (
     echo ✓ .env は既に存在します
+)
+
+if /i "%KASHIDASU_BOOTSTRAP_ONLY%"=="1" (
+    echo ✓ 初回起動用の初期化が完了しました
+    endlocal
+    exit /b 0
 )
 
 echo [%ROOT_DIR%]

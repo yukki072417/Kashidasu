@@ -59,7 +59,7 @@ async function initializeDatabase() {
       throw error;
     }
 
-    console.log("Store initializing succeeded");
+    console.log("正常にストアが初期化されました");
   }
 }
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Bookモデルの単体テスト
  */
 
@@ -12,12 +12,12 @@ const {
   deleteAllBooks,
   getAllBooks,
   setBookModelInstance,
-} = require("../../../model/bookModel");
+} = require("@/model/bookModel");
 
 // モックの設定
-jest.mock("../../../db/models/book");
+jest.mock("@/db/models/book");
 
-const BookModel = require("../../../db/models/book");
+const BookModel = require("@/db/models/book");
 const mockBookModel = new BookModel();
 
 describe("Book Model Tests", () => {

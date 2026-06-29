@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 書籍ルーターの単体テスト
  */
 
@@ -6,12 +6,12 @@ const request = require("supertest");
 const express = require("express");
 
 // モックの設定
-jest.mock("../../../controller/bookController");
-jest.mock("../../../services/auth");
+jest.mock("@/controller/bookController");
+jest.mock("@/services/auth");
 
-const bookController = require("../../../controller/bookController");
-const { apiAuth } = require("../../../services/auth");
-const bookRoutes = require("../../../router/bookRoutes");
+const bookController = require("@/controller/bookController");
+const { apiAuth } = require("@/services/auth");
+const bookRoutes = require("@/router/bookRoutes");
 
 describe("Book Routes Tests", () => {
   let app;

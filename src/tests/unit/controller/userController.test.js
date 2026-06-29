@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Userコントローラーの単体テスト
  */
 
@@ -7,12 +7,12 @@ const {
   getUser,
   updateUser,
   deleteUser,
-} = require("../../../controller/userController");
+} = require("@/controller/userController");
 
 // モックの設定
-jest.mock("../../../model/userModel");
+jest.mock("@/model/userModel");
 
-const userModel = require("../../../model/userModel");
+const userModel = require("@/model/userModel");
 
 describe("User Controller Tests", () => {
   let mockReq, mockRes, mockNext;
