@@ -4,6 +4,7 @@ certs
 repository
 .DS_Store
 .srl
+__node_builtins__
 
 # Logs
 logs
