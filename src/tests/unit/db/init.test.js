@@ -12,7 +12,7 @@ jest.mock("@/model/adminModel");
 const { createAdmin } = require("@/model/adminModel");
 
 describe("Database Init Tests", () => {
-  const actualRepositoryPath = path.join(__dirname, "@/../repository");
+  const actualRepositoryPath = path.join(__dirname, "../../../../repository");
 
   beforeEach(async () => {
     // 実際のリポジトリをクリーンアップ

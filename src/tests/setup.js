@@ -13,20 +13,6 @@ process.env.REPOSITORY_PATH = path.join(SRC, "test-db");
 // グローバルテストタイムアウトの設定
 jest.setTimeout(10000);
 
-// 統合テストの場合のみデータベースセットアップを実行
-const isIntegrationTest =
-  process.env.JEST_WORKER_ID !== undefined ||
-  process.env.npm_config_script === "test:integration" ||
-  process.env.npm_lifecycle_event === "test:integration";
-
-if (isIntegrationTest) {
-  const { setupTestDatabase } = require("@tests/integration/setup");
-
-  // 統合テスト開始前にデータベースをセットアップ
-  beforeAll(async () => {
-    await setupTestDatabase();
-  });
-}
 
 // テスト用ディレクトリのクリーンアップ関数
 function cleanupTestDirectories() {
