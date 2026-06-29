@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Userモデルの単体テスト
  */
 
@@ -9,10 +9,10 @@ const {
   updateUser,
   deleteUser,
   setUserModelInstance,
-} = require("../../../model/userModel");
+} = require("@/model/userModel");
 
 // モックの設定
-jest.mock("../../../db/models/user", () => {
+jest.mock("@/db/models/user", () => {
   return jest.fn().mockImplementation(() => ({
     create: jest.fn(),
     findOne: jest.fn(),
@@ -22,12 +22,12 @@ jest.mock("../../../db/models/user", () => {
   }));
 });
 
-jest.mock("../../../services/crypto", () => ({
+jest.mock("@/services/crypto", () => ({
   hash: jest.fn(),
 }));
 
-const UserModel = require("../../../db/models/user");
-const crypto = require("../../../services/crypto");
+const UserModel = require("@/db/models/user");
+const crypto = require("@/services/crypto");
 
 // グローバルモックインスタンス
 const mockUserModel = new UserModel();

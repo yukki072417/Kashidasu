@@ -1,9 +1,9 @@
-/**
+﻿/**
  * 統合テスト用セットアップ
  */
 
-const initDb = require("../../db/init");
-const adminModel = require("../../model/adminModel");
+const initDb = require("@/db/init");
+const adminModel = require("@/model/adminModel");
 
 // テスト用データベースの初期化
 async function setupTestDatabase() {

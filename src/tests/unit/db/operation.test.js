@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Database Operation モジュールの単体テスト
  */
 
@@ -6,7 +6,7 @@ const {
   readJsonFile,
   writeJsonFile,
   resolveFilePath,
-} = require("../../../db/operation");
+} = require("@/db/operation");
 const fs = require("fs").promises;
 const fsSync = require("fs");
 const path = require("path");

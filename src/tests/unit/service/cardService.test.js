@@ -1,8 +1,8 @@
-/**
+﻿/**
  * Cardサービスの単体テスト
  */
 
-const CardModel = require("../../../services/cardService");
+const CardModel = require("@/services/cardService");
 const fs = require("fs");
 const path = require("path");
 
@@ -72,7 +72,7 @@ describe("Card Service Tests", () => {
 
     test("出力ディレクトリパスが正しく設定される", () => {
       const service = new CardModel();
-      const expectedPath = path.join(__dirname, "../../../public/pdf");
+      const expectedPath = path.join(__dirname, "@/public/pdf");
 
       expect(service.outputDir).toBe(expectedPath);
       expect(path.isAbsolute(service.outputDir)).toBe(true); // 絶対パスであること

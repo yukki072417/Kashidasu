@@ -1,16 +1,16 @@
-/**
+﻿/**
  * Cardコントローラーの単体テスト
  */
 
 // モックの設定
-jest.mock("../../../services/cardService");
+jest.mock("@/services/cardService");
 
-const CardModel = require("../../../services/cardService");
+const CardModel = require("@/services/cardService");
 const {
   generateCard,
   getCardStatus,
   setCardModelInstance,
-} = require("../../../controller/cardController");
+} = require("@/controller/cardController");
 
 const mockCardModel = new CardModel();
 

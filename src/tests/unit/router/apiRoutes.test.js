@@ -1,4 +1,4 @@
-/**
+﻿/**
  * APIルーターの単体テスト
  */
 
@@ -6,12 +6,12 @@ const request = require("supertest");
 const express = require("express");
 
 // モックの設定
-jest.mock("../../../controller/cardController");
-jest.mock("../../../services/auth");
+jest.mock("@/controller/cardController");
+jest.mock("@/services/auth");
 
-const cardController = require("../../../controller/cardController");
-const { apiAuth } = require("../../../services/auth");
-const apiRoutes = require("../../../router/apiRoutes");
+const cardController = require("@/controller/cardController");
+const { apiAuth } = require("@/services/auth");
+const apiRoutes = require("@/router/apiRoutes");
 
 describe("API Routes Tests", () => {
   let app;

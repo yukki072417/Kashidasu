@@ -17,6 +17,9 @@ module.exports = {
   forceExit: true,
   moduleNameMapper: {
     "^jquery$": "jquery/dist/jquery.js",
+    "^@/(.*)$": "<rootDir>/src/$1",
+    "^@tests/(.*)$": "<rootDir>/src/tests/$1",
+    "^@root/(.*)$": "<rootDir>/$1",
   },
   transformIgnorePatterns: [
     "node_modules/(?!(jsdom|@exodus/bytes|@asamuzakjp|cssstyle|whatwg-encoding|whatwg-url|csscalc|csscolor|nwsapi|parse5|sax|symbol-tree|whatwg-mimetype|domexception|webidl-conversions|css-tree|mdn-data)/)",

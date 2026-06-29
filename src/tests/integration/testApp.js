@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 統合テスト用Expressアプリケーション
  */
 
@@ -8,13 +8,13 @@ const path = require("path");
 const fs = require("fs");
 
 // データベース初期化
-const initDb = require("../../db/init");
+const initDb = require("@/db/init");
 
 // ルーターインポート
-const adminRoutes = require("../../router/adminRoutes");
-const apiRoutes = require("../../router/apiRoutes");
-const bookRoutes = require("../../router/bookRoutes");
-const userRoutes = require("../../router/userRoutes");
+const adminRoutes = require("@/router/adminRoutes");
+const apiRoutes = require("@/router/apiRoutes");
+const bookRoutes = require("@/router/bookRoutes");
+const userRoutes = require("@/router/userRoutes");
 
 const app = express();
 

@@ -1,18 +1,18 @@
-/**
+﻿/**
  * Database Init モジュールの単体テスト
  */
 
-const { initDb } = require("../../../db/init");
+const { initDb } = require("@/db/init");
 const fs = require("fs").promises;
 const fsSync = require("fs");
 const path = require("path");
 
 // createAdminをモック
-jest.mock("../../../model/adminModel");
-const { createAdmin } = require("../../../model/adminModel");
+jest.mock("@/model/adminModel");
+const { createAdmin } = require("@/model/adminModel");
 
 describe("Database Init Tests", () => {
-  const actualRepositoryPath = path.join(__dirname, "../../../../repository");
+  const actualRepositoryPath = path.join(__dirname, "@/../repository");
 
   beforeEach(async () => {
     // 実際のリポジトリをクリーンアップ

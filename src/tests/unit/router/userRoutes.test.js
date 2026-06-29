@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ユーザールーターの単体テスト
  */
 
@@ -6,12 +6,12 @@ const request = require("supertest");
 const express = require("express");
 
 // モックの設定
-jest.mock("../../../controller/userController");
-jest.mock("../../../services/auth");
+jest.mock("@/controller/userController");
+jest.mock("@/services/auth");
 
-const userController = require("../../../controller/userController");
-const { apiAuth } = require("../../../services/auth");
-const userRoutes = require("../../../router/userRoutes");
+const userController = require("@/controller/userController");
+const { apiAuth } = require("@/services/auth");
+const userRoutes = require("@/router/userRoutes");
 
 describe("User Routes Tests", () => {
   let app;

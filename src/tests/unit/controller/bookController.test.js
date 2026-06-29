@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Bookコントローラーの単体テスト
  */
 
@@ -13,14 +13,14 @@ const {
   returnBook,
   getLoanByIsbn,
   getAllLoans,
-} = require("../../../controller/bookController");
+} = require("@/controller/bookController");
 
 // モックの設定
-jest.mock("../../../model/bookModel");
-jest.mock("../../../model/loanModel");
+jest.mock("@/model/bookModel");
+jest.mock("@/model/loanModel");
 
-const bookModel = require("../../../model/bookModel");
-const loanModel = require("../../../model/loanModel");
+const bookModel = require("@/model/bookModel");
+const loanModel = require("@/model/loanModel");
 
 describe("Book Controller Tests", () => {
   let mockReq, mockRes, mockNext;

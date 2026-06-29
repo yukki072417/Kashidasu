@@ -1,4 +1,4 @@
-/**
+﻿/**
  * 管理者ルーターの単体テスト
  */
 
@@ -6,12 +6,12 @@ const request = require("supertest");
 const express = require("express");
 
 // モックの設定
-jest.mock("../../../controller/adminController");
-jest.mock("../../../services/auth");
+jest.mock("@/controller/adminController");
+jest.mock("@/services/auth");
 
-const adminController = require("../../../controller/adminController");
-const { apiAuth, login, logout } = require("../../../services/auth");
-const adminRoutes = require("../../../router/adminRoutes");
+const adminController = require("@/controller/adminController");
+const { apiAuth, login, logout } = require("@/services/auth");
+const adminRoutes = require("@/router/adminRoutes");
 
 describe("Admin Routes Tests", () => {
   let app;

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Adminコントローラーの単体テスト
  */
 
@@ -7,12 +7,12 @@ const {
   getAdmin,
   updateAdmin,
   deleteAdmin,
-} = require("../../../controller/adminController");
+} = require("@/controller/adminController");
 
 // モックの設定
-jest.mock("../../../model/adminModel");
+jest.mock("@/model/adminModel");
 
-const adminModel = require("../../../model/adminModel");
+const adminModel = require("@/model/adminModel");
 
 describe("Admin Controller Tests", () => {
   let mockReq, mockRes, mockNext;

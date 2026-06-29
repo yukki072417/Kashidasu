@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Adminモデルの単体テスト
  */
 
@@ -10,10 +10,10 @@ const {
   isAdmin,
   deleteAdmin,
   setAdminModelInstance,
-} = require("../../../model/adminModel");
+} = require("@/model/adminModel");
 
 // モックの設定
-jest.mock("../../../db/models/admin", () => {
+jest.mock("@/db/models/admin", () => {
   return jest.fn().mockImplementation(() => ({
     create: jest.fn(),
     findOne: jest.fn(),
@@ -23,14 +23,14 @@ jest.mock("../../../db/models/admin", () => {
   }));
 });
 
-jest.mock("../../../services/crypto", () => ({
+jest.mock("@/services/crypto", () => ({
   hashPassword: jest.fn(),
   hash: jest.fn(),
   isValid: jest.fn(),
 }));
 
-const AdminModel = require("../../../db/models/admin");
-const crypto = require("../../../services/crypto");
+const AdminModel = require("@/db/models/admin");
+const crypto = require("@/services/crypto");
 
 // グローバルモックインスタンス
 const mockAdminModel = new AdminModel();

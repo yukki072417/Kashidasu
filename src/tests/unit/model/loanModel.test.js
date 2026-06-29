@@ -1,9 +1,9 @@
-/**
+﻿/**
  * Loanモデルの単体テスト
  */
 
-jest.mock("../../../model/loanModel", () => {
-  const originalModule = jest.requireActual("../../../model/loanModel");
+jest.mock("@/model/loanModel", () => {
+  const originalModule = jest.requireActual("@/model/loanModel");
   return {
     ...originalModule,
     createLoan: jest.fn(),
@@ -14,10 +14,10 @@ jest.mock("../../../model/loanModel", () => {
   };
 });
 
-jest.mock("../../../services/transaction");
-jest.mock("../../../model/adminModel");
+jest.mock("@/services/transaction");
+jest.mock("@/model/adminModel");
 
-jest.mock("../../../db/models/loan", () => {
+jest.mock("@/db/models/loan", () => {
   return jest.fn().mockImplementation(() => ({
     dataDir: "./test-data",
     create: jest.fn(),
@@ -30,7 +30,7 @@ jest.mock("../../../db/models/loan", () => {
   }));
 });
 
-jest.mock("../../../db/models/book", () => {
+jest.mock("@/db/models/book", () => {
   return jest.fn().mockImplementation(() => ({
     dataDir: "./test-data",
     findOne: jest.fn(),
@@ -46,13 +46,13 @@ const {
   returnBook,
   updateLoan,
   getUserLoans,
-} = require("../../../model/loanModel");
+} = require("@/model/loanModel");
 
-const { withTransaction } = require("../../../services/transaction");
-const { isAdmin } = require("../../../model/adminModel");
+const { withTransaction } = require("@/services/transaction");
+const { isAdmin } = require("@/model/adminModel");
 
-const LoanModel = require("../../../db/models/loan");
-const BookModel = require("../../../db/models/book");
+const LoanModel = require("@/db/models/loan");
+const BookModel = require("@/db/models/book");
 
 const mockLoanModel = new LoanModel();
 const mockBookModel = new BookModel();

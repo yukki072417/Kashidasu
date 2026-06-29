@@ -3,9 +3,12 @@
 const fs = require("fs");
 const path = require("path");
 
+const ROOT = path.resolve(__dirname, "../..");
+const SRC = path.resolve(__dirname, "..");
+
 // テスト用の環境変数設定
 process.env.NODE_ENV = "test";
-process.env.REPOSITORY_PATH = "./src/test-db";
+process.env.REPOSITORY_PATH = path.join(SRC, "test-db");
 
 // グローバルテストタイムアウトの設定
 jest.setTimeout(10000);
@@ -17,7 +20,7 @@ const isIntegrationTest =
   process.env.npm_lifecycle_event === "test:integration";
 
 if (isIntegrationTest) {
-  const { setupTestDatabase } = require("./integration/setup");
+  const { setupTestDatabase } = require("@tests/integration/setup");
 
   // 統合テスト開始前にデータベースをセットアップ
   beforeAll(async () => {
@@ -28,10 +31,10 @@ if (isIntegrationTest) {
 // テスト用ディレクトリのクリーンアップ関数
 function cleanupTestDirectories() {
   const testDirs = [
-    "./src/test-pdf",
-    "./src/test-db",
-    "./test-results",
-    "./coverage",
+    path.join(SRC, "test-pdf"),
+    path.join(SRC, "test-db"),
+    path.join(ROOT, "test-results"),
+    path.join(ROOT, "coverage"),
   ];
 
   testDirs.forEach((dir) => {
@@ -92,7 +95,11 @@ beforeAll(() => {
   cleanupTestDirectories();
 
   // テスト用ディレクトリを作成
-  const testDirs = ["./src/test-db", "./src/test-pdf", "./test-results"];
+  const testDirs = [
+    path.join(SRC, "test-db"),
+    path.join(SRC, "test-pdf"),
+    path.join(ROOT, "test-results"),
+  ];
   testDirs.forEach((dir) => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
