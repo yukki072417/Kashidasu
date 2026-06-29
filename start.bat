@@ -5,8 +5,8 @@ setlocal ENABLEDELAYEDEXPANSION
 REM この .bat が置かれているディレクトリ
 set SCRIPT_DIR=%~dp0
 
-REM 2階層上に移動し、絶対パスに正規化
-for /f "delims=" %%a in ("%SCRIPT_DIR%..\..") do set ROOT_DIR=%%~fa
+REM スクリプトのあるディレクトリをルートとして正規化
+for /f "delims=" %%a in ("%SCRIPT_DIR%.") do set ROOT_DIR=%%~fa
 
 set CERT_DIR=%ROOT_DIR%\certs
 set CA_INIT=%ROOT_DIR%\ca\init.bat
