@@ -29,7 +29,7 @@ function initializeModels() {
  */
 function getLoanFilePath() {
   initializeModels();
-  return path.join(loanModelInstance.dataDir, "loans.json");
+  return path.join(loanModelInstance.dataDir, "loan.json");
 }
 
 /**
